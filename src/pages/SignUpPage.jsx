@@ -24,16 +24,15 @@ const SignUpPage = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp!");
+      console.log("Mật khẩu xác nhận không khớp!");
       return;
     }
-
     try {
       await registerUser({ email, password });
-      alert("Đăng ký thành công!");
+      console.log("Đăng ký thành công!");
       navigate("/sign-in");
     } catch (error) {
-      alert("Đăng ký thất bại!");
+      console.log("Đăng ký thất bại!");
     }
   };
 
@@ -43,30 +42,32 @@ const SignUpPage = () => {
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Đăng ký</h2>
         <form onSubmit={handleSignUp}>
           <div className="mb-4">
+            <label className="block text-left mb-[5px] text-gray-600">Nhập email:</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 border border-gray-300 rounded-md "
               required
             />
           </div>
 
           <div className="relative mb-4">
+            <label className="block text-left mb-[5px] text-gray-600">Nhập mật khẩu:</label>
             <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mật khẩu"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 border border-gray-300 rounded-md "
               onFocus={() => setShowPasswordRequirements(true)}
               onBlur={() => setShowPasswordRequirements(false)}
               required
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-4 text-gray-500 cursor-pointer"
+              className="absolute right-4 mt-[18px] text-gray-500 cursor-pointer"
             >
               {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
             </span>
@@ -87,17 +88,18 @@ const SignUpPage = () => {
           </div>
 
           <div className="relative mb-4">
+            <label className="block text-left mb-[5px] text-gray-600">Xác nhận mật khẩu:</label>
             <input
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Xác nhận mật khẩu"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 border border-gray-300 rounded-md"
               required
             />
             <span
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-4 top-4 text-gray-500 cursor-pointer"
+              className="absolute right-4 bottom-[15px] text-gray-500 cursor-pointer"
             >
               {showConfirmPassword ? <FaRegEye /> : <FaRegEyeSlash />}
             </span>

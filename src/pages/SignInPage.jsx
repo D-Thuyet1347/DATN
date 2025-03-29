@@ -21,6 +21,9 @@ const SignInPage = () => {
       alert(res.message);
     }
   };
+  const ForgotPassword = () => {
+    navigate("/forgot-password");
+  }
 
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-purple-500">
@@ -28,6 +31,7 @@ const SignInPage = () => {
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Đăng nhập</h2>
         <form onSubmit={handleSignIn}>
           <div className="mb-4">
+            <label className="block text-left mb-[10px] text-gray-600">Nhập email:</label>
             <input
               type="email"
               value={email}
@@ -39,6 +43,7 @@ const SignInPage = () => {
           </div>
 
           <div className="relative mb-4">
+            <label className="block text-left mb-[10px] text-gray-600">Nhập mật khẩu:</label>
             <input
               type={showPassword ? "text" : "password"}
               value={password}
@@ -49,13 +54,13 @@ const SignInPage = () => {
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-4 text-gray-500 cursor-pointer"
+              className="absolute right-4 bottom-[15px] text-gray-500 cursor-pointer"
             >
               {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
             </span>
           </div>
 
-          <p className="text-right text-sm text-blue-500 cursor-pointer hover:underline">Quên mật khẩu?</p>
+          <p onClick={ForgotPassword} className="text-right text-sm text-blue-500 cursor-pointer hover:underline">Quên mật khẩu?</p>
 
           <div className="flex items-center mt-4 mb-4">
             <input type="checkbox" id="checkPolicy" className="mr-2" required />

@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         const role = localStorage.getItem("role"); 
-        if (token && role) {
+        if (token && role ) {
             fetchUserInfo(token);
         } else {
             setLoading(false);
@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
             console.error(error);
             localStorage.removeItem("token");
             localStorage.removeItem("role");
+            setUser(null);
         } finally {
             setLoading(false);
         }
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
+        localStorage.removeItem("image");
         setUser(null);
     };
 
