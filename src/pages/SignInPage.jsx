@@ -2,24 +2,26 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { errorToast, successToast, toastContainer } from "../utils/toast";
 
 const SignInPage = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  
   const handleSignIn = async (e) => {
     e.preventDefault();
     const res = await login({ email, password });
-
-    if (res.success) {
+    errorToast("Đăng nhập thất bại!");
+    if ( res.success) {
       navigate(res.user.role === "admin" ? "/admin" : "/");
+      successToast("Đăng nhập thành công!");
     } else {
-      alert(res.message);
     }
+    console.log(res.success)
   };
   const ForgotPassword = () => {
     navigate("/forgot-password");
@@ -27,6 +29,7 @@ const SignInPage = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-purple-500">
+        {toastContainer()}
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 text-center">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Đăng nhập</h2>
         <form onSubmit={handleSignIn}>

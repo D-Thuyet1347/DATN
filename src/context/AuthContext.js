@@ -41,14 +41,12 @@ export const AuthProvider = ({ children }) => {
             }
             return res;
         } catch (error) {
-            console.error(error);
         }
     };
 
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
-        localStorage.removeItem("image");
         setUser(null);
     };
 

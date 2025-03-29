@@ -14,6 +14,7 @@ import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import { Admin } from './pages/Admin';
 import { ForgotPassword } from './pages/ForgotPassword';
+import Profile from './pages/Project/Profile';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/profile" element={<Profile />} />
         {/* Router riêng dành cho admin và manager */}
         <Route path="/admin-sign" element={<SignInPage/>} />
         <Route path="/admin" element={<PrivateRoute element={<Admin/>} requiredRole={"admin"}/>} />

@@ -44,7 +44,10 @@ const Header = () => {
     localStorage.setItem('user', userAvatar);
     setIsMenu(false);
   };
-
+  const handleProfile = () => {
+    navigate('/profile');
+    setIsMenu(false);
+  }
 
   return (
     <header
@@ -127,7 +130,7 @@ const Header = () => {
                 <ul className="text-sm text-gray-700">
                   {userAvatar ? (
                     <>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                      <li onClick={handleProfile} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                         Thông tin cá nhân
                       </li>
                       <hr />
