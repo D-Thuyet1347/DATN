@@ -12,9 +12,10 @@ import About from './pages/About';
 import Cart from './pages/Cart';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
-import { Admin } from './pages/Admin';
 import { ForgotPassword } from './pages/ForgotPassword';
 import Profile from './pages/Project/Profile';
+import Schedule from './components/Schedule';
+import Admin from './pages/Admin';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/schedule" element={<Schedule />} />
         {/* Router riêng dành cho admin và manager */}
         <Route path="/admin-sign" element={<SignInPage/>} />
         <Route path="/admin" element={<PrivateRoute element={<Admin/>} requiredRole={"admin"}/>} />

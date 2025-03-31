@@ -48,6 +48,10 @@ const Header = () => {
     navigate('/profile');
     setIsMenu(false);
   }
+  const handleSchedule = () => {
+    navigate('/schedule');
+    setIsMenu(false);
+  }
 
   return (
     <header
@@ -95,7 +99,7 @@ const Header = () => {
             <IoMdSearch size={22} />
           </div>
 
-          <div className="cursor-pointer hover:text-maincolor transition">
+          <div onClick={handleSchedule} className="cursor-pointer hover:text-maincolor transition">
             <FaRegHeart size={22} />
           </div>
 

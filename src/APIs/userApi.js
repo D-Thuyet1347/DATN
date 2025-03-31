@@ -41,7 +41,7 @@ export const listUser = async () => {
 };
 // API xóa user
 export const removeUser = async (userId) => {
-    const response = await user.post("/user/remove", { userId });
+    const response = await user.delete("/user/remove", { userId });
     return response.data;
 };
 // API quên mật khẩu

@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }) => {
             }
             return res;
         } catch (error) {
+            return({ success: false, message: "Đăng nhập thất bại!" });
         }
     };
 

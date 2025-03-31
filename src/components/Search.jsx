@@ -44,7 +44,7 @@ const SearchComponent = ({ isVisible, onClose }) => {
     <div className={`flex inset-0 w-[1534px] ml-[-380px]  items-center justify-center h-[64px] bg-black bg-opacity-30 p-6 transition-opacity ${
       isVisible ? "block opacity-100" : "hidden opacity-0"
     }`} ref={searchRef}>
-      <div className="relative w-[1534px] ml-[-40px] mr-[-40px] bg-black bg-opacity-90 h-[64px]">
+      <div className="relative w-[1534px] ml-[-40px] mr-[-40px] bg-black bg-opacity-30 h-[64px]">
         <motion.div
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
