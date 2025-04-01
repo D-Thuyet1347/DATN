@@ -9,7 +9,7 @@ const { Option } = Select;
 const AccountManagement = () => {
     const [data, setData] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
     const [fileList, setFileList] = useState([]);
 
     const fetchAccount = async () => {
@@ -30,9 +30,9 @@ const AccountManagement = () => {
         fetchAccount();
     }, []);
 
-    const openDrawer = (user = null) => {
-        setSelectedUser(user ? { ...user } : { firstName: '', email: '', role: '', phoneNumber: '', address: '', image: '' });
-        setIsDrawerOpen(true);
+    const openEditDrawer = (user) => {
+        setSelectedUser(user ? { ...user } : { firstName: '', email: '', role: '', phone: '', address: '', image: '' });
+        setIsEditOpen(true);
     };
 
     const handleUpdateAccount = async () => {
@@ -41,7 +41,7 @@ const AccountManagement = () => {
             await updateUser(selectedUser._id, selectedUser);
             message.success("Cập nhật tài khoản thành công!");
             fetchAccount();
-            setIsDrawerOpen(false);
+            setIsEditOpen(false);
         } catch (error) {
             console.error(error);
             message.error("Có lỗi xảy ra, vui lòng thử lại.");
@@ -58,9 +58,11 @@ const AccountManagement = () => {
     };
     const handleDeleteAccount = async (userId) => {
         try {
-            await removeUser(userId);
+         const res= await removeUser(userId);
+         if(res.success){
             message.success("Xóa tài khoản thành công!");
             fetchAccount();
+         }
         } catch (error) {
             console.error(error);
             message.error("Có lỗi xảy ra khi xóa tài khoản.");
@@ -79,7 +81,7 @@ const AccountManagement = () => {
         { title: 'Tên tài khoản', dataIndex: 'firstName', key: 'firstName' },
         { title: 'Email', dataIndex: 'email', key: 'email' },
         { title: 'Vai trò', dataIndex: 'role', key: 'role' },
-        { title: 'Số điện thoại', dataIndex: 'phoneNumber', key: 'phoneNumber' },
+        { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },
         { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },
         {
             title: 'Ảnh đại diện',
@@ -91,9 +93,8 @@ const AccountManagement = () => {
             title: 'Hành động',
             key: 'action',
             render: (_, record) => (
-                <span>
-                    <EditOutlined onClick={() => openDrawer(record)} style={{ marginRight: 10, cursor: 'pointer' }} />
-                    <DeleteOutlined onClick={handleDeleteAccount} style={{ color: 'red', cursor: 'pointer' }} />
+                <span >
+                    <EditOutlined  onClick={() => openEditDrawer(record)}  />
                 </span>
             ),
         },
@@ -101,26 +102,29 @@ const AccountManagement = () => {
 
     return (
         <>
-            <Button type="primary" onClick={() => openDrawer()}>Thêm tài khoản</Button>
-            <Table dataSource={data} columns={columns} pagination={{ pageSize: 5 }} />
+            <Table className='mt-[50px]' dataSource={data} columns={columns} pagination={{ pageSize: 5 }} />
+           {/* Chỉnh sửa người dùng */}
             <Drawer
                 title="Chỉnh sửa tài khoản"
                 placement="right"
                 closable
-                onClose={() => setIsDrawerOpen(false)}
-                open={isDrawerOpen}
+                onClose={() => setIsEditOpen(false)}
+                open={isEditOpen}
             >
                 <Input placeholder="Tên" name="firstName" value={selectedUser?.firstName} onChange={handleInputChange} />
                 <Input placeholder="Email" name="email" value={selectedUser?.email} onChange={handleInputChange} className="mt-3" />
+                <Input placeholder="Số điện thoại" name="phone" value={selectedUser?.phone} onChange={handleInputChange} className="mt-3" />
                 <Select value={selectedUser?.role} onChange={handleRoleChange} className="mt-3" style={{ width: '100%' }}>
                     <Option value="User">User</Option>
                     <Option value="Admin">Admin</Option>
+                    <Option value="Manager">Manager</Option>
+                    <Option value="Employee">Employee</Option>
                 </Select>
                 <Upload fileList={fileList} beforeUpload={() => false} onChange={handleImageChange} showUploadList>
                     <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
                 </Upload>
                 {selectedUser?.image && <img src={selectedUser.image} alt="Avatar Preview" style={{ width: 50, height: 50, marginTop: 10 }} />}
-                <Button type="primary" className="mt-4" onClick={handleUpdateAccount}>Xác nhận cập nhật</Button>
+                <Button  className="mt-4 bg-blue-700" onClick={handleUpdateAccount}>Xác nhận cập nhật</Button>
             </Drawer>
         </>
     );

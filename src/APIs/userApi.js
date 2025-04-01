@@ -24,6 +24,21 @@ export const getUser = async (userId) => {
     const response = await user.get(`/user/${userId}`);
     return response.data;
 };
+// API lấy role user theo ID
+export const getUserRole = async (userId) => {
+    try {
+        const response = await user.get(`/user/${userId}`);
+        const role = response.data?.role;
+        if (role === "User" || role === "Employee") {
+            return role;
+        } else {
+            throw new Error("Invalid role received");
+        }
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+        return null;
+    }
+};
 // API cập nhật thông tin user
 export const updateUser = async (userId, data) => {
     const response = await user.put(`/user/update/${userId}`, data);
@@ -41,7 +56,7 @@ export const listUser = async () => {
 };
 // API xóa user
 export const removeUser = async (userId) => {
-    const response = await user.delete("/user/remove", { userId });
+    const response = await user.delete(`/user/remove/${userId}`);
     return response.data;
 };
 // API quên mật khẩu

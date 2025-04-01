@@ -19,6 +19,6 @@ export const listReview = async () => {
 };
 // API remove review
 export const removeReview = async (reviewId) => {
-    const response = await reviewsp.delete("/reviewsp/remove", { reviewId });
+    const response = await reviewsp.delete(`/reviewsp/remove/${reviewId}`);
     return response.data;
 };

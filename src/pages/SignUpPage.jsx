@@ -4,7 +4,6 @@ import { registerUser } from "../APIs/userApi";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { errorToast, successToast, toastContainer } from "../utils/toast";
-import { ToastContainer } from "react-toastify";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -22,7 +21,6 @@ const SignUpPage = () => {
     { id: "number", label: "At least 1 number", validator: (p) => /\d/.test(p) },
     { id: "special", label: "At least 1 special character", validator: (p) => /[!@#$%^&*(),.?":{}|<>]/.test(p) },
   ];
-
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -40,7 +38,7 @@ const SignUpPage = () => {
 
   return (
     
-    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-400 to-purple-400">
+    <div className="flex justify-center items-center h-screen bg-gradient-to-r">
         {toastContainer()}
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 text-center">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Đăng ký</h2>

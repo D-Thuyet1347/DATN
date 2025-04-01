@@ -16,30 +16,38 @@ import { ForgotPassword } from './pages/ForgotPassword';
 import Profile from './pages/Project/Profile';
 import Schedule from './components/Schedule';
 import Admin from './pages/Admin';
+import ProductReview from './components/ProductReview';
 
 
 function App() {
+
+
   return (
+    <>
+ 
       <AuthProvider>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/service" element={<Service />} />
-        <Route path="/product" element={<Products />} />
-        <Route path="/booknow" element={<Booknow />} />
-        <Route path="/booking" element={<Bookings />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contacts />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/sign-in" element={<SignInPage />} />
-        <Route path="/sign-up" element={<SignUpPage />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/schedule" element={<Schedule />} />
-        {/* Router riêng dành cho admin và manager */}
-        <Route path="/admin-sign" element={<SignInPage/>} />
-        <Route path="/admin" element={<PrivateRoute element={<Admin/>} requiredRole={"admin"}/>} />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/service" element={<Service />} />
+          <Route path="/product" element={<Products />} />
+          <Route path="/booknow" element={<Booknow />} />
+          <Route path="/booking" element={<Bookings />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contacts />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/schedule" element={<Schedule />} />
+          <Route path="/reviewsp" element={<ProductReview />} />
+          {/* Router riêng dành cho admin và manager */}
+          <Route path="/admin-sign" element={<SignInPage />} />
+          <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"Admin"} />} />
+          {/* Router riêng dành cho employee */}
+        </Routes>
       </AuthProvider>
+    </>
   );
 }
 

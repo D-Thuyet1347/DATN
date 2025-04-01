@@ -16,19 +16,18 @@ const SignInPage = () => {
     e.preventDefault();
     const res = await login({ email, password });
     errorToast("Đăng nhập thất bại!");
-    if ( res.success) {
+    if (res.success) {
       successToast("Đăng nhập thành công!");
       navigate(res.user.role === "admin" ? "/admin" : "/");
     } else {
     }
-    console.log(res.success)
   };
   const ForgotPassword = () => {
     navigate("/forgot-password");
   }
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-500 to-purple-500">
+    <div className="flex justify-center items-center h-screen ">
         {toastContainer()}
       <div className="bg-white p-8 rounded-lg shadow-lg w-96 text-center">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Đăng nhập</h2>
@@ -70,8 +69,7 @@ const SignInPage = () => {
             <label htmlFor="checkPolicy" className="text-sm text-gray-600">
               Tôi đồng ý với các điều khoản và chính sách
             </label>
-          </div>
-
+          </div>                                                  
           <button
             type="submit"
             disabled={!email || !password}

@@ -22,7 +22,6 @@ export const AuthProvider = ({ children }) => {
             const res = await getUser(token);
             setUser(res.user);
         } catch (error) {
-            console.error(error);
             localStorage.removeItem("token");
             localStorage.removeItem("role");
             setUser(null);
