@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { AppstoreOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PicCenterOutlined, UserOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PicCenterOutlined } from '@ant-design/icons';
 import { Button, Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import BannerLive from '../components/BannerLIve';
 import AccountManagement from '../components/AccountManagement';
 import { BrandManagement } from '../components/BrandManagement';
 import { EmployeeManagement } from '../components/EmployeeManagement';
+import BlogManagement from '../components/BlogManagement';
 
 const items = [
   {
@@ -62,11 +62,11 @@ const Admin = () => {
       case 'home':
         return navigate('/');
       case 'blog':
-        return <div>Blog Management</div>;
+        return <BlogManagement />;
       case 'brand':
         return <BrandManagement />;
-      case 'banner':
-        return <BannerLive />;
+      // case 'banner':
+      //   return <BannerLive />;
       case 'account':
         return <AccountManagement />;
       case 'employee':

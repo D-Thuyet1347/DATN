@@ -66,28 +66,31 @@ export const EmployeeManagement = () => {
         }));
     };
     const openEditDrawer = (employee = null) => {
-        setSelectEmployee(employee ? {...employee} : {BranchID: "",UserID: "",Position: "",Status: "Đang làm việc"});
+        setSelectEmployee(employee ? { ...employee } : { BranchID: "", UserID: "", Position: "", Status: "Đang làm việc" });
         setIsDrawerOpen(true);
     };
+    
     const handleUpdateEmployee = async () => {
         try {
             if (!selectEmployee.BranchID || !selectEmployee.UserID || !selectEmployee.Position || !selectEmployee.Status) {
                 console.log("Vui lòng chọn đầy đủ thông tin.");
                 return;
             }
-            if(selectEmployee.id){
-                await updateEmployee(selectEmployee.id, selectEmployee)
+            if(selectEmployee._id) {
+                await updateEmployee(selectEmployee._id, selectEmployee);
                 message.success("Cập nhật nhân viên thành công!");
-            }else{
-                await createEmployee(selectEmployee)
+            } else {
+                await createEmployee(selectEmployee);
                 message.success("Thêm nhân viên thành công!");
             }
-                fetchEmployee(); 
-                setIsDrawerOpen(false);
+            fetchEmployee();
+            setIsDrawerOpen(false);
         } catch (error) {
             message.error("Có lỗi xảy ra, vui lòng thử lại.");
         }
     };
+    
+
     const handleDeleteEmployee = async (id) => {
         try {
             await removeEmployee(id);
@@ -154,12 +157,13 @@ export const EmployeeManagement = () => {
             <Button className='bg-blue-600' onClick={() => openEditDrawer()}>Thêm Nhân Viên</Button>
 
             <Drawer
-                title={selectEmployee && selectEmployee.id ? "Chỉnh sửa nhân viên" : "Thêm nhân viên"}
-                placement="right"
-                closable
-                onClose={() => setIsDrawerOpen(false)}
-                open={isDrawerOpen}
-            >
+    title={selectEmployee && selectEmployee._id ? "Chỉnh sửa nhân viên" : "Thêm nhân viên"}
+    placement="right"
+    closable
+    onClose={() => setIsDrawerOpen(false)}
+    open={isDrawerOpen}
+>
+
                 <Select
                     placeholder="Chọn chi nhánh"
                     style={{ width: '100%', marginBottom: '10px' }}

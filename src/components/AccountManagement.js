@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { listUser, removeUser, updateUser, updateUserRole } from '../APIs/userApi';
+import { listUser, removeUser,updateUserRole } from '../APIs/userApi';
 import { Button, Drawer, Input, Table, Upload, message, Select } from 'antd';
 import { EditOutlined, UploadOutlined } from '@ant-design/icons';
 import { getBase64 } from '../utils/ultils';
+import { errorToast, successToast, toastContainer } from '../utils/toast';
 
 const { Option } = Select;
 
@@ -15,14 +16,12 @@ const AccountManagement = () => {
     const fetchAccount = async () => {
         try {
             const res = await listUser();
-            console.log("Dữ liệu từ API:", res.data);
             if (Array.isArray(res.data)) {
                 setData(res.data.map((item) => ({ ...item, key: item._id })));
             } else {
                 setData([]);
             }
         } catch (error) {
-            console.error(error);
             setData([]);
         }
     };
@@ -42,8 +41,7 @@ const AccountManagement = () => {
         try {
             const res = await updateUserRole(selectedUser._id, { role: selectedUser.role });
             console.log("API cập nhật role phản hồi:", res);
-    
-            message.success("Cập nhật role thành công!");
+            successToast("Cập nhật role thành công!");
             setData((prevData) =>
                 prevData.map((user) =>
                     user._id === selectedUser._id ? { ...user, role: selectedUser.role } : user
@@ -52,7 +50,7 @@ const AccountManagement = () => {
             setIsEditOpen(false);
         } catch (error) {
             console.error("Lỗi khi cập nhật role:", error);
-            message.error("Có lỗi xảy ra, vui lòng thử lại.");
+            errorToast("Có lỗi xảy ra, vui lòng thử lại.");
         }
     };
     
@@ -112,6 +110,7 @@ const AccountManagement = () => {
 
     return (
         <>
+          {toastContainer()}
             <Table className='mt-[50px]' dataSource={data} columns={columns} pagination={{ pageSize: 5 }} />
            {/* Chỉnh sửa người dùng */}
             <Drawer

@@ -13,11 +13,10 @@ import Cart from './pages/Cart';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import { ForgotPassword } from './pages/ForgotPassword';
-import Profile from './pages/Project/Profile';
+import Profile from './pages/Profile';
 import Schedule from './components/Schedule';
 import Admin from './pages/Admin';
 import ProductReview from './components/ProductReview';
-
 
 function App() {
 
