@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { AppstoreOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PicCenterOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Menu, Switch } from 'antd';
+import { Button, Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import BannerLive from '../components/BannerLIve';
 import AccountManagement from '../components/AccountManagement';
-// import { Search } from '../components/Search';
+import { BrandManagement } from '../components/BrandManagement';
+import { EmployeeManagement } from '../components/EmployeeManagement';
 
 const items = [
+  {
+    key: 'home',
+    label: 'Trang người dùng',
+    icon: <HomeOutlined />,
+  },
   {
     key: 'manager',
     label: 'Manager',
     icon: <PicCenterOutlined />,
     children: [
-      { key: 'blog', label: 'Blog Management' },
-      { key: '2', label: 'Option 2' },
+      { key: 'blog', label: 'Quản lý BLog' },
+      { key: 'employee', label: 'Quản lý nhân viên' },
       { key: '3', label: 'Option 3' },
       { key: '4', label: 'Option 4' },
     ],
@@ -25,6 +31,7 @@ const items = [
     children: [
       { key: 'banner', label: 'Banner trang chủ' },
       { key: 'account', label: 'Quản lý tài khoản' },
+      {key: 'brand', label: 'Quản lý thương hiệu'},
       {
         key: 'sub3',
         label: 'Submenu',
@@ -35,11 +42,7 @@ const items = [
       },
     ],
   },
-  {
-    key: 'home',
-    label: 'Trang người dùng',
-    icon: <HomeOutlined />,
-  },
+  
 ];
 
 const Admin = () => {
@@ -59,10 +62,15 @@ const Admin = () => {
       case 'home':
         return navigate('/');
       case 'blog':
+        return <div>Blog Management</div>;
+      case 'brand':
+        return <BrandManagement />;
       case 'banner':
         return <BannerLive />;
       case 'account':
         return <AccountManagement />;
+      case 'employee':
+        return <EmployeeManagement />;
       default:
         return <></>;
     }
@@ -76,13 +84,9 @@ const Admin = () => {
   return (
    <>
      <div style={{ display: 'flex', height: '100vh' }}>
-
-      {/* Sidebar */}
-     
-     
       <div
         style={{
-          width: collapsed ? 30 : 200,
+          width: collapsed ? 60 : 200,
           padding: '10px',
           transition: 'width 0.3s ease',
           display: 'flex',
@@ -91,8 +95,6 @@ const Admin = () => {
           boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
         }}
       >
-        {/* Toggle Menu Button */}
-     
         <Button
           type="primary"
           onClick={toggleCollapsed}
@@ -102,7 +104,8 @@ const Admin = () => {
             borderColor: '#1890ff',        
             transition: 'margin-left 0.3s ease',
             position: 'fixed',
-            left: 0,
+            top: 10,
+            left: 5,
           }}
         >
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -110,7 +113,7 @@ const Admin = () => {
         {/* Menu */}
         <Menu
           onClick={handleOnClick}
-          style={{ width: '100%', flex: 1, marginTop: 30 }}
+          style={{ width: '100%', flex: 1, marginTop: 30,marginLeft: collapsed ? 0 : 0, transition: 'margin-left 0.3s ease' }}
           defaultSelectedKeys={['1']}
           selectedKeys={[current]}
           mode="inline"
@@ -118,8 +121,6 @@ const Admin = () => {
           items={items}
         />
       </div>
-
-      {/* Nội dung chính */}
       <div
         style={{
           flex: 1,
@@ -130,7 +131,6 @@ const Admin = () => {
 
         }}
       >
-        {/* Header */}
         <div
           style={{
             display: 'flex',
@@ -141,12 +141,10 @@ const Admin = () => {
             marginLeft: collapsed ? 1200 : 1200,
             transition: 'margin-left 0.3s ease',
           }}
-        >
-       
-          <UserOutlined style={{ fontSize: '20px' }} />
+        >      
         </div>
 
-        <div style={{ flex: 1, top:1000, color: 'GrayText', paddingTop: '20px', marginLeft: collapsed ? 20 : 20, transition: 'margin-left 0.3s ease' }}>
+        <div style={{ flex: 1, top:1000, color: 'GrayText', paddingTop: '20px', marginRight: collapsed ? 0 :0, transition: 'margin-left 0.3s ease' }}>
       {renderPage(stateOpenKeys)}
      </div>
       </div>

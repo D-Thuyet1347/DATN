@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { listUser, removeUser, updateUser } from '../APIs/userApi';
+import { listUser, removeUser, updateUser, updateUserRole } from '../APIs/userApi';
 import { Button, Drawer, Input, Table, Upload, message, Select } from 'antd';
-import { DeleteOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
+import { EditOutlined, UploadOutlined } from '@ant-design/icons';
 import { getBase64 } from '../utils/ultils';
 
 const { Option } = Select;
@@ -15,6 +15,7 @@ const AccountManagement = () => {
     const fetchAccount = async () => {
         try {
             const res = await listUser();
+            console.log("Dữ liệu từ API:", res.data);
             if (Array.isArray(res.data)) {
                 setData(res.data.map((item) => ({ ...item, key: item._id })));
             } else {
@@ -37,16 +38,25 @@ const AccountManagement = () => {
 
     const handleUpdateAccount = async () => {
         if (!selectedUser) return;
+    
         try {
-            await updateUser(selectedUser._id, selectedUser);
-            message.success("Cập nhật tài khoản thành công!");
-            fetchAccount();
+            const res = await updateUserRole(selectedUser._id, { role: selectedUser.role });
+            console.log("API cập nhật role phản hồi:", res);
+    
+            message.success("Cập nhật role thành công!");
+            setData((prevData) =>
+                prevData.map((user) =>
+                    user._id === selectedUser._id ? { ...user, role: selectedUser.role } : user
+                )
+            );
             setIsEditOpen(false);
         } catch (error) {
-            console.error(error);
+            console.error("Lỗi khi cập nhật role:", error);
             message.error("Có lỗi xảy ra, vui lòng thử lại.");
         }
     };
+    
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -115,10 +125,10 @@ const AccountManagement = () => {
                 <Input placeholder="Email" name="email" value={selectedUser?.email} onChange={handleInputChange} className="mt-3" />
                 <Input placeholder="Số điện thoại" name="phone" value={selectedUser?.phone} onChange={handleInputChange} className="mt-3" />
                 <Select value={selectedUser?.role} onChange={handleRoleChange} className="mt-3" style={{ width: '100%' }}>
-                    <Option value="User">User</Option>
-                    <Option value="Admin">Admin</Option>
-                    <Option value="Manager">Manager</Option>
-                    <Option value="Employee">Employee</Option>
+                    <Option value="user">User</Option>
+                    <Option value="admin">Admin</Option>
+                    <Option value="manager">Manager</Option>
+                    <Option value="employee">Employee</Option>
                 </Select>
                 <Upload fileList={fileList} beforeUpload={() => false} onChange={handleImageChange} showUploadList>
                     <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>

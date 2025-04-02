@@ -29,7 +29,7 @@ export const getUserRole = async (userId) => {
     try {
         const response = await user.get(`/user/${userId}`);
         const role = response.data?.role;
-        if (role === "User" || role === "Employee") {
+        if (role === "user" || role === "employee") {
             return role;
         } else {
             throw new Error("Invalid role received");
@@ -55,8 +55,8 @@ export const listUser = async () => {
     return response.data;
 };
 // API xóa user
-export const removeUser = async (userId) => {
-    const response = await user.delete(`/user/remove/${userId}`);
+export const removeUser = async (id) => {
+    const response = await user.delete(`/user/remove/${id}`);
     return response.data;
 };
 // API quên mật khẩu

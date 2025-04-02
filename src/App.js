@@ -43,7 +43,7 @@ function App() {
           <Route path="/reviewsp" element={<ProductReview />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />
-          <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"Admin"} />} />
+          <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"admin"} />} />
           {/* Router riêng dành cho employee */}
         </Routes>
       </AuthProvider>

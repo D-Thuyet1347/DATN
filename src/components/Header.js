@@ -132,7 +132,7 @@ console.log("userRole", userRole);
                   {userAvatar ? (
                     <>
                       <li onClick={handleProfile} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Thông tin cá nhân</li>
-                  {userRole === "Employee" && (
+                  {userRole === "employee" && (
                         <li onClick={handleSchedule} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Lịch làm việc</li>
                       )}
                       <hr />
