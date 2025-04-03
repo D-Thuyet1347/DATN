@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'; // Sử dụng toast từ parent hoặc 
 
 // Lấy URL gốc của backend từ biến môi trường hoặc đặt cứng (ít linh hoạt hơn)
 const BACKEND_URL = process.env.REACT_APP_API_KEY ? process.env.REACT_APP_API_KEY.replace("/api", "") : "http://localhost:4000";
-const DEFAULT_AVATAR = 'https://via.placeholder.com/150?text=No+Image'; // Ảnh mặc định nếu không có
+const DEFAULT_AVATAR = 'https://placehold.co/150?text=No+Image';
 
 const ProfileTab = () => {
     // State cho dữ liệu người dùng và trạng thái
@@ -74,14 +74,11 @@ const ProfileTab = () => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
-            // ... xử lý lỗi thiếu token ...
             return;
         }
 
         try {
             const decodedToken = jwtDecode(token);
-            // **QUAN TRỌNG:** Đảm bảo key trong token là 'id'
-            // Key này phải khớp với key bạn dùng khi tạo token ở backend (createToken = (id) => jwt.sign({ id }, ...))
             const idFromToken = decodedToken.id; // <--- KIỂM TRA DÒNG NÀY
 
             // Thêm log để kiểm tra ID lấy được
@@ -191,18 +188,12 @@ const ProfileTab = () => {
         dataToSend.append('lastName', formData.lastName);
         dataToSend.append('phone', formData.phone);
         dataToSend.append('address', formData.address);
-        // Email thường không nên cho sửa, nếu cho sửa cần validate kỹ
-        // dataToSend.append('email', formData.email);
+
         dataToSend.append('dateOfBirth', formData.dateOfBirth);
 
-        // **QUAN TRỌNG:** Chỉ thêm file ảnh mới nếu người dùng đã chọn
         if (imageFile) {
-            // Key phải khớp với key mà multer mong đợi ở backend (`avatar`)
             dataToSend.append('avatar', imageFile);
-             console.log("Đã thêm file ảnh mới vào FormData với key 'avatar'");
-        } else {
-            console.log("Không có file ảnh mới được chọn.");
-        }
+        } 
 
 
         try {

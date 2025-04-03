@@ -66,7 +66,7 @@ export const EmployeeManagement = () => {
         }));
     };
     const openEditDrawer = (employee = null) => {
-        setSelectEmployee(employee ? { ...employee } : { BranchID: "", UserID: "", Position: "", Status: "Đang làm việc" });
+        setSelectEmployee(employee ? { ...employee } : { BranchID: "", UserID: "", Position: "", Status: "" });
         setIsDrawerOpen(true);
     };
     

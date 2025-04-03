@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { AppstoreOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PicCenterOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined, PicCenterOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
+// import BannerLive from '../components/BannerLIve';
 import AccountManagement from '../components/AccountManagement';
 import { BrandManagement } from '../components/BrandManagement';
 import { EmployeeManagement } from '../components/EmployeeManagement';
+import ServiceManagement from '../components/ServiceManagement';
+import ProductManagement from '../components/ProductManagement';
 import BlogManagement from '../components/BlogManagement';
 
 const items = [
@@ -20,7 +23,8 @@ const items = [
     children: [
       { key: 'blog', label: 'Quản lý BLog' },
       { key: 'employee', label: 'Quản lý nhân viên' },
-      { key: '3', label: 'Option 3' },
+      { key: 'service', label: 'Quản lý dịch vụ' },
+      { key: 'product', label: 'Quản lý sản phẩm' },
       { key: '4', label: 'Option 4' },
     ],
   },
@@ -71,6 +75,10 @@ const Admin = () => {
         return <AccountManagement />;
       case 'employee':
         return <EmployeeManagement />;
+      case 'service':
+        return <ServiceManagement />;
+      case 'product':
+        return <ProductManagement />;
       default:
         return <></>;
     }

@@ -37,16 +37,9 @@ const AccountManagement = () => {
 
     const handleUpdateAccount = async () => {
         if (!selectedUser) return;
-    
         try {
-            const res = await updateUserRole(selectedUser._id, { role: selectedUser.role });
-            console.log("API cập nhật role phản hồi:", res);
+            await updateUserRole(selectedUser._id, selectedUser );
             successToast("Cập nhật role thành công!");
-            setData((prevData) =>
-                prevData.map((user) =>
-                    user._id === selectedUser._id ? { ...user, role: selectedUser.role } : user
-                )
-            );
             setIsEditOpen(false);
         } catch (error) {
             console.error("Lỗi khi cập nhật role:", error);

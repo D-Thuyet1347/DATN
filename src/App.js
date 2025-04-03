@@ -16,7 +16,7 @@ import { ForgotPassword } from './pages/ForgotPassword';
 import Profile from './pages/Profile';
 import Schedule from './components/Schedule';
 import Admin from './pages/Admin';
-import ProductReview from './components/ProductReview';
+import BlogViewer from './components/BlogViewer';
 
 function App() {
 
@@ -39,7 +39,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/schedule" element={<Schedule />} />
-          <Route path="/reviewsp" element={<ProductReview />} />
+          <Route path="/blogview" element={<BlogViewer />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"admin"} />} />

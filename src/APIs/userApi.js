@@ -3,7 +3,6 @@ import axios from "axios";
 const API_BASE_URL = process.env.REACT_APP_API_KEY || "http://localhost:4000/api";
 console.log("API Base URL:", API_BASE_URL); // Kiểm tra URL
 
-const getToken = () => localStorage.getItem('token');
 
 const userApi = axios.create({
     baseURL: API_BASE_URL,
@@ -25,9 +24,32 @@ export const getUser = async (id) => {
 };
 
 export const updateUser = async (id, data) => {
-        const response = await userApi.put(`/user/update/${id}`, data);
-        return response.data;
-};
+        try {
+            // Lấy token trực tiếp trong hàm này
+            const token = localStorage.getItem('token');
+            if (!token) {
+                return { success: false, message: "Không có token, vui lòng đăng nhập lại" };
+            }
+    
+            const response = await axios.put(
+                `${API_BASE_URL}/user/update/${id}`, 
+                data, 
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        // Không cần thiết lập Content-Type cho FormData, browser sẽ tự thêm boundary
+                    }
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi cập nhật:", error);
+            return { 
+                success: false, 
+                message: error.response?.data?.message || "Lỗi kết nối server" 
+            };
+        }
+    };
 
 export const updateUserRole = async (id, data) => {
         const response = await userApi.post(`/user/${id}/role`, data);
@@ -55,9 +77,24 @@ export const verifyCodeAndResetPassword = async (data) => {
   
 };
 
+// API đổi mật khẩu (yêu cầu đã đăng nhập)
 export const changePassword = async (data) => {
-        const response = await userApi.post(`/user/changepassword`, data);
-        return response.data;
+  try {
+      const token = localStorage.getItem('token');  // Lấy token từ localStorage hoặc state
+      if (!token) {
+          throw new Error('Không có token, vui lòng đăng nhập lại');
+      }
+
+      const response = await userApi.post(
+          '/user/changepassword', 
+          data,
+          { headers: { Authorization: `Bearer ${token}` } }  // Gửi token trong header
+      );
+      return response.data;
+  } catch (error) {
+      console.error("Lỗi API đổi mật khẩu:", error.response?.data || error.message);
+      return error.response?.data || { success: false, message: "Lỗi kết nối hoặc máy chủ khi đổi mật khẩu." };
+  }
 };
 
 export const logoutUser = async () => {

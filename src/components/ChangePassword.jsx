@@ -3,100 +3,98 @@ import { Input, Button, Space } from 'antd';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { changePassword } from '../APIs/userApi'; // Import API call
+import { useTranslation } from 'react-i18next'; // <-- Import
 
-function ChangePassword() {
+function ChangePasswordTab() { // Renamed component for clarity if needed
+    const { t } = useTranslation(); // <-- Use hook
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const handlePasswordChange = async () => {
-        // Kiểm tra các trường nhập liệu
+        // Use translated error messages
         if (!oldPassword) {
-            toast.error('Vui lòng nhập mật khẩu cũ.');
+            toast.error(t('changePassword.errors.oldPasswordRequired'));
             return;
         }
-
         if (!newPassword) {
-            toast.error('Vui lòng nhập mật khẩu mới.');
+            toast.error(t('changePassword.errors.newPasswordRequired'));
             return;
         }
-
         if (!confirmPassword) {
-            toast.error('Vui lòng nhập xác nhận mật khẩu.');
+            toast.error(t('changePassword.errors.confirmPasswordRequired'));
             return;
         }
-
         if (newPassword !== confirmPassword) {
-            toast.error('Mật khẩu mới và xác nhận mật khẩu không khớp.');
+            toast.error(t('changePassword.errors.passwordsDoNotMatch'));
             return;
         }
 
-        // Kiểm tra định dạng mật khẩu mới
         const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
         if (!passwordRegex.test(newPassword)) {
-            toast.error('Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ hoa, số và ký tự đặc biệt.');
+            toast.error(t('changePassword.errors.newPasswordInvalid'));
             return;
         }
 
         try {
-            // Gọi API đổi mật khẩu
-            const response = await changePassword( {
-                oldPassword,
-                newPassword,
-            });
+            const response = await changePassword({ oldPassword, newPassword });
 
             if (response.success) {
-                toast.success(response.message); // Thông báo thành công từ backend
+                // Use translated success message
+                toast.success(response.message || t('changePassword.success')); // Use backend message if available, else fallback
                 setOldPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
             } else {
-                // Kiểm tra thông báo lỗi từ backend
-                if (response.message === "Mật khẩu cũ không chính xác") {
-                    toast.error("Mật khẩu cũ không chính xác. Vui lòng nhập lại.");
+                // Use translated specific error or generic backend message
+                if (response.message === "Mật khẩu cũ không chính xác" || response.message === "Incorrect old password") { // Check both languages or use error code if backend provides one
+                    toast.error(t('changePassword.errors.oldPasswordIncorrect'));
                 } else {
-                    toast.error(response.message); // Hiển thị các lỗi khác từ backend
+                    toast.error(response.message || t('changePassword.errors.updateFailed'));
                 }
             }
         } catch (error) {
             console.error('Lỗi khi đổi mật khẩu:', error);
-
-            if (error.response && error.response.data && error.response.data.message === "Mật khẩu cũ không chính xác") {
-                toast.error("Mật khẩu cũ không chính xác. Vui lòng nhập lại.");
+            // Use translated specific error or generic frontend message
+            if (error.response && error.response.data && (error.response.data.message === "Mật khẩu cũ không chính xác" || error.response.data.message === "Incorrect old password")) {
+                toast.error(t('changePassword.errors.oldPasswordIncorrect'));
             } else {
-                toast.error('Đã xảy ra lỗi. Vui lòng thử lại sau.'); // Thông báo chung khi có lỗi mạng
+                toast.error(t('changePassword.errors.updateFailed'));
             }
         }
     };
 
     return (
         <div className="p-4 rounded-md shadow-md bg-white">
-            <h2 className="text-xl font-semibold mb-4">Đổi Mật Khẩu</h2>
-            <Space direction="vertical">
+            {/* Translate title */}
+            <h2 className="text-xl font-semibold mb-4">{t('changePassword.title')}</h2>
+            <Space direction="vertical" className="w-full"> {/* Ensure Space takes full width */}
                 <Input.Password
-                    placeholder="Mật khẩu cũ"
+                    // Translate placeholders
+                    placeholder={t('changePassword.oldPasswordPlaceholder')}
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
                     className="w-full"
                 />
                 <Input.Password
-                    placeholder="Mật khẩu mới"
+                    placeholder={t('changePassword.newPasswordPlaceholder')}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full"
                 />
                 <Input.Password
-                    placeholder="Xác nhận mật khẩu"
+                    placeholder={t('changePassword.confirmPasswordPlaceholder')}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full"
                 />
+                {/* Translate button text */}
                 <Button type="primary" onClick={handlePasswordChange} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Cập Nhật
+                    {t('changePassword.updateButton')}
                 </Button>
             </Space>
         </div>
     );
 }
 
-export default ChangePassword;
+export default ChangePasswordTab;

@@ -39,9 +39,7 @@ const BlogManagement = () => {
             message.error("Vui lòng nhập tiêu đề và nội dung!");
             return;
         }
-
         const blogData = { userId, title, content, image, isPublished };
-
         try {
             if (editingId) {
                 await updateBlog(editingId, blogData);
