@@ -103,3 +103,24 @@ export const logoutUser = async () => {
     console.log("Token đã được xóa khỏi localStorage.");
     return { success: true, message: "Đã đăng xuất (phía client)." };
 };
+export const getCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return { success: false, message: "Không tìm thấy token" };
+      }
+  
+      const response = await userApi.get('/user/me/info', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin người dùng:", error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || "Lỗi khi lấy thông tin người dùng" 
+      };
+    }
+  };

@@ -7,6 +7,7 @@ import { IoBagHandleOutline } from "react-icons/io5";
 import SearchComponent from "./Search";
 import { getUser } from "../APIs/userApi";
 import { jwtDecode } from "jwt-decode";
+import { useTranslation } from 'react-i18next'
 
 const BACKEND_URL = process.env.REACT_APP_API_KEY
   ? process.env.REACT_APP_API_KEY.replace("/api", "")
@@ -15,6 +16,7 @@ const BACKEND_URL = process.env.REACT_APP_API_KEY
 const DEFAULT_AVATAR = user;
 
 const Header = () => {
+  const { t, i18n } = useTranslation();
   const [showSearch, setShowSearch] = useState(false);
   const [isMenu, setIsMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -22,7 +24,10 @@ const Header = () => {
   const [userRole, setUserRole] = useState("");
 
   const navigate = useNavigate();
-
+  const handleLanguageChange = () => {
+    const newLang = i18n.language === "vi" ? "en" : "vi"; // Toggle giữa "vi" và "en"
+    i18n.changeLanguage(newLang); // Thay đổi ngôn ngữ của i18n
+  };
   // Fetch user data from API
   const fetchUserData = async () => {
     const token = localStorage.getItem("token");
@@ -95,10 +100,6 @@ const Header = () => {
     setIsMenu(false);
   };
 
-  const handleProduct = () => {
-    navigate("/product-page");
-    setIsMenu(false);
-  };
 
   // Fetch user data khi token tồn tại
   useEffect(() => {
@@ -120,25 +121,28 @@ const Header = () => {
         </div>
         <nav className="space-x-6">
           <Link to="/" className="text-gray-600 hover:text-maincolor">
-            Trang chủ
+          {t("header.home")}
           </Link>
+         
           <Link to="/service" className="text-gray-600 hover:text-maincolor">
-            Dịch vụ
+           {t("header.services")}
           </Link>
-          <Link onClick={handleProduct} className="text-gray-600 hover:text-maincolor">
-            Sản phẩm
+          
+          <Link to="/product" className="text-gray-600 hover:text-maincolor">
+          {t("header.products")}
           </Link>
+          
           <Link to="/booknow" className="text-gray-600 hover:text-maincolor">
-            Đặt hàng
+          {t("header.bookNow")}
           </Link>
           <Link onClick={handleBlog} to="/blogview" className="text-gray-600 hover:text-maincolor">
-            Bài viết
+          {t("header.blogger")}
           </Link>
           <Link to="/about" className="text-gray-600 hover:text-maincolor">
-            Giới thiệu
+          {t("header.about")}
           </Link>
           <Link to="/contact" className="text-gray-600 hover:text-maincolor">
-            Liên hệ
+          {t("header.contact")}
           </Link>
         </nav>
         <div className="flex items-center space-x-4">
@@ -160,6 +164,9 @@ const Header = () => {
             <span className="absolute -top-2 -right-2 bg-maincolor text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               4
             </span>
+          </div>
+          <div className="cursor-pointer hover:text-maincolor transition" onClick={handleLanguageChange}>
+            <span className="text-lg">{i18n.language === "vi" ? "🌍 Tiếng Việt" : "🌍 English"}</span>
           </div>
           <div className="relative">
             {userAvatar ? (

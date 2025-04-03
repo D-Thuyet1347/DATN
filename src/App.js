@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import Schedule from './components/Schedule';
 import Admin from './pages/Admin';
 import BlogViewer from './components/BlogViewer';
+import ServiceDetails from './components/ServiceDetails';
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blogview" element={<BlogViewer />} />
+          <Route path="/service/:id" element={<ServiceDetails />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"admin"} />} />

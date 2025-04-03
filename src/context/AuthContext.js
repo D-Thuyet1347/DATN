@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { loginUser, getUser } from "../APIs/userApi";
+import { loginUser,getCurrentUser  } from "../APIs/userApi";
 
 export const AuthContext = createContext();
 
@@ -19,16 +19,21 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUserInfo = async (token) => {
         try {
-            const res = await getUser(token);
-            setUser(res.user);
+          // Sử dụng endpoint mới thay vì endpoint cũ
+          const res = await getCurrentUser();
+          if (res.success) {
+            setUser(res.data); // Lưu ý: response trả về data chứ không phải user như trước
+          } else {
+            throw new Error(res.message);
+          }
         } catch (error) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-            setUser(null);
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          setUser(null);
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    };
+      };
 
     const login = async (credentials) => {
         try {

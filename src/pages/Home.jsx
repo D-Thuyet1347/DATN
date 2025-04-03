@@ -6,6 +6,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import BlogViewer from "../components/BlogViewer";
 import OneProduct  from "../components/OneProduct";
+import Products from "./Products";
+import Cart from "./Cart";
 
 const Home = () => {
   return (
@@ -17,7 +19,8 @@ const Home = () => {
 
       <FeaturedServices />
       <BlogViewer />
-      <OneProduct />
+      <Products />
+      <Cart />
       <Footer />
     </>
   );

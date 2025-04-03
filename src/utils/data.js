@@ -1,8 +1,8 @@
 export const PRcategories = [
-    {
-        id: 1,
-        name: 'Tất cả',
-    },
+    // {
+    //     id: 1,
+    //     name: 'Tất cả',
+    // },
     {
         id: 2,
         name: 'Tinh dầu',
@@ -10,7 +10,7 @@ export const PRcategories = [
     {
         id: 3,
         name: 'Chăm sóc da',
-    }, 
+    },
     {
         id: 4,
         name: 'Chăm sóc tóc',
@@ -29,12 +29,11 @@ export const PRcategories = [
     },
   ];
 
-
 export const SVcategories = [
-    {
-        id: 1,
-        name: 'Tất cả dịch vụ',
-    },
+    // {
+    //     id: 1,
+    //     name: 'Tất cả dịch vụ',
+    // },
     {
         id: 2,
         name: 'Massage đá nóng',
@@ -64,3 +63,4 @@ export const SVcategories = [
         name: 'Massage mặt',
     },
 ]
+
