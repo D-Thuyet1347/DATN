@@ -1,116 +1,116 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setCartData } from "../redux/cartSlice";
-import { useParams } from "react-router-dom";
+import {
+  getCart,
+  addToCart,
+  removeFromCart,
+  decreaseToCart,
+} from "../APIs/cartApi";
 import { getProducts } from "../APIs/ProductsApi";
-import { getCart, addToCart, decreaseFromCart, removeFromCart } from "../APIs/cartApi";
 
 const Cart = () => {
-  const dispatch = useDispatch();
-  const { userId } = useParams();
-  const { cartData, status, error } = useSelector((state) => state.cart); 
+  const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (userId) {
-      getCart(userId)
-        .then(cart => dispatch(setCartData(cart)))
-        .catch(console.error);
+    fetchData();
+    fetchProducts();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await getCart();
+      setCartItems(res?.data || {});
+      setLoading(false);
+    } catch (err) {
+      setError("Lỗi khi tải giỏ hàng");
+      setLoading(false);
     }
-    getProducts()
-      .then(setProducts)
-      .catch(console.error);
-  }, [dispatch, userId]);
-
-  const handleAdd = (productId) => {
-    addToCart(userId, productId)
-      .then(() => {
-        getCart(userId)
-          .then(cart => dispatch(setCartData(cart)))
-          .catch(console.error);
-      })
-      .catch(console.error);
   };
 
-  const handleDecrease = (productId) => {
-    decreaseFromCart(userId, productId)
-      .then(() => {
-        // Cập nhật lại giỏ hàng sau khi giảm số lượng
-        getCart(userId)
-          .then(cart => dispatch(setCartData(cart)))
-          .catch(console.error);
-      })
-      .catch(console.error);
+  const fetchProducts = async () => {
+    try {
+      const res = await getProducts();
+      if (res.success) {
+        setProducts(res.data);
+      } else {
+        setError("Không thể lấy dữ liệu sản phẩm");
+      }
+    } catch (err) {
+      setError("Lỗi khi tải sản phẩm");
+    }
   };
 
-  const handleRemove = (productId) => {
-    removeFromCart(userId, productId)
-      .then(() => {
-        // Cập nhật lại giỏ hàng sau khi xóa sản phẩm
-        getCart(userId)
-          .then(cart => dispatch(setCartData(cart)))
-          .catch(console.error);
-      })
-      .catch(console.error);
+  const handleAddToCart = async (productID) => {
+    await addToCart(productID);
+    fetchData();
   };
 
-  if (status === "loading") return <p className="text-center text-gray-500">Loading cart...</p>;
-  if (status === "failed") return <p className="text-center text-red-500">Error: {error}</p>;
+  const handleRemoveFromCart = async (productID) => {
+    await removeFromCart(productID);
+    fetchData();
+  };
+
+  const handleDecreaseItem = async (productID) => {
+    await decreaseToCart(productID);
+    fetchData();
+  };
+
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4">Shopping Cart</h2>
-      {/* Kiểm tra nếu giỏ hàng trống */}
-      {Object.keys(cartData).length === 0 ? (
-        <p className="text-center text-gray-500">Your cart is empty.</p>
-      ) : (
-        <ul className="space-y-4">
-          {Object.entries(cartData).map(([productId, item]) => (
-            <li key={productId} className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
-              <span className="text-lg font-semibold">{item.productName} - {item.quantity} x ${item.price}</span>
-              <div className="flex space-x-2">
-                <button 
-                  onClick={() => handleAdd(productId)}
-                  className="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600"
-                >
-                  +
-                </button>
-                <button 
-                  onClick={() => handleDecrease(productId)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600"
-                >
-                  -
-                </button>
-                <button 
-                  onClick={() => handleRemove(productId)}
-                  className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
-                >
-                  Remove
-                </button>
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold mb-4">Giỏ hàng của bạn</h2>
+      {products.map((product) => (
+        cartItems[product._id] ? (
+          <div
+            key={product._id}
+            className="flex justify-between items-center mb-4 p-4 border-b"
+          >
+            <div className="flex items-center">
+              <img
+                src={product.ImagePD}
+                alt={product.ProductName}
+                className="w-24 h-24 object-cover mr-4"
+              />
+              <div className="flex flex-col">
+                <p className="text-lg font-semibold">{product.ProductName}</p>
+                <p className="text-sm text-gray-600">{product.PricePD} VND</p>
+                <p className="text-sm text-gray-600">
+                  Số lượng: {cartItems[product._id]}
+                </p>
               </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <h2 className="text-2xl font-semibold mt-8 mb-4">Available Products</h2>
-      <ul className="space-y-4">
-        {products?.length > 0 ? (
-          products.map((product) => (
-            <li key={product.id} className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
-              <span className="text-lg font-semibold">{product.ProductName} - ${product.PricePD}</span>
-              <button 
-                onClick={() => handleAdd(product.id)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleDecreaseItem(product._id)}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
-                Add to Cart
+                -
               </button>
-            </li>
-          ))
-        ) : (
-          <p className="text-center text-gray-500">No products available.</p>
-        )}
-      </ul>
+              <button
+                onClick={() => handleAddToCart(product._id)}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                +
+              </button>
+              <button
+                onClick={() => handleRemoveFromCart(product._id)}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Xóa
+              </button>
+            </div>
+          </div>
+        ) : null
+      ))}
+      <div className="text-right mt-6">
+        <button className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
+          Thanh toán
+        </button>
+      </div>
     </div>
   );
 };

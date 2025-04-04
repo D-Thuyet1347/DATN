@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Button, Drawer, Table, Select, message, Input, Upload } from 'antd';
+import { Button, Drawer, Table, Select, message, Input, Upload, Spin } from 'antd';
 import { DeleteOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
 import { getProducts, addProduct, updateProduct } from '../APIs/ProductsApi';
 import axios from 'axios';
@@ -17,12 +16,14 @@ const ProductManagement = () => {
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(null);
     const [fileList, setFileList] = useState([]);
+    const [isTableLoading, setIsTableLoading] = useState(true); // Loading state for table
 
     useEffect(() => {
         fetchProducts();
     }, []);
 
     const fetchProducts = async () => {
+        setIsTableLoading(true); 
         try {
             const response = await getProducts();
             if (response.success) {
@@ -31,6 +32,8 @@ const ProductManagement = () => {
         } catch (error) {
             console.error('Lỗi khi lấy danh sách sản phẩm:', error);
             setProducts([]);
+        } finally {
+            setIsTableLoading(false); 
         }
     };
 
@@ -43,8 +46,8 @@ const ProductManagement = () => {
 
     const openEditDrawer = (product = null) => {
         if (product) {
-            setSelectProduct({ ...product }); 
-            setImage(product.ImagePD || null); 
+            setSelectProduct({ ...product });
+            setImage(product.ImagePD || null);
             setFileList(product.ImagePD ? [{ url: product.ImagePD }] : []);
         } else {
             setSelectProduct({
@@ -60,7 +63,6 @@ const ProductManagement = () => {
         }
         setIsDrawerOpen(true);
     };
-    
 
     const handleUpdateProduct = async () => {
         setLoading(true);
@@ -70,12 +72,12 @@ const ProductManagement = () => {
                 setLoading(false);
                 return;
             }
-            
+
             const updatedData = {
                 ...selectProduct,
-                ImagePD: image || selectProduct.ImagePD, 
+                ImagePD: image || selectProduct.ImagePD,
             };
-    
+
             if (selectProduct._id) {
                 await updateProduct(selectProduct._id, updatedData);
                 message.success('Cập nhật sản phẩm thành công!');
@@ -83,7 +85,7 @@ const ProductManagement = () => {
                 await addProduct(updatedData);
                 message.success('Thêm sản phẩm thành công!');
             }
-    
+
             fetchProducts();
             setIsDrawerOpen(false);
         } catch (error) {
@@ -93,7 +95,6 @@ const ProductManagement = () => {
             setLoading(false);
         }
     };
-    
 
     const handleDeleteProduct = async (id) => {
         try {
@@ -107,6 +108,7 @@ const ProductManagement = () => {
             message.error('Xóa sản phẩm thất bại!');
         }
     };
+
     const handleImageChange = async ({ fileList }) => {
         const file = fileList[0];
         if (file && !file.url && !file.preview) {
@@ -114,8 +116,8 @@ const ProductManagement = () => {
         }
         setImage(file.preview);
         setFileList(fileList);
-        // setSelectProduct((prev) => ({ ...prev, ImagePD: file.preview }));
     };
+
     const columns = [
         {
             title: "Ảnh",
@@ -214,12 +216,14 @@ const ProductManagement = () => {
                 </Button>
             </Drawer>
 
-            <Table
-                style={{ marginTop: 20 }}
-                dataSource={products}
-                columns={columns}
-                pagination={{ pageSize: 5 }}
-            />
+            <Spin className='mt-9' tip="Loading data...." spinning={isTableLoading}>
+                <Table
+                    style={{ marginTop: 20 }}
+                    dataSource={products}
+                    columns={columns}
+                    pagination={{ pageSize: 5 }}
+                />
+            </Spin>
         </div>
     );
 };

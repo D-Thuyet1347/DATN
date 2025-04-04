@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Drawer, Table, Select, message, Input, Upload } from 'antd';
+import { Button, Drawer, Table, Select, message, Input, Upload, Spin } from 'antd';
 import { DeleteOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
 import { getAllServices, createService, updateService, deleteService } from '../APIs/ServiceAPI';
 import { SVcategories } from '../utils/data';
@@ -13,6 +13,8 @@ const ServiceManagement = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
         const [image, setImage] = useState(null);
         const [fileList, setFileList] = useState([]);
+            const [isTableLoading, setIsTableLoading] = useState(true);
+        
    
 
     // Lấy danh sách dịch vụ khi component được mount
@@ -21,6 +23,7 @@ const ServiceManagement = () => {
     }, []);
 
     const fetchServices = async () => {
+        setIsTableLoading(true); 
         try {
             const response = await getAllServices();
             if (response.success) {
@@ -32,6 +35,7 @@ const ServiceManagement = () => {
             console.error('Lỗi khi lấy danh sách dịch vụ:', error);
             setServices([]);
         }
+        setIsTableLoading(false);
     };
 
     const handleFieldChange = (field, value) => {
@@ -203,12 +207,14 @@ const ServiceManagement = () => {
                 </Button>
             </Drawer>
 
-            <Table
-                style={{ marginTop: 20 }}
-                dataSource={services}
-                columns={columns}
-                pagination={{ pageSize: 5 }}
-            />
+            <Spin className='mt-9' tip="Loading data...." spinning={isTableLoading}>
+                <Table
+                    style={{ marginTop: 20 }}
+                    dataSource={services}
+                    columns={columns}
+                    pagination={{ pageSize: 5 }}
+                />
+            </Spin>
         </div>
     );
 };

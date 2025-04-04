@@ -37,7 +37,6 @@ export const updateUser = async (id, data) => {
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        // Không cần thiết lập Content-Type cho FormData, browser sẽ tự thêm boundary
                     }
                 }
             );

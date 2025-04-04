@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { listUser, removeUser,updateUserRole } from '../APIs/userApi';
 import { Button, Drawer, Input, Table, Upload, message, Select } from 'antd';
-import { EditOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, UploadOutlined } from '@ant-design/icons';
 import { getBase64 } from '../utils/ultils';
 import { errorToast, successToast, toastContainer } from '../utils/toast';
 
@@ -69,14 +69,6 @@ const AccountManagement = () => {
             message.error("Có lỗi xảy ra khi xóa tài khoản.");
         }
     };
-    const handleImageChange = async ({ fileList }) => {
-        const file = fileList[0];
-        if (file && !file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
-        }
-        setSelectedUser({ ...selectedUser, image: file.preview });
-        setFileList(fileList);
-    };
 
     const columns = [
         { title: 'Tên tài khoản', dataIndex: 'firstName', key: 'firstName' },
@@ -85,18 +77,19 @@ const AccountManagement = () => {
         { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },
         { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },
         {
-            title: 'Ảnh đại diện',
-            dataIndex: 'image',
-            key: 'image',
-            render: (text) => text && <img width={50} height={50} src={text} alt="Avatar" />,
-        },
-        {
             title: 'Hành động',
             key: 'action',
             render: (_, record) => (
-                <span >
-                    <EditOutlined  onClick={() => openEditDrawer(record)}  />
-                </span>
+                <div>
+                <DeleteOutlined
+                    style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }}
+                    onClick={() => handleDeleteAccount(record._id)}
+                />
+                <EditOutlined
+                    style={{ color: 'blue', fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
+                    onClick={() => openEditDrawer(record)}
+                />
+            </div>
             ),
         },
     ];
@@ -122,10 +115,6 @@ const AccountManagement = () => {
                     <Option value="manager">Manager</Option>
                     <Option value="employee">Employee</Option>
                 </Select>
-                <Upload fileList={fileList} beforeUpload={() => false} onChange={handleImageChange} showUploadList>
-                    <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
-                </Upload>
-                {selectedUser?.image && <img src={selectedUser.image} alt="Avatar Preview" style={{ width: 50, height: 50, marginTop: 10 }} />}
                 <Button  className="mt-4 bg-blue-700" onClick={handleUpdateAccount}>Xác nhận cập nhật</Button>
             </Drawer>
         </>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getAllBlogs, createBlog, updateBlog, deleteBlog } from "../APIs/blogApi";
-import { Table, Button, Input, Upload, message, Drawer, Switch } from "antd";
+import { Table, Button, Input, Upload, message, Drawer, Switch, Spin } from "antd";
 import { UploadOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getBase64 } from "../utils/ultils";
 
@@ -13,6 +13,7 @@ const BlogManagement = () => {
     const [editingId, setEditingId] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isTableLoading, setIsTableLoading] = useState(true);
     const userId = "123456";
 
     useEffect(() => {
@@ -20,6 +21,8 @@ const BlogManagement = () => {
     }, []);
 
     const fetchBlogs = async () => {
+        setIsTableLoading(true); 
+
         try {
             const response = await getAllBlogs();  // Ensure this is the right API method
             console.log("Data from API: ", response);  // Log full response to check structure
@@ -32,6 +35,7 @@ const BlogManagement = () => {
             console.error("Error fetching blogs: ", error);
             message.error("Lỗi tải danh sách bài viết!");
         }
+        setIsTableLoading(false); // Stop loading
     };
 
     const handleSubmit = async () => {
@@ -126,7 +130,14 @@ const BlogManagement = () => {
         <div>
             <h1>Quản lý Blog</h1>
             <Button type="primary" onClick={() => setIsDrawerOpen(true)}>Thêm bài viết</Button>
-            <Table className="mt-4" dataSource={blogs} columns={columns} pagination={{ pageSize: 5 }} />
+            <Spin className='mt-9' tip="Loading data...." spinning={isTableLoading}>
+                <Table
+                    style={{ marginTop: 20 }}
+                    dataSource={blogs}
+                    columns={columns}
+                    pagination={{ pageSize: 5 }}
+                />
+            </Spin>
             <Drawer
                 title={editingId ? "Cập nhật bài viết" : "Thêm bài viết"}
                 placement="right"

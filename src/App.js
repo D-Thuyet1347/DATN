@@ -20,11 +20,8 @@ import BlogViewer from './components/BlogViewer';
 import ServiceDetails from './components/ServiceDetails';
 
 function App() {
-
-
   return (
     <>
- 
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
