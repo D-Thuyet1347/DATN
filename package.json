@@ -28,6 +28,7 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^11.0.5",
     "toast": "^0.5.4",
+    "typescript": "^5.8.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -59,4 +60,5 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^3.3.3"
   }
+  
 }
