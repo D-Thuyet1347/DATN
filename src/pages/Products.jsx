@@ -5,14 +5,17 @@ import { getProducts } from '../APIs/ProductsApi';  // Đảm bảo import đún
 import { PRcategories } from '../utils/data';
 import { motion } from 'framer-motion';
 import { addToCart } from '../APIs/cartApi';
+import {  useParams } from 'react-router-dom';
+import { errorToast, successToast } from '../utils/toast';
 
 const Products = () => {
   const [filter, setFilter] = useState('Tất cả');
   const [data, setData] = useState({});
-  const [cart, setCart] = useState({});  // Giỏ hàng
+  const [quantity, setQuantity] = useState(1);  
+
   const [loading, setLoading] = useState(false);  // Thêm trạng thái loading
   const [cartMessage, setCartMessage] = useState('');  // Thông báo cho người dùng
-
+  const { id } = useParams();
   useEffect(() => {
     const fetchData = async () => {
       const res = await getProducts();
@@ -31,38 +34,24 @@ const Products = () => {
       ? data
       : data.filter((product) => product.Category === filter);
 
-  const handleAddToCart = async (productId) => {
-    console.log("Thêm sản phẩm vào giỏ hàng:", productId);
-    setLoading(true);
-    setCartMessage('');
-    setCart((prev) => ({
-      ...prev,
-      [productId]: (prev[productId] || 0) + 1,
-    }));  
-    try {
-      const res = await addToCart(productId);
-      if (res.success) {
-        setCartMessage("Sản phẩm đã được thêm vào giỏ hàng!");
-      } else {
-        setCartMessage("Không thể thêm sản phẩm vào giỏ hàng.");
-      }
-    } catch (error) {
-      setCartMessage("Lỗi khi thêm sản phẩm vào giỏ hàng.");
-    } finally {
-      setLoading(false); 
-    }
-  };
+const handleAddToCart = async (productId, quantity) => {
+        try {
+          const res = await addToCart(productId, quantity); // Chỉ thêm sản phẩm vào giỏ hàng
+          if (res.success) {
+            successToast("Sản phẩm đã được thêm vào giỏ hàng!");
+          }
+        } catch (error) {
+          errorToast("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
+        }
+};
+
 
   return (
     <div className="mt-16">
       <section className="p-10">
-        <h2 className="text-3xl font-bold text-maincolor text-center">Our Products</h2>
-        
-        {/* Hiển thị thông báo khi thêm sản phẩm vào giỏ hàng */}
-        {cartMessage && <div className="text-center text-red-500 mb-4">{cartMessage}</div>}
-        
+        <h2 className="text-3xl font-bold text-maincolor text-center">Our Products</h2>  
+        {cartMessage && <div className="text-center text-red-500 mb-4">{cartMessage}</div>}   
         <div className="flex justify-center space-x-4 py-4 mt-8">
-          {/* Lọc sản phẩm theo danh mục */}
           <motion.div
             whileTap={{ scale: 0.7 }}
             key={1}
@@ -94,7 +83,7 @@ const Products = () => {
                   description={product.DescriptionPD}
                   image={product.ImagePD}
                   productId={product._id}  // Truyền productId vào component
-                  onAddToCart={handleAddToCart}  // Truyền hàm vào component
+                  onAddToCart={() => handleAddToCart(product._id, quantity)}  // Truyền hàm vào component
                   loading={loading}  // Trạng thái loading
                 />
               </div>

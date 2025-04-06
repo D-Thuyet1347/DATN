@@ -126,7 +126,7 @@ const ProductManagement = () => {
             render: (img) => img && <img width={50} height={50} src={img} alt="Ảnh bài viết" />,
         },
         { title: 'Tên', dataIndex: 'ProductName', key: 'ProductName' },
-        { title: 'Mô tả', dataIndex: 'DescriptionPD', key: 'DescriptionPD' },
+        { title: 'Mô tả', dataIndex: 'DescriptionPD', key: 'DescriptionPD' , className: 'w-[500px]'},
         { title: 'Giá', dataIndex: 'PricePD', key: 'PricePD' },
         { title: 'Số lượng', dataIndex: 'StockQuantity', key: 'StockQuantity' },
         { title: 'Danh mục', dataIndex: 'Category', key: 'Category' },

@@ -95,11 +95,6 @@ const Header = () => {
     setIsMenu(false);
   };
 
-  const handleBlog = () => {
-    navigate("/blogview");
-    setIsMenu(false);
-  };
-
 
   // Fetch user data khi token tồn tại
   useEffect(() => {
@@ -127,7 +122,6 @@ const Header = () => {
           <Link to="/service" className="text-gray-600 hover:text-maincolor">
            {t("header.services")}
           </Link>
-          
           <Link to="/product" className="text-gray-600 hover:text-maincolor">
           {t("header.products")}
           </Link>
@@ -135,8 +129,11 @@ const Header = () => {
           <Link to="/booknow" className="text-gray-600 hover:text-maincolor">
           {t("header.bookNow")}
           </Link>
-          <Link onClick={handleBlog} to="/blogview" className="text-gray-600 hover:text-maincolor">
+          <Link to="/blogview" className="text-gray-600 hover:text-maincolor">
           {t("header.blogger")}
+          </Link>
+          <Link to="/spvc" href="#" className="text-gray-600 hover:text-maincolor">
+          {t("header.voucher")}
           </Link>
           <Link to="/about" className="text-gray-600 hover:text-maincolor">
           {t("header.about")}

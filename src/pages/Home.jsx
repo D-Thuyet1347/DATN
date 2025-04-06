@@ -31,8 +31,6 @@ const Home = () => {
       <FeaturedServices />
       <BlogViewer />
       <Products />
-      <Footer />
-      <Cart />
     {/* </Spin> */}
     </>
   );

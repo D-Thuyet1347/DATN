@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { getProducts } from '../APIs/ProductsApi';
 
 export const ProductView = () => {
@@ -16,10 +16,13 @@ export const ProductView = () => {
             setDataUserProduct([]);
         }
     }
+    useEffect(() => {
+        fetchProduct();
+    }, []);
   return (
-    <div>
+    <div className='mt-16'>
         <h1>Danh sách sản phẩm</h1>
-        <button onClick={fetchProduct}>Lấy danh sách sản phẩm</button>
+        <button >Lấy danh sách sản phẩm</button>
         <table>
             <thead>
                 <tr>
@@ -31,8 +34,8 @@ export const ProductView = () => {
             <tbody>
                 {dataUserProduct.map(product => (
                     <tr key={product._id}>
-                        <td>{product.name}</td>
-                        <td>{product.price}</td>
+                        <td>{product.ProductName}</td>
+                        <td>{product.PricePD}</td>
                         <td>{product.description}</td>
                     </tr>
                 ))}

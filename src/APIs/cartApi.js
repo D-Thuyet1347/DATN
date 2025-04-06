@@ -17,45 +17,35 @@ export const getCart = async () => {
   }
 };
 
-// Thêm sản phẩm vào giỏ hàng
-export const addToCart = async (itemId) => {
-  try {
+export const clearCart = async () => {
     const token = localStorage.getItem("token");
-    console.log("Token from localStorage:", token);
-    
-    const response = await axios.post(
-      `${API_URL}/cart/add`,
-      { itemId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    
-    if (response.data.success) {
-      console.log("Added to cart successfully:", response.data.message);
-    } else {
-      console.log("Failed to add to cart:", response.data.message);
-    }
-    
+    const response = await axios.post(`${API_URL}/cart/clear`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });  
     return response.data;
-  } catch (error) {
-    console.error("Error adding item to cart:", error);
-    if (error.response) {
-      console.log("Backend error response:", error.response.data);
-    } else if (error.request) {
-      console.log("No response received from server:", error.request);
-    } else {
-      console.log("Error setting up request:", error.message);
-    }
-    throw error;
-  }
 };
 
-// Xóa sản phẩm khỏi giỏ hàng
+
+// Thêm sản phẩm vào giỏ hàng
+export const addToCart = async (itemId, quantity) => {
+  const token = localStorage.getItem("token");
+  
+  const response = await axios.post(
+    `${API_URL}/cart/add`,  // Đảm bảo rằng API của bạn đã xử lý yêu cầu này.
+    { itemId, quantity },   // Gửi cả itemId và quantity lên backend.
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+
 export const removeFromCart = async (itemId) => {
-  try {
     const token = localStorage.getItem("token");
     const response = await axios.post(
       `${API_URL}/cart/remove`,
@@ -67,15 +57,10 @@ export const removeFromCart = async (itemId) => {
       }
     );
     return response.data;
-  } catch (error) {
-    console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng:", error);
-    throw error;
-  }
 };
 
 // Giảm số lượng sản phẩm trong giỏ hàng
 export const decreaseToCart = async (itemId) => {
-  try {
     const token = localStorage.getItem("token");
     const response = await axios.post(
       `${API_URL}/cart/decrease`,
@@ -87,8 +72,5 @@ export const decreaseToCart = async (itemId) => {
       }
     );
     return response.data;
-  } catch (error) {
-    console.error("Lỗi khi giảm số lượng sản phẩm:", error);
-    throw error;
-  }
 };
+

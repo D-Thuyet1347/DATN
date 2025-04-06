@@ -28,10 +28,9 @@ const BlogViewer = () => {
     };
 
     return (
-        <div className="container mx-auto px-2 py-4 max-w-3xl">
-            <h1 className="text-2xl font-bold mb-6">Danh sách Bài Viết</h1>
-            <div className="all-blogs">
-                <h2 className="text-xl font-semibold mb-4">Tất cả Bài Viết</h2>
+        <div className="container m-auto px-2 pb-[550px] w-full h-[100px] mt-0">
+            <h1 className="text-2xl font-bold mb-6 text-center">Bài viết nổi bật</h1>
+            <div className="flex gap-[30px] w-[1000px] items-center ml-[80px] ">
                 {blogs.map((blog) => (
                     <div key={blog._id} className="fbPost border border-gray-300 rounded-lg mb-4 bg-white p-4 shadow-md">
                         <div className="postHeader flex items-center mb-4">
@@ -45,11 +44,11 @@ const BlogViewer = () => {
                                 <span>{new Date(blog.createdAt).toLocaleString()}</span>
                             </div>
                         </div>
-
                         <div className="postContent mt-2">
                             <h2 className="postTitle text-xl font-semibold mb-2">{blog.title}</h2>
                             <p className="postText text-base mb-4">{blog.content}</p>
-                            {blog.image && <img src={blog.image} alt="Post Image" className="postImage w-full max-w-xl h-auto rounded-lg mt-4" />}
+                            {blog.image && 
+                            <img src={blog.image} alt="Post Iage" className=" w-[400px] h-[300px] rounded-lg mt-4" />}
                         </div>
                     </div>
                 ))}
