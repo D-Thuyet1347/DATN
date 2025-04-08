@@ -73,7 +73,7 @@ const handleAddToCart = async (productId, quantity) => {
         </div>
 
         {/* Hiển thị sản phẩm */}
-        <div className="grid grid-cols-4 gap-3 mt-8 ml-10">
+        <div className="grid grid-cols-4 gap-3 mt-8 ml-10 ">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product, index) => (
               <div key={index}>
@@ -82,9 +82,9 @@ const handleAddToCart = async (productId, quantity) => {
                   price={product.PricePD}
                   description={product.DescriptionPD}
                   image={product.ImagePD}
-                  productId={product._id}  // Truyền productId vào component
-                  onAddToCart={() => handleAddToCart(product._id, quantity)}  // Truyền hàm vào component
-                  loading={loading}  // Trạng thái loading
+                  productId={product._id} 
+                  onAddToCart={() => handleAddToCart(product._id, quantity)} 
+                  loading={loading} 
                 />
               </div>
             ))

@@ -9,6 +9,7 @@ import { EmployeeManagement } from '../components/EmployeeManagement';
 import ServiceManagement from '../components/ServiceManagement';
 import ProductManagement from '../components/ProductManagement';
 import BlogManagement from '../components/BlogManagement';
+import SlideBannerManagement from '../components/SlideBannerManagement';
 
 const items = [
   {
@@ -69,8 +70,8 @@ const Admin = () => {
         return <BlogManagement />;
       case 'brand':
         return <BrandManagement />;
-      // case 'banner':
-      //   return <BannerLive />;
+      case 'banner':
+        return <SlideBannerManagement />;
       case 'account':
         return <AccountManagement />;
       case 'employee':

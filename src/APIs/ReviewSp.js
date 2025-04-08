@@ -7,17 +7,16 @@ const reviewsp = axios.create({
   headers: { "Content-Type": "application/json" }
 });
 
-// API add review
 export const addReview = async (data) => {
     const response = await reviewsp.post("/reviewsp/add", data);
     return response.data;
 };
-// API list review
-export const listReview = async () => {
-    const response = await reviewsp.get("/reviewsp/list");
-    return response.data;
+
+export const listReview = async (productId) => {
+    const response = await reviewsp.get(`/reviewsp/${productId}`);
+    return response.data.data;
 };
-// API remove review
+
 export const removeReview = async (reviewId) => {
     const response = await reviewsp.delete(`/reviewsp/remove/${reviewId}`);
     return response.data;

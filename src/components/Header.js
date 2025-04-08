@@ -25,10 +25,9 @@ const Header = () => {
 
   const navigate = useNavigate();
   const handleLanguageChange = () => {
-    const newLang = i18n.language === "vi" ? "en" : "vi"; // Toggle giữa "vi" và "en"
-    i18n.changeLanguage(newLang); // Thay đổi ngôn ngữ của i18n
+    const newLang = i18n.language === "vi" ? "en" : "vi"; 
+    i18n.changeLanguage(newLang); 
   };
-  // Fetch user data from API
   const fetchUserData = async () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -54,14 +53,12 @@ const Header = () => {
     }
   };
 
-  // Scroll effect to change navbar style
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Lắng nghe thay đổi localStorage để cập nhật avatar
   useEffect(() => {
     const handleStorageChange = () => {
       setUserAvatar(localStorage.getItem("userAvatar") || DEFAULT_AVATAR);
@@ -106,8 +103,8 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full shadow-sm transition-all ${
-        isScrolled ? "text-black py-4 bg-blue-400" : "bg-transparent text-black p-3"
+      className={`sticky  z-50 top-0 left-0 w-full shadow-sm transition-all ${
+        isScrolled ? "text-black py-4 bg-white" : "bg-transparent text-black p-3"
       }`}
     >
       <div className="container relative mx-auto flex justify-between items-center px-6">

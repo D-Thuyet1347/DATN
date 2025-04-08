@@ -5,7 +5,6 @@ import { getProductById } from '../APIs/ProductsApi';
 import { RightOutlined } from '@ant-design/icons';
 import { addToCart, decreaseToCart } from '../APIs/cartApi';
 import { errorToast, successToast, toastContainer } from '../utils/toast';
-import { ToastContainer } from 'react-toastify';
 
 const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1); // Trạng thái chỉ lưu số lượng

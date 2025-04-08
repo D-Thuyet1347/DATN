@@ -24,10 +24,8 @@ const Home = () => {
   return (
      <>
      {/* <Spin  spinning={isPending} tip="Loading page....." size="large" className="absolute top-1/2 left-1/2 z-50"> */}
-      <div className="width-full position-relative z-index-1">
         <Header />
         <Hero />
-      </div>
       <FeaturedServices />
       <BlogViewer />
       <Products />
