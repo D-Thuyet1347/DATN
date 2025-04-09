@@ -8,7 +8,7 @@ const ProductDetailPage = () => {
   return (
     <div className='    '>
     <Header />
-      <div className='p-10 pt-16'>
+      <div className='p-10 pt-6'>
         <ProductDetail />
         <ReviewsInDeTail />
       </div>

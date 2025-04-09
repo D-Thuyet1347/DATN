@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import { getAllServices } from '../APIs/ServiceAPI';
 import { SVcategories } from '../utils/data';
 import { motion } from 'framer-motion'
-
 const Service = () => {
+  // const fades = ["right", "down", "left"];
   const [filter, setFilter] = useState('Tất cả dịch vụ')
   useEffect(() => {
 
@@ -21,11 +21,11 @@ const Service = () => {
       console.error('Lỗi khi lấy danh sách dịch vụ:', error);
     }
   }
-  
   useEffect(() => {
     fetchData()
   }, [])
 
+  // Lọc sản phẩm theo danh mục
   const filteredProducts =
     filter === "Tất cả dịch vụ"
       ? data // Nếu filter là "tatca", hiển thị tất cả sản phẩm
@@ -52,6 +52,7 @@ const Service = () => {
               <div  key={index}>
                 <OneService
                     name={db.name}
+                    id={db._id}
                     title={db.title}
                     price={db.price}
                     duration={db.duration}
@@ -67,18 +68,6 @@ const Service = () => {
           )}
         </div>
       </section>
-      <div className="text-center bg-abovefootcolor text-white p-10" >
-        <h2 className="text-3xl font-bold">Ready to Experience True Relaxation?</h2>
-        <p className="mt-4">
-          Book your appointment today and discover why our clients keep coming back. Whether you’re looking for relaxation, rejuvenation, or a little self-care, we have the perfect treatment for you.
-        </p>
-        <Link to="/booknow">
-          <button className="bg-white text-maincolor px-6 py-3 rounded-md hover:bg-gray-200 mt-6 flex items-center mx-auto">
-            Book Now <span className="ml-2 material-icons">arrow_forward</span>
-          </button>
-        </Link>
-      </div>
-      <Footer />
     </div>
   )
 }

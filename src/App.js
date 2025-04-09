@@ -17,13 +17,16 @@ import Profile from './pages/Profile';
 import Schedule from './components/Schedule';
 import Admin from './pages/Admin';
 import BlogViewer from './components/BlogViewer';
-import ServiceDetails from './components/ServiceDetails';
 import ProductDetailPage from './pages/ProductDetailsPage';
 import { ProductView } from './components/ProductView';
+import SuperVouchers from './pages/SuperVouchers';
+import MyVouchers from './pages/MyVouchers';
+import ServiceDetailPage from './pages/ServiceDetailPage';
 
 function App() {
   return (
     <>
+    {/* <Header /> */}
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -41,8 +44,11 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blogview" element={<BlogViewer />} />
           <Route path="/productview" element={<ProductView />} />
-          <Route path="/service/:id" element={<ServiceDetails />} />
+          <Route path="/service/:id" element={<ServiceDetailPage />} />
           <Route path="/product/:id" element={<ProductDetailPage/>} />
+          <Route path="/spvc" element={<SuperVouchers />} />
+          {/* <Route path="/myvc" element={<MyVouchers />} /> */}
+          <Route path="/myvc" element={<PrivateRoute element={<MyVouchers />} requiredRole="user" />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"admin"} />} />

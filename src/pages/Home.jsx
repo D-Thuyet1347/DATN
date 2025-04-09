@@ -8,6 +8,7 @@ import Products from "./Products";
 import { Spin } from "antd";
 import { getProducts } from "../APIs/ProductsApi";
 import Cart from "./Cart";
+import Service from "./Service";
 
 const Home = () => {
   const [isPending, setIsPending] = useState(false);
@@ -26,8 +27,8 @@ const Home = () => {
      {/* <Spin  spinning={isPending} tip="Loading page....." size="large" className="absolute top-1/2 left-1/2 z-50"> */}
         <Header />
         <Hero />
-      <FeaturedServices />
       <BlogViewer />
+      <Service />
       <Products />
     {/* </Spin> */}
     </>
