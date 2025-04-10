@@ -58,6 +58,11 @@ const SuperVouchers = () => {
   };
 
   const handleSaveVoucher = (voucher) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Bạn cần đăng nhập để lưu voucher!');
+      return;
+    }
     // Lấy danh sách voucher đã lưu từ localStorage
     const savedVouchers = JSON.parse(localStorage.getItem('myVouchers')) || [];
     // Kiểm tra xem voucher đã tồn tại chưa

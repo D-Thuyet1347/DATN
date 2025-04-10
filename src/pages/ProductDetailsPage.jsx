@@ -1,8 +1,8 @@
 import React from 'react'
 import ProductDetail from '../components/ProductDetail'
-import ReviewsInDeTail from '../components/ReviewsInDeTail'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
+import ReviewsInDeTailSP from '../components/ReviewsDetailSP'
 
 const ProductDetailPage = () => {
   return (
@@ -10,7 +10,7 @@ const ProductDetailPage = () => {
     <Header />
       <div className='p-10 pt-6'>
         <ProductDetail />
-        <ReviewsInDeTail />
+        <ReviewsInDeTailSP />
       </div>
       <Footer />
       

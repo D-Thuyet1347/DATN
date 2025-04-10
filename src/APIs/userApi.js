@@ -73,7 +73,6 @@ export const forgotPassword = async (email) => {
 export const verifyCodeAndResetPassword = async (data) => {
         const response = await userApi.post("/user/verify-code-and-reset-password", data);
         return response.data;
-  
 };
 
 // API đổi mật khẩu (yêu cầu đã đăng nhập)

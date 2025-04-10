@@ -6,7 +6,7 @@ import { PRcategories } from '../utils/data';
 import { motion } from 'framer-motion';
 import { addToCart } from '../APIs/cartApi';
 import {  useParams } from 'react-router-dom';
-import { errorToast, successToast } from '../utils/toast';
+import { errorToast, successToast, toastContainer } from '../utils/toast';
 
 const Products = () => {
   const [filter, setFilter] = useState('Tất cả');
@@ -48,6 +48,7 @@ const handleAddToCart = async (productId, quantity) => {
 
   return (
     <div className="mt-16">
+    {toastContainer()}
       <section className="p-10">
         <h2 className="text-3xl font-bold text-maincolor text-center">Our Products</h2>  
         {cartMessage && <div className="text-center text-red-500 mb-4">{cartMessage}</div>}   

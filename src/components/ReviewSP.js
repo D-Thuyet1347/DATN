@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getUser } from '../APIs/userApi';
 import { getProductById } from '../APIs/ProductsApi';
-import { addReview } from '../APIs/ReviewSp';
+import {  addReviewSP } from "../APIs/ReviewSPAPI";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { jwtDecode } from 'jwt-decode';
 
-export const Review = () => {
+export const ReviewSP = () => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(null);
   const [comment, setComment] = useState('');
@@ -84,10 +84,9 @@ export const Review = () => {
       comment
     };
 
-    console.log("📝 Submitting review with data:", reviewData);
 
     try {
-      const res = await addReview(reviewData);
+      const res = await addReviewSP(reviewData);
       if (res.success) {
         alert("✅ Gửi đánh giá thành công!");
         setRating(0);

@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
-import { Review } from "./Review";
-import { listReview, removeReview } from "../APIs/ReviewSp";
+import { ReviewSP } from "./ReviewSP";
+import { listReviewSP, removeReviewSP } from "../APIs/ReviewSPAPI";
 import { getUser } from "../APIs/userApi";
 import { useParams } from "react-router-dom";
 import { RxDotsVertical } from "react-icons/rx";
 
-const ReviewsInDeTail = () => {
+const ReviewsDetailSP = () => {
   const [showReview, setShowReview] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [userFullName, setUserFullName] = useState({});
   const { id } = useParams();
   const [openMenuId, setOpenMenuId] = useState(null);
+  const currentUserId = localStorage.getItem("userId"); // Lấy userId từ localStorage
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const data = await listReview(id);
+        const data = await listReviewSP(id);
         const infoReviewUser = Array.isArray(data.reviews)
           ? data.reviewsInfoUser
           : Array.isArray(data)
@@ -28,7 +29,6 @@ const ReviewsInDeTail = () => {
         const uniqueUserIds = [
           ...new Set(infoReviewUser.map((review) => review.userId)),
         ];
-
         const userInfoMap = {};
         await Promise.all(
           uniqueUserIds.map(async (userID) => {
@@ -45,7 +45,6 @@ const ReviewsInDeTail = () => {
             }
           })
         );
-
         setUserFullName(userInfoMap);
       } catch (error) {
         console.error("Lỗi khi lấy đánh giá:", error);
@@ -65,13 +64,36 @@ const ReviewsInDeTail = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleRemoveReview = async (reviewId) => {
-    const res = await removeReview(reviewId);
-    if (res.success) {
-      setReviews((prev) => prev.filter((review) => review._id !== reviewId));
-        console.log("Xoá đánh giá thành công");
-    } else {
+  const handleRemoveReview = async (review) => {
+    const token = localStorage.getItem("token");
+
+    if (!token || !currentUserId) {
+      alert("Vui lòng đăng nhập để thực hiện hành động này.");
+      return;
     }
+
+    if (String(review.userId) !== currentUserId) {
+      alert("Bạn không có quyền xoá đánh giá này.");
+      return;
+    }
+
+    const confirmDelete = window.confirm("Bạn có chắc chắn muốn xoá đánh giá này?");
+    if (!confirmDelete) return;
+
+    const res = await removeReviewSP(review._id);
+
+    if (res.success) {
+      setReviews((prev) => prev.filter((r) => r._id !== review._id));
+      console.log("Xoá đánh giá thành công");
+    } else {
+      alert(res.message || "Xoá đánh giá thất bại.");
+    }
+
+    setOpenMenuId(null);
+  };
+
+  const handleReportReview = (reviewId) => {
+    alert("Cảm ơn bạn đã báo cáo đánh giá.");
     setOpenMenuId(null);
   };
 
@@ -136,7 +158,7 @@ const ReviewsInDeTail = () => {
             Viết đánh giá
           </button>
 
-          {showReview && <Review />}
+          {showReview && <ReviewSP />}
         </div>
 
         {/* Danh sách đánh giá */}
@@ -182,11 +204,19 @@ const ReviewsInDeTail = () => {
                   {openMenuId === review._id && (
                     <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow z-10">
                       <button
-                        onClick={() => handleRemoveReview(review._id)}
+                        onClick={() => handleReportReview(review._id)}
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                       >
-                        Xoá đánh giá
+                        Báo cáo
                       </button>
+                      {String(review.userId) === currentUserId && (
+                        <button
+                          onClick={() => handleRemoveReview(review)}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                        >
+                          Xoá đánh giá
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -199,4 +229,4 @@ const ReviewsInDeTail = () => {
   );
 };
 
-export default ReviewsInDeTail;
+export default ReviewsDetailSP;

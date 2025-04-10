@@ -18,10 +18,11 @@ import Schedule from './components/Schedule';
 import Admin from './pages/Admin';
 import BlogViewer from './components/BlogViewer';
 import ProductDetailPage from './pages/ProductDetailsPage';
-import { ProductView } from './components/ProductView';
 import SuperVouchers from './pages/SuperVouchers';
 import MyVouchers from './pages/MyVouchers';
 import ServiceDetailPage from './pages/ServiceDetailPage';
+import Payment from './pages/Payment';
+import OrderConfirmation from './pages/OrderConfirmation';
 
 function App() {
   return (
@@ -40,10 +41,11 @@ function App() {
           <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/blogview" element={<BlogViewer />} />
-          <Route path="/productview" element={<ProductView />} />
           <Route path="/service/:id" element={<ServiceDetailPage />} />
           <Route path="/product/:id" element={<ProductDetailPage/>} />
           <Route path="/spvc" element={<SuperVouchers />} />
