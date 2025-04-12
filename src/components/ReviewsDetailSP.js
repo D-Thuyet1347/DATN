@@ -5,25 +5,46 @@ import { listReviewSP, removeReviewSP } from "../APIs/ReviewSPAPI";
 import { getUser } from "../APIs/userApi";
 import { useParams } from "react-router-dom";
 import { RxDotsVertical } from "react-icons/rx";
+import { errorToast, successToast, toastContainer } from "../utils/toast";
+import { jwtDecode } from "jwt-decode";
 
 const ReviewsDetailSP = () => {
   const [showReview, setShowReview] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [userFullName, setUserFullName] = useState({});
+  const [loading, setLoading] = useState(true);
   const { id } = useParams();
+  const [userId, setUserId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const currentUserId = localStorage.getItem("userId"); // Lấy userId từ localStorage
 
   useEffect(() => {
-    const fetchReviews = async () => {
+    const fetchUserAndReviews = async () => {
+      setLoading(true);
       try {
+        // Lấy userId từ token
+        const token = localStorage.getItem("token");
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          const loggedInUserId = decodedToken.id;
+
+          setUserId(loggedInUserId); // Lưu userId vào state
+
+          // Lấy thông tin người dùng
+          const userData = await getUser(loggedInUserId);
+          if (userData.success) {
+            setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
+          } else {
+            console.error("Không thể lấy thông tin người dùng.");
+          }
+        }
+
+        // Lấy danh sách đánh giá sản phẩm
         const data = await listReviewSP(id);
         const infoReviewUser = Array.isArray(data.reviews)
           ? data.reviewsInfoUser
           : Array.isArray(data)
           ? data
           : [];
-
         setReviews(infoReviewUser);
 
         const uniqueUserIds = [
@@ -45,55 +66,31 @@ const ReviewsDetailSP = () => {
             }
           })
         );
-        setUserFullName(userInfoMap);
+        setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
       } catch (error) {
         console.error("Lỗi khi lấy đánh giá:", error);
       }
+      setLoading(false);
     };
 
-    fetchReviews();
+    fetchUserAndReviews();
   }, [id]);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".dropdown-review")) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const handleRemoveReview = async (review) => {
-    const token = localStorage.getItem("token");
-
-    if (!token || !currentUserId) {
-      alert("Vui lòng đăng nhập để thực hiện hành động này.");
+    if (review.userId !== userId) {
+      errorToast("Bạn không thể xoá đánh giá của người khác.");
       return;
     }
-
-    if (String(review.userId) !== currentUserId) {
-      alert("Bạn không có quyền xoá đánh giá này.");
-      return;
-    }
-
-    const confirmDelete = window.confirm("Bạn có chắc chắn muốn xoá đánh giá này?");
-    if (!confirmDelete) return;
-
     const res = await removeReviewSP(review._id);
-
     if (res.success) {
       setReviews((prev) => prev.filter((r) => r._id !== review._id));
-      console.log("Xoá đánh giá thành công");
-    } else {
-      alert(res.message || "Xoá đánh giá thất bại.");
+      successToast("Xoá đánh giá thành công");
     }
-
     setOpenMenuId(null);
   };
 
   const handleReportReview = (reviewId) => {
-    alert("Cảm ơn bạn đã báo cáo đánh giá.");
+    successToast("Cảm ơn bạn đã báo cáo đánh giá.");
     setOpenMenuId(null);
   };
 
@@ -104,11 +101,11 @@ const ReviewsDetailSP = () => {
 
   return (
     <div className="mt-8 pl-5">
+      {toastContainer()}
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
         Đánh giá sản phẩm
       </h2>
       <div className="flex gap-5">
-        {/* Bên trái: thống kê và form đánh giá */}
         <div className="w-fit h-fit bg-gray-100 rounded-lg mb-5 p-5">
           <div className="flex items-center mb-4">
             <span className="text-2xl font-bold text-gray-800 mr-2">
@@ -163,7 +160,9 @@ const ReviewsDetailSP = () => {
 
         {/* Danh sách đánh giá */}
         <div className="space-y-4 flex-1">
-          {reviews.length === 0 ? (
+          {loading ? (
+            <p className="text-gray-500 italic">Đang tải đánh giá...</p>
+          ) : reviews.length === 0 ? (
             <p className="text-gray-600">Không có đánh giá nào.</p>
           ) : (
             reviews.map((review) => (
@@ -191,7 +190,6 @@ const ReviewsDetailSP = () => {
                 </div>
                 <p className="text-gray-600 mt-2">{review.comment}</p>
 
-                {/* Dropdown menu */}
                 <div className="relative dropdown-review">
                   <div
                     className="flex justify-end mt-2 cursor-pointer"
@@ -201,6 +199,7 @@ const ReviewsDetailSP = () => {
                   >
                     <RxDotsVertical />
                   </div>
+
                   {openMenuId === review._id && (
                     <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow z-10">
                       <button
@@ -209,14 +208,12 @@ const ReviewsDetailSP = () => {
                       >
                         Báo cáo
                       </button>
-                      {String(review.userId) === currentUserId && (
-                        <button
-                          onClick={() => handleRemoveReview(review)}
-                          className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        >
-                          Xoá đánh giá
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleRemoveReview(review)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                      >
+                        Xoá đánh giá
+                      </button>
                     </div>
                   )}
                 </div>
@@ -228,5 +225,4 @@ const ReviewsDetailSP = () => {
     </div>
   );
 };
-
 export default ReviewsDetailSP;

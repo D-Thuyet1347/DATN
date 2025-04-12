@@ -33,6 +33,7 @@ const toastContainer = () => {
         rtl={false}
         pauseOnFocusLoss
         draggable
+        className={"mt-[50px]"}
         pauseOnHover
         />
     );

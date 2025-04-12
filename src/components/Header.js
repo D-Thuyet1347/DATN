@@ -160,7 +160,7 @@ const Header = () => {
             </span>
           </div>
           <div className="cursor-pointer hover:text-maincolor transition" onClick={handleLanguageChange}>
-            <span className="text-lg">{i18n.language === "vi" ? "🌍 Tiếng Việt" : "🌍 English"}</span>
+            <span className="text-lg">{i18n.language === "vi" ? "🌍 Tiếng việt" : "🌍 Tiếng anh"}</span>
           </div>
           <div className="relative">
             {userAvatar ? (

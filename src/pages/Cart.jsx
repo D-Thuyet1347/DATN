@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Checkbox, Divider, Row, Col, Typography } from "antd";
+import { Card, Button, Checkbox, Divider, Row, Col, Typography,Popconfirm, } from "antd";
 import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -17,7 +17,6 @@ const { Text } = Typography;
 const Cart = () => {
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
-  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedAll, setSelectedAll] = useState(false);
@@ -34,7 +33,7 @@ const Cart = () => {
       setCartItems(res?.data || {});
       setLoading(false);
     } catch (err) {
-      setError("Lỗi khi tải giỏ hàng");
+      setError("Vui lòng đăng nhập để xem giỏ hàng");
       setLoading(false);
     }
   };
@@ -162,12 +161,19 @@ const Cart = () => {
                           +
                         </button>
                       </div>
-                      <button
-                        onClick={() => handleRemoveFromCart(product._id)}
-                        className="p-2 text-red-500 hover:text-red-700 rounded hover:bg-red-50"
+                      <Popconfirm
+                        title="Bạn có chắc chắn muốn xóa sản phẩm này?"
+                        onConfirm={() => handleRemoveFromCart(product._id)}
+
+                okText="Xóa"
+                cancelText="Hủy"
+                okButtonProps={{
+                style: { backgroundColor: 'blue', color: 'white', borderRadius: '5px' }
+                }}
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        <Trash2 className="w-4 h-4"
+                         />
+                      </Popconfirm>
                     </div>
                   </Card>
                 )

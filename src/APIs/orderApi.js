@@ -28,7 +28,15 @@ export const getOrders = async (token) => {
       throw new Error(error.message || 'Lỗi khi tải đơn hàng');
   }
 };
-
+export const listOrder = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/api/order/list`);
+        return response.data;
+    } catch (error) {
+        console.error('Error in listOrder:', error);
+        throw error;
+    }
+};
 export const getOrderDetail = async (orderId, token) => {
     try {
         const response = await axios.get(`${API_URL}/api/order/${orderId}`, {
@@ -66,9 +74,23 @@ export const placeOrder = async (orderData, token) => {
       throw error;
   }
 };
-export const updateOrderStatus = async (data) => {
-      const response = await axios.post(`${API_URL}/api/order/status`, data
+export const updateOrderStatus = async (orderId, statusData) => {
+    try {
+        const response = await axios.put(
+            `${API_URL}/api/order/status`, 
+            { orderId, ...statusData }
+        );
+        console.log('Update Status Response:', response.data); // Debug log
+        return response.data;
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        throw error;
+    }
+};
+export const deleteOrder = async (data) => {
+      const response = await axios.delete(`${API_URL}/api/order/delete-order`, data
       );
       return response.data;
   };
+
   

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import { RightOutlined } from '@ant-design/icons';
-import { getServiceById } from '../APIs/ServiceAPI';
+import { getServiceById } from '../../APIs/ServiceAPI';
 
 const ServiceDetail = () => {
   const [service, setService] = useState(null);

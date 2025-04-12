@@ -41,16 +41,25 @@ const handleAddToCart = async (productId, quantity) => {
             successToast("Sản phẩm đã được thêm vào giỏ hàng!");
           }
         } catch (error) {
-          errorToast("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
+          errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng!", error);
         }
 };
 
 
   return (
-    <div className="mt-16">
+    <motion.div className="mt-16"
+     initial={{ opacity: 0, y: 50 }}  
+    whileInView={{ opacity: 1, y: 0 }} 
+    viewport={{ once: true, amount: 0.2 }} 
+    transition={{ duration: 1.2 }}
+    
+    >
     {toastContainer()}
       <section className="p-10">
-        <h2 className="text-3xl font-bold text-maincolor text-center">Our Products</h2>  
+      <h2 className="text-3xl font-bold text-maincolor text-center" style={{ }}>
+    Our Products
+</h2>
+
         {cartMessage && <div className="text-center text-red-500 mb-4">{cartMessage}</div>}   
         <div className="flex justify-center space-x-4 py-4 mt-8">
           <motion.div
@@ -95,7 +104,7 @@ const handleAddToCart = async (productId, quantity) => {
         </div>
       </section>
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 

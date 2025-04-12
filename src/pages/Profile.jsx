@@ -55,7 +55,7 @@ function Profile() {
 
     return (
         <div className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-            <div className="flex w-full max-w-screen-lg bg-white rounded-3xl shadow-xl overflow-hidden">
+            <div className="flex w-[1100px] bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div className="w-64 flex-shrink-0 bg-gradient-to-b from-pink-200 to-purple-300 rounded-l-3xl">
                     <Menu
                         mode="inline"
@@ -65,7 +65,7 @@ function Profile() {
                         className="!border-e-0 h-full bg-transparent p-4 text-gray-700"
                     />
                 </div>
-                <div className="flex-1 p-8 bg-gray-50 rounded-r-3xl overflow-y-auto">
+                <div className="flex-1 p-8  bg-gray-50 rounded-r-3xl overflow-y-auto">
                     {renderContent()}
                 </div>
             </div>

@@ -1,0 +1,292 @@
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  Table,
+  Button,
+  Tag,
+  Drawer,
+  Spin,
+  Select,
+  Descriptions,
+  Badge,
+  message,
+  Space,
+  Empty
+} from "antd";
+import {
+  EditOutlined,
+  ReloadOutlined
+} from "@ant-design/icons";
+import { listOrder, updateOrderStatus } from "../../APIs/orderApi";
+
+const OrderManagement = () => {
+  const [state, setState] = useState({
+    orders: [],
+    selectedOrder: null,
+    isDrawerOpen: false,
+    loading: {
+      table: true,
+      status: false,
+      detail: false
+    },
+    error: null
+  });
+
+  const fetchOrders = useCallback(async () => {
+    setState(prev => ({ ...prev, loading: { ...prev.loading, table: true }, error: null }));
+    try {
+      const response = await listOrder();
+      if (response.success && Array.isArray(response.data)) {
+        const processedOrders = response.data.map(item => ({
+          ...item,
+          key: item._id,
+          orderDate: item.orderDate ? new Date(item.orderDate).toLocaleString() : 'Không rõ'
+        }));
+        setState(prev => ({
+          ...prev,
+          orders: processedOrders,
+          loading: { ...prev.loading, table: false }
+        }));
+        message.success(`Đã tải ${processedOrders.length} đơn hàng`);
+      } else {
+        throw new Error(response.message || "Dữ liệu nhận được không hợp lệ");
+      }
+    } catch (error) {
+      console.error("Lỗi tải đơn hàng:", error);
+      setState(prev => ({
+        ...prev,
+        error: error.response?.data?.message || error.message,
+        loading: { ...prev.loading, table: false }
+      }));
+      message.error(error.response?.data?.message || "Không thể tải đơn hàng");
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    setState(prev => ({ ...prev, loading: { ...prev.loading, status: true } }));
+    try {
+      const response = await updateOrderStatus(orderId, { orderStatus: newStatus });
+      if (response.success) {
+        setState(prev => ({
+          ...prev,
+          orders: prev.orders.map(order =>
+            order._id === orderId
+              ? { ...order, orderStatus: newStatus }
+              : order
+          )
+        }));
+        message.success("Đã cập nhật trạng thái đơn hàng");
+      } else {
+        throw new Error(response.message || "Cập nhật thất bại");
+      }
+    } catch (error) {
+      console.error("Lỗi cập nhật trạng thái:", error);
+      message.error(error.response?.data?.message || "Không thể cập nhật trạng thái");
+      fetchOrders();
+    } finally {
+      setState(prev => ({ ...prev, loading: { ...prev.loading, status: false } }));
+    }
+  };
+
+  const handleViewDetails = (order) => {
+    setState(prev => ({
+      ...prev,
+      selectedOrder: order,
+      isDrawerOpen: true
+    }));
+  };
+    const orderStatusOptions = [
+      { value: "Processing", label: "Đang xử lý" },
+      { value: "Shipped", label: "Đã gửi" },
+      { value: "Delivered", label: "Đã giao" },
+      { value: "Cancelled", label: "Đã hủy" },
+    ];
+
+  const paymentStatusTag = (status) => {
+    const colorMap = {
+      Pending: "orange",
+      Paid: "green",
+      Failed: "red",
+      Refunded: "blue"
+    };
+    const labelMap = {
+      Pending: "Chờ thanh toán",
+      Paid: "Đã thanh toán",
+      Failed: "Thất bại",
+      Refunded: "Đã hoàn tiền"
+    };
+    return <Tag color={colorMap[status] || "default"}>{labelMap[status] || status}</Tag>;
+  };
+
+  const columns = [
+    {
+      title: "Mã đơn hàng",
+      dataIndex: "_id",
+      key: "_id",
+      render: (id) => id ? `${id.substring(0, 8)}...` : 'Không rõ',
+      // Thêm tính năng lọc
+      filters: state.orders.map((order) => ({
+        text: order._id ? `${order._id.substring(0, 8)}...` : 'Không rõ',
+        value: order._id,
+      })),
+      onFilter: (value, record) => record._id === value,
+    },
+    {
+      title: "Tổng tiền",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
+    },
+    {
+      title: "Ngày đặt hàng",
+      dataIndex: "orderDate",
+      key: "orderDate",
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "orderStatus",
+      key: "orderStatus",
+      width: 150,
+      render: (status, record) => (
+        <Select
+          value={status}
+          style={{ width: 140 }}
+          onChange={(value) => handleStatusChange(record._id, value)}
+          loading={state.loading.status}
+          options={orderStatusOptions}
+          disabled={state.loading.status}
+        />
+      ),
+      filters: orderStatusOptions.map(opt => ({
+        text: opt.label,
+        value: opt.value,
+      })),
+      onFilter: (value, record) => record.orderStatus === value,
+    },
+    {
+      title: "Thanh toán",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      width: 150,
+      render: paymentStatusTag,
+      filters: [
+        { text: 'Chờ thanh toán', value: 'Pending' },
+        { text: 'Đã thanh toán', value: 'Paid' },
+        { text: 'Thất bại', value: 'Failed' },
+        { text: 'Đã hoàn tiền', value: 'Refunded' },
+      ],
+      onFilter: (value, record) => record.paymentStatus === value,
+    },
+    {
+      title: "Thao tác",
+      key: "actions",
+      fixed: 'right',
+      width: 100,
+      render: (_, record) => (
+        <Space size="small">
+          <Button
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => handleViewDetails(record)}
+            disabled={state.loading.status}
+          >
+            Chi tiết
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+  
+
+  return (
+    <div className="mt-3">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Quản lý đơn hàng</h1>
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={fetchOrders}
+          loading={state.loading.table}
+        >
+          Tải lại
+        </Button>
+      </div>
+
+      <Spin tip="Đang tải đơn hàng..." spinning={state.loading.table}>
+        <Table
+          style={{ marginTop: 20 }}
+          dataSource={state.orders}
+          columns={columns}
+          pagination={{
+            pageSize: 5,
+            showSizeChanger: true,
+          }}
+          bordered
+          size="middle"
+          locale={{
+            emptyText: state.error ? (
+              <Empty
+                description={
+                  <span>
+                    Lỗi tải đơn hàng: {state.error}
+                    <br />
+                    <Button onClick={fetchOrders}>Thử lại</Button>
+                  </span>
+                }
+              />
+            ) : <Empty description="Không có đơn hàng nào" />
+          }}
+        />
+      </Spin>
+
+      <Drawer
+        title={state.selectedOrder ? `Chi tiết đơn hàng - ${state.selectedOrder._id.substring(0, 8)}...` : 'Chi tiết đơn hàng'}
+        placement="right"
+        width={700}
+        closable
+        onClose={() => setState(prev => ({ ...prev, isDrawerOpen: false }))}
+        open={state.isDrawerOpen}
+        destroyOnClose
+      >
+        <Spin spinning={state.loading.detail}>
+          {state.selectedOrder ? (
+            <div>
+              <Descriptions bordered column={1} size="small">
+                <Descriptions.Item label="Mã đơn hàng">{state.selectedOrder._id}</Descriptions.Item>
+                <Descriptions.Item label="Khách hàng">
+                  {state.selectedOrder.userId?.name || "Khách vãng lai"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Ngày đặt hàng">
+                  {state.selectedOrder.orderDate}
+                </Descriptions.Item>
+                <Descriptions.Item label="Trạng thái">
+                  <Badge
+                    status={
+                      state.selectedOrder.orderStatus === 'Delivered' ? 'success' :
+                        state.selectedOrder.orderStatus === 'Cancelled' ? 'error' : 'processing'
+                    }
+                    text={state.selectedOrder.orderStatus}
+                  />
+                </Descriptions.Item>
+                <Descriptions.Item label="Tình trạng thanh toán">
+                  {paymentStatusTag(state.selectedOrder.paymentStatus)}
+                </Descriptions.Item>
+                <Descriptions.Item label="Phương thức thanh toán">
+                  {state.selectedOrder.paymentMethod || 'Không rõ'}
+                </Descriptions.Item>
+                <Descriptions.Item label="Tổng tiền">
+                  ${(state.selectedOrder.totalAmount || 0).toFixed(2)}
+                </Descriptions.Item>
+              </Descriptions>
+            </div>
+          ) : (
+            <Empty description="Chưa chọn đơn hàng" />
+          )}
+        </Spin>
+      </Drawer>
+    </div>
+  );
+};
+
+export default OrderManagement;

@@ -22,7 +22,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="flex items-center justify-between p-10 bg-gray-100">
+    <section className="flex items-center justify-between p-0 bg-gray-100">
       <div className="max-w-lg">
         <span className="text-sm text-gray-500 uppercase">
           {heroSlide?.title || "Luxury Spa Experience"}

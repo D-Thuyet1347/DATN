@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getUser } from '../APIs/userApi';
 import { getProductById } from '../APIs/ProductsApi';
-import {  addReviewSP } from "../APIs/ReviewSPAPI";
+import { addReviewSP } from "../APIs/ReviewSPAPI";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { jwtDecode } from 'jwt-decode';
+import { errorToast, successToast, toastContainer } from '../utils/toast';
 
 export const ReviewSP = () => {
   const [rating, setRating] = useState(0);
@@ -13,9 +14,9 @@ export const ReviewSP = () => {
   const [userId, setUserId] = useState('');
   const [userFullName, setUserFullName] = useState('');
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(false); // <-- Thêm loading
   const { id } = useParams();
 
-  // Lấy thông tin sản phẩm theo id
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -30,14 +31,12 @@ export const ReviewSP = () => {
     fetchProduct();
   }, [id]);
 
-  // Lấy userId từ token
   const getUserIdFromToken = () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        const userId = decodedToken.id;
-        return userId;
+        return decodedToken.id;
       } catch (error) {
         console.error("Lỗi giải mã token:", error);
         return null;
@@ -46,7 +45,6 @@ export const ReviewSP = () => {
     return null;
   };
 
-  // Gọi API lấy thông tin user
   useEffect(() => {
     const fetchUserData = async () => {
       const userId = getUserIdFromToken();
@@ -66,6 +64,7 @@ export const ReviewSP = () => {
     };
     fetchUserData();
   }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -84,24 +83,26 @@ export const ReviewSP = () => {
       comment
     };
 
-
     try {
+      setLoading(true); // Bắt đầu loading
       const res = await addReviewSP(reviewData);
       if (res.success) {
-        alert("✅ Gửi đánh giá thành công!");
+        successToast("Đánh giá thành công!");
         setRating(0);
         setComment('');
       } else {
-        alert("❌ Không thể gửi đánh giá.");
+        errorToast("Không thể gửi đánh giá.");
       }
     } catch (err) {
       console.error("❌ Lỗi gửi đánh giá:", err);
-      alert("Có lỗi xảy ra.");
+    } finally {
+      setLoading(false); // Kết thúc loading
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-4 shadow-md rounded border mt-4">
+      {toastContainer()}
       <h1 className="text-2xl font-bold mb-4">Đánh giá sản phẩm</h1>
 
       {userFullName && (
@@ -147,9 +148,12 @@ export const ReviewSP = () => {
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          disabled={loading}
+          className={`w-full px-4 py-2 rounded text-white ${
+            loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
-          Gửi đánh giá
+          {loading ? "Đang gửi..." : "Gửi đánh giá"}
         </button>
       </form>
     </div>

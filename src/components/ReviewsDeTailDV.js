@@ -6,6 +6,7 @@ import { getUser } from "../APIs/userApi";
 import { useParams } from "react-router-dom";
 import { RxDotsVertical } from "react-icons/rx";
 import { errorToast, successToast, toastContainer } from "../utils/toast";
+import { jwtDecode } from "jwt-decode";
 
 const ReviewsDeTailDV = () => {
   const [showReview, setShowReview] = useState(false);
@@ -13,16 +14,37 @@ const ReviewsDeTailDV = () => {
   const [userFullName, setUserFullName] = useState({});
   const { id } = useParams();
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null); // Thêm state để lưu userId
 
   useEffect(() => {
-    const fetchReviews = async () => {
+    const fetchUserAndReviews = async () => {
+      setLoading(true);
       try {
+        // Lấy userId từ token
+        const token = localStorage.getItem("token");
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          const loggedInUserId = decodedToken.id;
+
+          setUserId(loggedInUserId); // Lưu userId vào state
+
+          // Lấy thông tin người dùng
+          const userData = await getUser(loggedInUserId);
+          if (userData.success) {
+            setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
+          } else {
+            console.error("Không thể lấy thông tin người dùng.");
+          }
+        }
+
+        // Lấy danh sách đánh giá sản phẩm
         const data = await listReviewDV(id);
         const infoReviewUser = Array.isArray(data.reviews)
-        ? data.reviewsInfoUser
-        : Array.isArray(data)
-        ? data
-        : [];
+          ? data.reviewsInfoUser
+          : Array.isArray(data)
+          ? data
+          : [];
         setReviews(infoReviewUser);
 
         const uniqueUserIds = [
@@ -44,13 +66,14 @@ const ReviewsDeTailDV = () => {
             }
           })
         );
-        setUserFullName(userInfoMap);
+        setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
       } catch (error) {
         console.error("Lỗi khi lấy đánh giá:", error);
       }
+      setLoading(false);
     };
 
-    fetchReviews();
+    fetchUserAndReviews();
   }, [id]);
 
 
@@ -64,25 +87,18 @@ const ReviewsDeTailDV = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleRemoveReview = async (reviewId) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      errorToast("Vui lòng đăng nhập để thực hiện hành động này.");
+  const handleRemoveReview = async (review) => {
+    if (review.userId !== userId) {
+      errorToast("Bạn không thể xoá đánh giá của người khác.");
       return;
     }
-    const userId = localStorage.getItem("userId");
-  if (userId !== reviewId.userId) {
-    errorToast("Bạn không có quyền xoá đánh giá này.");
-    return;
-  }
-    const res = await removeReviewDV(reviewId);
+    const res = await removeReviewDV(review._id);
     if (res.success) {
-      setReviews((prev) => prev.filter((review) => review._id !== reviewId));
+      setReviews((prev) => prev.filter((r) => r._id !== review._id));
       successToast("Xoá đánh giá thành công");
     }
     setOpenMenuId(null);
   };
-
   const avgRating =
     reviews.length > 0
       ? (

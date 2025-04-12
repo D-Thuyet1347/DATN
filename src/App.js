@@ -23,6 +23,8 @@ import MyVouchers from './pages/MyVouchers';
 import ServiceDetailPage from './pages/ServiceDetailPage';
 import Payment from './pages/Payment';
 import OrderConfirmation from './pages/OrderConfirmation';
+import SearchResultPage from './pages/SearchResult';
+import { Page404 } from './pages/Page404';
 
 function App() {
   return (
@@ -48,7 +50,9 @@ function App() {
           <Route path="/blogview" element={<BlogViewer />} />
           <Route path="/service/:id" element={<ServiceDetailPage />} />
           <Route path="/product/:id" element={<ProductDetailPage/>} />
+          <Route path="/search" element={<SearchResultPage />} />
           <Route path="/spvc" element={<SuperVouchers />} />
+          <Route path="*" element={<Page404 />} />
           {/* <Route path="/myvc" element={<MyVouchers />} /> */}
           <Route path="/myvc" element={<PrivateRoute element={<MyVouchers />} requiredRole="user" />} />
           {/* Router riêng dành cho admin và manager */}

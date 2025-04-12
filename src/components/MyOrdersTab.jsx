@@ -8,7 +8,13 @@ const MyOrdersTab = () => {
   const [orders, setOrders] = useState([]);
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
-
+  const orderStatusOptions = [
+    { value: "Processing", label: "Đang xử lý", color: "orange" },
+    { value: "Shipped", label: "Đã gửi", color: "blue" },
+    { value: "Delivered", label: "Đã giao", color: "green" },
+    { value: "Cancelled", label: "Đã hủy", color: "red" },
+  ];
+  
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -104,32 +110,14 @@ const MyOrdersTab = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
-        const normalizedStatus = status || 'unknown';
-        let color, text;
-        switch (normalizedStatus) {
-          case 'completed':
-            color = 'green';
-            text = 'Hoàn thành';
-            break;
-          case 'shipping':
-            color = 'blue';
-            text = 'Đang giao';
-            break;
-          case 'processing':
-            color = 'orange';
-            text = 'Chờ xử lý';
-            break;
-          case 'cancelled':
-            color = 'red';
-            text = 'Đã hủy';
-            break;
-          default:
-            color = 'gray';
-            text = 'Không xác định';
+        const found = orderStatusOptions.find(opt => opt.value.toLowerCase() === status?.toLowerCase());
+        if (found) {
+          return <Tag color={found.color}>{found.label}</Tag>;
         }
-        return <Tag color={color}>{text}</Tag>;
+        return <Tag color="gray">Không xác định</Tag>;
       },
-    },
+    }
+    
   ];
 
   return (

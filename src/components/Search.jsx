@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { FaSearch } from "react-icons/fa";
 import { getProducts } from "../APIs/ProductsApi";
 import { getAllServices } from "../APIs/ServiceAPI";
-import { getAllBlogs } from "../APIs/blogApi";
 
 const SearchComponent = ({ isVisible, onClose }) => {
   const [query, setQuery] = useState("");
@@ -30,12 +29,7 @@ const SearchComponent = ({ isVisible, onClose }) => {
         data = services.filter((item) =>
           item.name?.toLowerCase().includes(query.toLowerCase())
         );
-      } else if (selectedType === "blog") {
-        const blogs = await getAllBlogs();
-        data = blogs.filter((item) =>
-          item.title?.toLowerCase().includes(query.toLowerCase())
-        );
-      }
+      } 
 
       setResults(data);
     } catch (error) {
