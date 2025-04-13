@@ -25,6 +25,8 @@ import Payment from './pages/Payment';
 import OrderConfirmation from './pages/OrderConfirmation';
 import SearchResultPage from './pages/SearchResult';
 import { Page404 } from './pages/Page404';
+import SearchPage from './pages/SearchResult';
+import StripeCheckout from './pages/StripeCheckout';
 
 function App() {
   return (
@@ -52,7 +54,10 @@ function App() {
           <Route path="/product/:id" element={<ProductDetailPage/>} />
           <Route path="/search" element={<SearchResultPage />} />
           <Route path="/spvc" element={<SuperVouchers />} />
+          <Route path="/stripe-checkout" element={<StripeCheckout />} />
           <Route path="*" element={<Page404 />} />
+          <Route path="/search" element={<SearchPage/>}  />
+          
           {/* <Route path="/myvc" element={<MyVouchers />} /> */}
           <Route path="/myvc" element={<PrivateRoute element={<MyVouchers />} requiredRole="user" />} />
           {/* Router riêng dành cho admin và manager */}

@@ -30,7 +30,7 @@ const OneProduct = ({
     <div className="relative h-[500px] w-[320px] group  ">
       <div className="bg-white h-[320px] w-[320px] p-4 border  group overflow-hidden relative transition-all duration-300 ">
         <motion.img
-          whileHover={{ scale: 1.1, rotate: 45 }}
+          whileHover={{ scale: 1.2 }}
           src={image}
           alt={title}
           className="w-full h-56 object-cover rounded-lg transition-all duration-300 "
@@ -43,7 +43,7 @@ const OneProduct = ({
           >
             <FaCartPlus
               onClick={() => onAddToCart(productId)}
-              className="h-[28px] mt-[10px] w-[28px] border border-black opacity-60"
+              className="h-[28px] mt-[10px] w-[28px] border border-black  opacity-60"
             />
           </Tooltip>
           <Tooltip

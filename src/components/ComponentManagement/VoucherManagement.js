@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Button, Drawer, Table, Select, Input, Spin,
-  Form, InputNumber, DatePicker, Popconfirm
+  Form, InputNumber, DatePicker, Popconfirm,
 } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -18,8 +18,8 @@ const VoucherManagement = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(true);
-  const [form] = Form.useForm();
   const [voucherCodeFilter, setVoucherCodeFilter] = useState('');
+  const [form] = Form.useForm();
 
   useEffect(() => {
     fetchVouchers();
@@ -29,11 +29,11 @@ const VoucherManagement = () => {
     setIsTableLoading(true);
     try {
       const data = await getVouchers();
-      const filteredData = data
-        .map(item => ({ ...item, key: item._id }))
-        .filter(item => item.code.toLowerCase().includes(voucherCodeFilter.toLowerCase()));
-      setVouchers(filteredData);
-    } catch (error) {
+      const filtered = data
+        .map(v => ({ ...v, key: v._id }))
+        .filter(v => v.code.toLowerCase().includes(voucherCodeFilter.toLowerCase()));
+      setVouchers(filtered);
+    } catch {
       errorToast('Không thể tải danh sách voucher.');
     } finally {
       setIsTableLoading(false);
@@ -55,10 +55,44 @@ const VoucherManagement = () => {
     }
   };
 
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+    setSelectVoucher(null);
+    form.resetFields();
+  };
+
+  const validateForm = (values) => {
+    const { discount, maximumDiscount, minimumAmount, startDate, endDate, usageLimit } = values;
+
+    if (discount <= 0 || discount >= 100) {
+      errorToast('Giảm giá phải lớn hơn 0% và nhỏ hơn 100%.');
+      return false;
+    }
+    if (maximumDiscount <= 0) {
+      errorToast('Giảm tối đa phải lớn hơn 0.');
+      return false;
+    }
+    if (minimumAmount < 0) {
+      errorToast('Đơn tối thiểu phải lớn hơn hoặc bằng 0.');
+      return false;
+    }
+    if (!startDate || !endDate || startDate >= endDate) {
+      errorToast('Ngày kết thúc phải sau ngày bắt đầu.');
+      return false;
+    }
+    if (usageLimit <= 0) {
+      errorToast('Giới hạn sử dụng phải lớn hơn 0.');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      const formattedValues = {
+      if (!validateForm(values)) return;
+
+      const payload = {
         ...values,
         startDate: values.startDate.toISOString(),
         endDate: values.endDate.toISOString(),
@@ -66,17 +100,16 @@ const VoucherManagement = () => {
 
       setLoading(true);
       if (selectVoucher?._id) {
-        await updateVoucher(selectVoucher._id, formattedValues);
+        await updateVoucher(selectVoucher._id, payload);
         successToast('Cập nhật voucher thành công!');
       } else {
-        await addVoucher(formattedValues);
+        await addVoucher(payload);
         successToast('Thêm voucher thành công!');
       }
+      closeDrawer();
       fetchVouchers();
-      setIsDrawerOpen(false);
-      form.resetFields();
     } catch (error) {
-      console.error('Validate failed or error:', error);
+      console.error('Submit error:', error);
     } finally {
       setLoading(false);
     }
@@ -87,44 +120,39 @@ const VoucherManagement = () => {
       await deleteVoucher(id);
       successToast('Xóa voucher thành công!');
       fetchVouchers();
-    } catch (error) {
+    } catch {
       errorToast('Xóa voucher thất bại!');
     }
   };
 
   const columns = [
-    { title: 'Mã', dataIndex: 'code', key: 'code' },
-    { title: 'Giảm giá (%)', dataIndex: 'discount', key: 'discount' },
-    { title: 'Giảm tối đa', dataIndex: 'maximumDiscount', key: 'maximumDiscount' },
-    { title: 'Đơn tối thiểu', dataIndex: 'minimumAmount', key: 'minimumAmount' },
+    { title: 'Mã', dataIndex: 'code' },
+    { title: 'Giảm giá (%)', dataIndex: 'discount' },
+    { title: 'Giảm tối đa', dataIndex: 'maximumDiscount' },
+    { title: 'Đơn tối thiểu', dataIndex: 'minimumAmount' },
     {
       title: 'Ngày bắt đầu',
       dataIndex: 'startDate',
-      key: 'startDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
       title: 'Ngày kết thúc',
       dataIndex: 'endDate',
-      key: 'endDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
-    { title: 'Giới hạn sử dụng', dataIndex: 'usageLimit', key: 'usageLimit' },
+    { title: 'Giới hạn sử dụng', dataIndex: 'usageLimit' },
     {
       title: 'Số lượt dùng',
       dataIndex: 'usageLeft',
-      key: 'usageLeft',
-      render: (value) => value || 0,
+      render: (v) => v ?? 0,
     },
     {
       title: 'Áp dụng cho',
       dataIndex: 'applicableTo',
-      key: 'applicableTo',
-      render: (value) => value || 'Tất cả',
+      render: (v) => v === 'all' ? 'Tất cả' : v === 'products' ? 'Sản phẩm' : 'Dịch vụ',
     },
     {
       title: 'Hành động',
-      key: 'action',
       render: (record) => (
         <div>
           <Popconfirm
@@ -133,10 +161,10 @@ const VoucherManagement = () => {
             okText="Xóa"
             cancelText="Hủy"
           >
-            <DeleteOutlined style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+            <DeleteOutlined style={{ color: 'red', fontSize: 20, cursor: 'pointer' }} />
           </Popconfirm>
           <EditOutlined
-            style={{ color: 'blue', fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
+            style={{ color: 'blue', fontSize: 20, marginLeft: 10, cursor: 'pointer' }}
             onClick={() => openEditDrawer(record)}
           />
         </div>
@@ -145,84 +173,50 @@ const VoucherManagement = () => {
   ];
 
   return (
-    <div className="pt-16 p-4">
+    <div className="pt-5 p-4">
       <h2>Quản Lý Voucher</h2>
       {toastContainer()}
-      <Button className="bg-blue-600" onClick={() => openEditDrawer()}>
-        Thêm Voucher
-      </Button>
-      {/* Add filter input for voucher code */}
-      <Input
-        placeholder="Tìm theo mã voucher"
-        value={voucherCodeFilter}
-        onChange={(e) => setVoucherCodeFilter(e.target.value)}
-        style={{ width: 300, marginTop: 10, marginBottom: 20 , marginLeft: 100}}
-      />
+
+      <div className="flex gap-4 mt-4 mb-6">
+        <Button className='bg-blue-500' onClick={() => openEditDrawer()}>Thêm Voucher</Button>
+        <Input
+          placeholder="Tìm theo mã voucher"
+          value={voucherCodeFilter}
+          onChange={(e) => setVoucherCodeFilter(e.target.value)}
+          style={{ width: 300 }}
+        />
+      </div>
 
       <Drawer
         title={selectVoucher ? 'Chỉnh sửa voucher' : 'Thêm voucher'}
         placement="right"
-        onClose={() => {
-          setIsDrawerOpen(false);
-          form.resetFields();
-        }}
+        onClose={closeDrawer}
         open={isDrawerOpen}
+        width={400}
       >
         <Form layout="vertical" form={form}>
-          <Form.Item
-            name="code"
-            label="Mã voucher"
-            rules={[{ required: true, message: 'Vui lòng nhập mã voucher' }]}
-          >
+          <Form.Item name="code" label="Mã voucher" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item
-            name="discount"
-            label="Giảm giá (%)"
-            rules={[{ required: true, message: 'Vui lòng nhập phần trăm giảm giá' }]}
-          >
+          <Form.Item name="discount" label="Giảm giá (%)" rules={[{ required: true }]}>
             <InputNumber min={1} max={99} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item
-            name="maximumDiscount"
-            label="Giảm tối đa"
-            rules={[{ required: true, message: 'Vui lòng nhập giảm tối đa' }]}
-          >
+          <Form.Item name="maximumDiscount" label="Giảm tối đa" rules={[{ required: true }]}>
             <InputNumber min={1} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item
-            name="minimumAmount"
-            label="Đơn tối thiểu"
-            rules={[{ required: true, message: 'Vui lòng nhập đơn tối thiểu' }]}
-          >
+          <Form.Item name="minimumAmount" label="Đơn tối thiểu" rules={[{ required: true }]}>
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item
-            name="startDate"
-            label="Ngày bắt đầu"
-            rules={[{ required: true, message: 'Vui lòng chọn ngày bắt đầu' }]}
-          >
+          <Form.Item name="startDate" label="Ngày bắt đầu" rules={[{ required: true }]}>
             <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item
-            name="endDate"
-            label="Ngày kết thúc"
-            rules={[{ required: true, message: 'Vui lòng chọn ngày kết thúc' }]}
-          >
+          <Form.Item name="endDate" label="Ngày kết thúc" rules={[{ required: true }]}>
             <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item
-            name="usageLimit"
-            label="Giới hạn sử dụng"
-            rules={[{ required: true, message: 'Vui lòng nhập giới hạn' }]}
-          >
+          <Form.Item name="usageLimit" label="Giới hạn sử dụng" rules={[{ required: true }]}>
             <InputNumber min={1} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item
-            name="applicableTo"
-            label="Áp dụng cho"
-            rules={[{ required: true, message: 'Vui lòng chọn đối tượng áp dụng' }]}
-          >
+          <Form.Item name="applicableTo" label="Áp dụng cho" rules={[{ required: true }]}>
             <Select>
               <Option value="all">Tất cả</Option>
               <Option value="services">Dịch vụ</Option>
@@ -230,17 +224,17 @@ const VoucherManagement = () => {
             </Select>
           </Form.Item>
           <Button
-            className="mt-4 bg-blue-500"
+            className='bg-blue-500'
+            block
             onClick={handleSubmit}
             loading={loading}
-            block
           >
             Xác nhận
           </Button>
         </Form>
       </Drawer>
 
-      <Spin className="mt-9" tip="Loading data..." spinning={isTableLoading}>
+      <Spin tip="Đang tải dữ liệu..." spinning={isTableLoading}>
         <Table
           style={{ marginTop: 20 }}
           dataSource={vouchers}

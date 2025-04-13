@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
 import OneProduct from '../components/OneProduct';
-import { getProducts } from '../APIs/ProductsApi';  // Đảm bảo import đúng API
+import { getProducts } from '../APIs/ProductsApi';
 import { PRcategories } from '../utils/data';
 import { motion } from 'framer-motion';
 import { addToCart } from '../APIs/cartApi';
-import {  useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { errorToast, successToast, toastContainer } from '../utils/toast';
+import { Pagination } from 'antd';
 
 const Products = () => {
   const [filter, setFilter] = useState('Tất cả');
-  const [data, setData] = useState({});
-  const [quantity, setQuantity] = useState(1);  
-
-  const [loading, setLoading] = useState(false);  // Thêm trạng thái loading
-  const [cartMessage, setCartMessage] = useState('');  // Thông báo cho người dùng
+  const [data, setData] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [cartMessage, setCartMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8; // Số sản phẩm mỗi trang
   const { id } = useParams();
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await getProducts();
@@ -29,42 +32,48 @@ const Products = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1); // Reset trang khi thay filter
+  }, [filter]);
+
   const filteredProducts =
     filter === 'Tất cả'
       ? data
       : data.filter((product) => product.Category === filter);
 
-const handleAddToCart = async (productId, quantity) => {
-        try {
-          const res = await addToCart(productId, quantity); // Chỉ thêm sản phẩm vào giỏ hàng
-          if (res.success) {
-            successToast("Sản phẩm đã được thêm vào giỏ hàng!");
-          }
-        } catch (error) {
-          errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng!", error);
-        }
-};
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
+  const handleAddToCart = async (productId, quantity) => {
+    try {
+      const res = await addToCart(productId, quantity);
+      if (res.success) {
+        successToast("Sản phẩm đã được thêm vào giỏ hàng!");
+      }
+    } catch (error) {
+      errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng!", error);
+    }
+  };
 
   return (
-    <motion.div className="mt-16"
-     initial={{ opacity: 0, y: 50 }}  
-    whileInView={{ opacity: 1, y: 0 }} 
-    viewport={{ once: true, amount: 0.2 }} 
-    transition={{ duration: 1.2 }}
-    
+    <motion.div className="mt-2"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 1.2 }}
     >
-    {toastContainer()}
+      {toastContainer()}
       <section className="p-10">
-      <h2 className="text-3xl font-bold text-maincolor text-center" style={{ }}>
-    Our Products
-</h2>
+        <h2 className="text-3xl font-bold text-maincolor text-center">Our Products</h2>
 
-        {cartMessage && <div className="text-center text-red-500 mb-4">{cartMessage}</div>}   
-        <div className="flex justify-center space-x-4 py-4 mt-8">
+        {cartMessage && <div className="text-center text-red-500 mb-4">{cartMessage}</div>}
+
+        <div className="flex justify-center space-x-4 py-4 mt-8 flex-wrap">
           <motion.div
             whileTap={{ scale: 0.7 }}
-            key={1}
+            key="all"
             onClick={() => setFilter('Tất cả')}
             className={`px-4 py-2 rounded-lg cursor-pointer ${filter === 'Tất cả' ? 'bg-maincolor text-white' : 'bg-gray-200 text-gray-700'}`}
           >
@@ -82,26 +91,42 @@ const handleAddToCart = async (productId, quantity) => {
           ))}
         </div>
 
-        {/* Hiển thị sản phẩm */}
-        <div className="grid grid-cols-4 gap-3 mt-8 ml-10 ">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product, index) => (
-              <div key={index}>
-                <OneProduct
-                  title={product.ProductName}
-                  price={product.PricePD}
-                  description={product.DescriptionPD}
-                  image={product.ImagePD}
-                  productId={product._id} 
-                  onAddToCart={() => handleAddToCart(product._id, quantity)} 
-                  loading={loading} 
-                />
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8 ml-4">
+          {paginatedProducts.length > 0 ? (
+            paginatedProducts.map((product, index) => (
+              <OneProduct
+                key={index}
+                title={product.ProductName}
+                price={product.PricePD}
+                description={product.DescriptionPD}
+                image={product.ImagePD}
+                productId={product._id}
+                onAddToCart={() => handleAddToCart(product._id, quantity)}
+                loading={loading}
+              />
             ))
           ) : (
-            <p className="text-center text-gray-600 col-span-3">Không có sản phẩm nào trong danh mục này.</p>
+            <p className="text-center text-gray-600 col-span-4">
+              Không có sản phẩm nào trong danh mục này.
+            </p>
           )}
         </div>
+
+        {/* Pagination */}
+        {filteredProducts.length > pageSize && (
+          <div className="flex justify-center mt-10">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredProducts.length}
+              onChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              showSizeChanger={false}
+            />
+          </div>
+        )}
       </section>
       <Footer />
     </motion.div>

@@ -1,67 +1,149 @@
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { getProducts } from "../APIs/ProductsApi";
-import { getAllServices } from "../APIs/ServiceAPI";
-import { getAllBlogs } from "../APIs/blogApi";
+import React, { useState, useEffect } from 'react';
+import { useLocation, Link } from 'react-router-dom';
+import { getAllServices } from '../APIs/ServiceAPI';
+import { getProducts } from '../APIs/ProductsApi';
+import Header from '../components/Header';
 
-const SearchResultPage = () => {
-  const location = useLocation();
-  const [results, setResults] = useState([]);
+const SearchPage = () => {
+  const [query, setQuery] = useState('');
+  const [services, setServices] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const params = new URLSearchParams(location.search);
-  const query = params.get("query") || "";
-  const type = params.get("type") || "product";
+  const [error, setError] = useState(null);
+  const location = useLocation();
 
+  // Lấy query từ URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const q = searchParams.get('q') || '';
+    setQuery(q);
+  }, [location.search]);
+
+  // Tìm kiếm khi query thay đổi
   useEffect(() => {
     const fetchResults = async () => {
-      setLoading(true);
-      try {
-        let data = [];
-        if (type === "product") {
-          const products = await getProducts();
-          data = products.filter(p =>
-            p.productName?.toLowerCase().includes(query.toLowerCase())
-          );
-        } else if (type === "service") {
-          const services = await getAllServices();
-          data = services.filter(s =>
-            s.name?.toLowerCase().includes(query.toLowerCase())
-          );
-        } else if (type === "blog") {
-          const blogs = await getAllBlogs();
-          data = blogs.filter(b =>
-            b.title?.toLowerCase().includes(query.toLowerCase())
-          );
-        }
-        setResults(data);
-      } catch (error) {
-        console.error("Lỗi khi tìm kiếm:", error);
+      if (!query.trim()) {
+        setServices([]);
+        setProducts([]);
+        return;
       }
-      setLoading(false);
-    };
+      setLoading(true);
+      setError(null);
+      try {
+        const serviceResponse = await getAllServices();
+        const filteredServices = serviceResponse.data.filter(service =>
+          service.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setServices(filteredServices);
 
-    if (query) fetchResults();
-  }, [query, type]);
+        const productResponse = await getProducts();
+        const filteredProducts = productResponse.data.filter(product =>
+          product.ProductName.toLowerCase().includes(query.toLowerCase())
+        );
+        setProducts(filteredProducts);
+      } catch (err) {
+        setError('Không thể tải kết quả tìm kiếm.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchResults();
+  }, [query]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    window.history.pushState({}, '', `/search?q=${encodeURIComponent(query)}`);
+    // Kích hoạt tìm kiếm lại bằng cách cập nhật query
+  };
 
   return (
-    <div>
-      <h2>Kết quả tìm kiếm cho: "{query}"</h2>
-      {loading && <div>Đang tải...</div>}
-      <ul>
-        {results.length > 0 ? (
-          results.map((item, idx) => (
-            <li key={idx}>
-              {type === "product" && item.productName}
-              {type === "service" && item.name}
-              {type === "blog" && item.title}
-            </li>
-          ))
-        ) : (
-          <div>Không có kết quả tìm kiếm phù hợp.</div>
-        )}
-      </ul>
+    <div className="min-h-screen bg-gray-100">
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        {/* Thanh tìm kiếm */}
+        <form onSubmit={handleSearch} className="mb-8">
+          <div className="flex items-center max-w-2xl mx-auto">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tìm kiếm sản phẩm hoặc dịch vụ..."
+              className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-maincolor"
+            />
+            <button
+              type="submit"
+              className="bg-maincolor text-white px-6 py-3 rounded-r-lg hover:bg-maincolorhover"
+            >
+              Tìm kiếm
+            </button>
+          </div>
+        </form>
+
+        {/* Trạng thái tải */}
+        {loading && <p className="text-center text-gray-600">Đang tải...</p>}
+
+        {/* Lỗi */}
+        {error && <p className="text-center text-red-500">{error}</p>}
+
+        {/* Kết quả tìm kiếm */}
+        <div>
+          {/* Dịch vụ */}
+          {services.length > 0 && (
+            <div className="mb-12">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Dịch vụ</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {services.map((service) => (
+                  <Link
+                    key={service._id}
+                    to={`/service/${service._id}`}
+                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
+                  >
+                    <img
+                      src={service.image || 'https://via.placeholder.com/150'}
+                      alt={service.name}
+                      className="w-full h-40 object-cover rounded-lg mb-3"
+                    />
+                    <h3 className="text-lg font-semibold text-gray-800">{service.name}</h3>
+                    <p className="text-gray-600">{service.price} đ</p>
+                    <p className="text-sm text-gray-500 line-clamp-2">{service.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sản phẩm */}
+          {products.length > 0 && (
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Sản phẩm</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <Link
+                    key={product._id}
+                    to={`/product/${product._id}`}
+                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
+                  >
+                    <img
+                      src={product.ImagePD || 'https://via.placeholder.com/150'}
+                      alt={product.ProductName}
+                      className="w-full h-40 object-cover rounded-lg mb-3"
+                    />
+                    <h3 className="text-lg font-semibold text-gray-800">{product.ProductName}</h3>
+                    <p className="text-gray-600">{product.PricePD} đ</p>
+                    <p className="text-sm text-gray-500 line-clamp-2">{product.DescriptionPD}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          {query && !loading && services.length === 0 && products.length === 0 && (
+            <p className="text-center text-gray-600">Không tìm thấy kết quả cho "{query}"</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default SearchResultPage;
+export default SearchPage;

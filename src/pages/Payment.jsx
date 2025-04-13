@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, Button, Divider, Row, Col, Typography, Image } from 'antd';
+import {  Divider, Image } from 'antd';
 import { CreditCard, Truck, ArrowLeft, CheckCircle } from 'lucide-react';
-import { toastContainer } from '../utils/toast';
+import { errorToast, toastContainer } from '../utils/toast';
 import { placeOrder } from '../APIs/orderApi'; // Import API
 
-const { Text, Title } = Typography;
 
 const PaymentMethod = ({ id, name, icon, selected, onSelect }) => {
   return (
@@ -37,20 +36,17 @@ const Payment = () => {
     note: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Lấy dữ liệu từ Cart qua location.state
+
   const { cartItems = {}, products = [] } = location.state || {};
-  
+
   // Tính toán tổng tiền
   const subtotal = products.reduce((total, product) => 
     cartItems[product._id] ? total + (product.PricePD * cartItems[product._id]) : total, 
   0);
-  const shippingFee = 30000; // Phí vận chuyển
-  const discount = 0; // Giảm giá
-  const total = subtotal + shippingFee - discount;
+  const shippingFee = 30000;
+  const total = subtotal + shippingFee;
 
   useEffect(() => {
-    // Kiểm tra nếu không có sản phẩm nào thì quay lại giỏ hàng
     if (Object.keys(cartItems).length === 0) {
       navigate('/cart');
     }
@@ -61,26 +57,38 @@ const Payment = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const validateForm = () => {
+    if (!formData.fullName.trim()) {
+      throw new Error('Vui lòng nhập họ tên');
+    }
+    if (!formData.phone.match()) {
+      throw new Error('Số điện thoại không hợp lệ');
+    }
+    if (!formData.address.trim()) {
+      throw new Error('Vui lòng nhập địa chỉ');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    
     try {
-      // Lấy token từ localStorage
+      validateForm();
+      
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Vui lòng đăng nhập để đặt hàng');
-      }
-
-      // Chuẩn bị dữ liệu đơn hàng
+      if (!token) throw new Error('Vui lòng đăng nhập để đặt hàng');
+  
+      const orderItems = products.filter(p => cartItems[p._id]).map(product => ({
+        _id: product._id,
+        name: product.ProductName,
+        price: product.PricePD,
+        quantity: cartItems[product._id],
+        image: product.ImagePD
+      }));
+  
       const orderData = {
-        items: products.filter(p => cartItems[p._id]).map(product => ({
-          _id: product._id,
-          name: product.ProductName,
-          price: product.PricePD,
-          quantity: cartItems[product._id],
-          image: product.ImagePD
-        })),
+        items: orderItems,
         totalAmount: total,
         shippingAddress: {
           fullName: formData.fullName,
@@ -90,16 +98,16 @@ const Payment = () => {
         paymentMethod: selectedPayment,
         note: formData.note
       };
-
-      console.log('Order data to be sent:', orderData);
-
-      // Gọi API để lưu đơn hàng
+  
       const response = await placeOrder(orderData, token);
       
-      // Nếu thành công, chuyển hướng đến trang xác nhận đơn hàng
       if (response.success) {
-        navigate('/order-confirmation', {
-          state: {
+        const { session_url } = response;
+        if (selectedPayment === 'card') {
+          window.location.href = session_url;
+        } else if (selectedPayment === 'cod') {
+          navigate('/order-confirmation', {
+            state: {
             orderDetails: {
               ...formData,
               paymentMethod: selectedPayment,
@@ -107,25 +115,20 @@ const Payment = () => {
               total,
               orderId: response.orderId
             }
-          }
-        });
-      } else {
-        throw new Error(response.message || 'Lỗi khi đặt hàng');
+            }
+          });
+        }
+        
+        localStorage.removeItem('cart');
       }
     } catch (error) {
-      console.error('Error submitting order:', error);
-      toastContainer({
-        type: 'error',
-        message: error.message || 'Lỗi khi đặt hàng, vui lòng thử lại'
-      });
+      errorToast(error.message || 'Lỗi khi đặt hàng');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleBackToCart = () => {
-    navigate('/cart');
-  };
+  const handleBackToCart = () => navigate('/cart');
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -170,7 +173,6 @@ const Payment = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column - Payment Form */}
           <div className="lg:w-2/3">
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm overflow-hidden">
               {/* Shipping Information */}
@@ -249,17 +251,9 @@ const Payment = () => {
                   <h2 className="text-xl font-semibold text-gray-800">Phương thức thanh toán</h2>
                 </div>
                 
-                <div className="space-y-3">
+                <div className="space-y-3">   
                   <PaymentMethod 
                     id="card" 
-                    name="Thẻ tín dụng / Ghi nợ" 
-                    icon={<CreditCard size={20} />}
-                    selected={selectedPayment} 
-                    onSelect={setSelectedPayment} 
-                  />
-                  
-                  <PaymentMethod 
-                    id="bank" 
                     name="Chuyển khoản ngân hàng" 
                     icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -277,18 +271,6 @@ const Payment = () => {
                     selected={selectedPayment} 
                     onSelect={setSelectedPayment} 
                   />
-                  
-                  {selectedPayment === 'bank' && (
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <h4 className="text-sm font-medium text-yellow-800">Thông tin chuyển khoản</h4>
-                      <div className="mt-2 text-sm text-yellow-700">
-                        <p>Ngân hàng: Techcombank</p>
-                        <p>Số tài khoản: 1903 6666 8888</p>
-                        <p>Chủ tài khoản: CÔNG TY TNHH SHOPPING</p>
-                        <p>Nội dung: SĐT + Mã đơn hàng</p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </form>
@@ -339,7 +321,7 @@ const Payment = () => {
                   
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Giảm giá</span>
-                    <span className="text-sm font-medium text-red-500">-{discount.toLocaleString('vi-VN')}₫</span>
+                    {/* <span className="text-sm font-medium text-red-500">-{discount.toLocaleString('vi-VN')}₫</span> */}
                   </div>
                   
                   <Divider className="my-2" />

@@ -32,7 +32,7 @@ const ProductManagement = () => {
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [fileList, setFileList] = useState([]);
-  const [isTableLoading, setIsTableLoading] = useState(true); // Loading state for table
+  const [isTableLoading, setIsTableLoading] = useState(true);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const ProductManagement = () => {
     try {
       const response = await getProducts();
       if (response.success) {
-        setProducts(response.data.map((item) => ({ ...item, key: item._id })));
+        setProducts(response.data);
       }
     } catch (error) {
       console.error("Lỗi khi lấy danh sách sản phẩm:", error);
@@ -59,15 +59,23 @@ const ProductManagement = () => {
       setSelectProduct({ ...product });
       setImage(product.ImagePD || null);
       setFileList(product.ImagePD ? [{ url: product.ImagePD }] : []);
+      form.setFieldsValue({
+        ProductName: product.ProductName,
+        DescriptionPD: product.DescriptionPD,
+        PricePD: product.PricePD,
+        StockQuantity: product.StockQuantity,
+        Category: product.Category,
+      });
     } else {
-      setSelectProduct({
+      const emptyProduct = {
         ProductName: "",
         DescriptionPD: "",
         PricePD: "",
         StockQuantity: "",
         Category: "",
-        ImagePD: "",
-      });
+      };
+      setSelectProduct(emptyProduct);
+      form.setFieldsValue(emptyProduct);
       setImage(null);
       setFileList([]);
     }
@@ -77,24 +85,12 @@ const ProductManagement = () => {
   const handleUpdateProduct = async (values) => {
     setLoading(true);
     try {
-      if (
-        !values.ProductName ||
-        !values.DescriptionPD ||
-        !values.PricePD ||
-        !values.StockQuantity ||
-        !values.Category
-      ) {
-        message.error("Vui lòng điền đầy đủ thông tin.");
-        setLoading(false);
-        return;
-      }
-
       const updatedData = {
         ...values,
         ImagePD: image || selectProduct.ImagePD,
       };
 
-      if (selectProduct._id) {
+      if (selectProduct?._id) {
         await updateProduct(selectProduct._id, updatedData);
         message.success("Cập nhật sản phẩm thành công!");
       } else {
@@ -104,6 +100,7 @@ const ProductManagement = () => {
 
       fetchProducts();
       setIsDrawerOpen(false);
+      form.resetFields();
     } catch (error) {
       console.error("Lỗi khi lưu sản phẩm:", error);
       message.error("Có lỗi xảy ra, vui lòng thử lại.");
@@ -125,19 +122,20 @@ const ProductManagement = () => {
     } catch (error) {
       console.error("Lỗi khi xóa sản phẩm:", error);
       message.error("Xóa sản phẩm thất bại!");
-    } finally {
     }
   };
 
   const handleImageChange = async ({ fileList }) => {
     if (fileList.length === 0) {
       setImage(null);
+      setFileList([]);
+      return;
     }
     const file = fileList[0];
     if (file && !file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
-    setImage(file.preview);
+    setImage(file.preview || file.url);
     setFileList(fileList);
   };
 
@@ -153,13 +151,12 @@ const ProductManagement = () => {
       title: "Tên sản phẩm",
       dataIndex: "ProductName",
       key: "ProductName",
-      // Thêm tính năng lọc
       filters: products.map((product) => ({
         text: product.ProductName,
         value: product.ProductName,
       })),
       onFilter: (value, record) =>
-        record.ProductName.toLowerCase().includes(value.toLowerCase()),
+        record.ProductName?.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: "Mô tả",
@@ -175,16 +172,19 @@ const ProductManagement = () => {
       key: "action",
       render: (record) => (
         <div>
-           <Popconfirm
-                title="Bạn có chắc chắn muốn xóa sản phẩm này?"
-                onConfirm={() => handleDeleteProduct(record._id)}
-                okText="Xóa"
-                cancelText="Hủy"
-                okButtonProps={{
-                style: { backgroundColor: 'blue', color: 'white', borderRadius: '5px' }
-                }}>
-          <DeleteOutlined style={{ color: "red", fontSize: "20px", cursor: "pointer" }}/>
-            </Popconfirm>
+          <Popconfirm
+            title="Bạn có chắc chắn muốn xóa sản phẩm này?"
+            onConfirm={() => handleDeleteProduct(record._id)}
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{
+              style: { backgroundColor: "blue", color: "white", borderRadius: "5px" },
+            }}
+          >
+            <DeleteOutlined
+              style={{ color: "red", fontSize: "20px", cursor: "pointer" }}
+            />
+          </Popconfirm>
           <EditOutlined
             style={{
               color: "blue",
@@ -198,7 +198,6 @@ const ProductManagement = () => {
       ),
     },
   ];
-  
 
   return (
     <div className="pt-3">
@@ -208,14 +207,16 @@ const ProductManagement = () => {
       </Button>
       <Button
         icon={<ReloadOutlined />}
-        className="ml-[90%] "
+        className="ml-[90%]"
         onClick={fetchProducts}
         loading={isTableLoading}
       >
         Tải lại
       </Button>
+
       <Spin tip="Đang tải..." spinning={isTableLoading}>
         <Table
+          rowKey="_id"
           style={{ marginTop: 20 }}
           dataSource={products}
           columns={columns}
@@ -231,20 +232,13 @@ const ProductManagement = () => {
         }
         placement="right"
         closable
-        onClose={() => setIsDrawerOpen(false)}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          form.resetFields();
+        }}
         open={isDrawerOpen}
       >
-        <Form
-          form={form}
-          initialValues={{
-            ProductName: selectProduct?.ProductName || "",
-            DescriptionPD: selectProduct?.DescriptionPD || "",
-            PricePD: selectProduct?.PricePD || "",
-            StockQuantity: selectProduct?.StockQuantity || "",
-            Category: selectProduct?.Category || "",
-          }}
-          onFinish={handleUpdateProduct}
-        >
+        <Form form={form} onFinish={handleUpdateProduct}>
           <Form.Item
             name="ProductName"
             label="Tên sản phẩm"
@@ -256,9 +250,7 @@ const ProductManagement = () => {
           <Form.Item
             name="DescriptionPD"
             label="Mô tả"
-            rules={[
-              { required: true, message: "Vui lòng nhập mô tả sản phẩm!" },
-            ]}
+            rules={[{ required: true, message: "Vui lòng nhập mô tả sản phẩm!" }]}
           >
             <TextArea />
           </Form.Item>
@@ -293,7 +285,7 @@ const ProductManagement = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item>
+          <Form.Item label="Hình ảnh">
             <Upload
               fileList={fileList}
               beforeUpload={() => false}
@@ -312,7 +304,12 @@ const ProductManagement = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button className="mt-5 bg-blue-500" block loading={loading}>
+            <Button
+              className="mt-5 bg-blue-500"
+              block
+              loading={loading}
+              htmlType="submit"
+            >
               Xác nhận
             </Button>
           </Form.Item>

@@ -32,7 +32,7 @@ const BlogManagement = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(true);
   const [form] = Form.useForm();
-  const userId = "123456"; // giả định cố định
+  const userId = "WINNER"; // giả định cố định
 
   useEffect(() => {
     fetchBlogs();
@@ -73,6 +73,13 @@ const BlogManagement = () => {
     setIsDrawerOpen(true);
   };
 
+  const handleCloseDrawer = () => {
+    form.resetFields();
+    setImage("");
+    setFileList([]);
+    setIsDrawerOpen(false);
+  };
+
   const handleSubmit = async (values) => {
     const blogData = { ...values, image, userId };
     try {
@@ -83,7 +90,7 @@ const BlogManagement = () => {
         await createBlog(blogData);
         message.success("Thêm bài viết thành công!");
       }
-      setIsDrawerOpen(false);
+      handleCloseDrawer();
       fetchBlogs();
     } catch (error) {
       console.error(error);
@@ -92,25 +99,34 @@ const BlogManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
-      try {
-        await deleteBlog(id);
-        message.success("Xóa bài viết thành công!");
-        fetchBlogs();
-      } catch (error) {
-        console.error(error);
-        message.error("Lỗi khi xóa bài viết!");
-      }
+    try {
+      await deleteBlog(id);
+      message.success("Xóa bài viết thành công!");
+      fetchBlogs();
+    } catch (error) {
+      console.error(error);
+      message.error("Lỗi khi xóa bài viết!");
     }
   };
 
   const handleImageChange = async ({ fileList }) => {
+    if (!fileList.length) {
+      setImage("");
+      setFileList([]);
+      return;
+    }
+
     const file = fileList[0];
     if (file && !file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
+      try {
+        file.preview = await getBase64(file.originFileObj);
+      } catch (error) {
+        console.error("Lỗi khi đọc file: ", error);
+        message.error("Không thể đọc file ảnh!");
+      }
     }
-    setImage(file.preview);
-    setFileList(fileList);
+    setImage(file.url || file.preview);
+    setFileList([file]);
   };
 
   const columns = [
@@ -135,22 +151,28 @@ const BlogManagement = () => {
       key: "action",
       render: (_, record) => (
         <span>
-            <Popconfirm
-                        title="Bạn có chắc chắn muốn xóa nhân viên này?"
-                        onConfirm={() => handleDelete(record._id)}
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        okButtonProps={{
-                        style: { backgroundColor: 'blue', color: 'white', borderRadius: '5px' }
-                    }}
-                    >
-                        <DeleteOutlined
-                            style={{ color: "red", fontSize: "20px", cursor: "pointer" }}
-                        />
-                    </Popconfirm>
+          <Popconfirm
+            title="Bạn có chắc chắn muốn xóa bài viết này không?"
+            onConfirm={() => handleDelete(record._id)}
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{
+              style: { backgroundColor: "blue", color: "white", borderRadius: "5px" },
+            }}
+          >
+            <DeleteOutlined
+              style={{ color: "red", fontSize: "20px", cursor: "pointer" }}
+            />
+          </Popconfirm>
           <EditOutlined
             onClick={() => openDrawer(record)}
-            style={{ marginRight: 10, cursor: "pointer",fontSize: "20px",marginLeft: '10px', color: "blue" }}
+            style={{
+              marginRight: 10,
+              cursor: "pointer",
+              fontSize: "20px",
+              marginLeft: "10px",
+              color: "blue",
+            }}
           />
         </span>
       ),
@@ -172,6 +194,7 @@ const BlogManagement = () => {
           style={{ marginTop: 20 }}
           dataSource={blogs}
           columns={columns}
+          rowKey="_id"
           pagination={{ pageSize: 5 }}
         />
       </Spin>
@@ -179,7 +202,7 @@ const BlogManagement = () => {
         title={editingBlog ? "Cập nhật bài viết" : "Thêm bài viết"}
         placement="right"
         closable
-        onClose={() => setIsDrawerOpen(false)}
+        onClose={handleCloseDrawer}
         open={isDrawerOpen}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
@@ -222,7 +245,7 @@ const BlogManagement = () => {
             <Switch />
           </Form.Item>
           <Form.Item>
-            <Button className="bg-blue-500" block>
+            <Button className="bg-blue-500" block htmlType="submit">
               {editingBlog ? "Cập nhật" : "Thêm bài viết"}
             </Button>
           </Form.Item>

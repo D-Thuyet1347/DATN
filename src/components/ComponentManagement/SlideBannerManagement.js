@@ -1,12 +1,35 @@
 import React, { useEffect, useState } from "react";
-import {getAllSlides,createSlide,deleteSlide} from "../../APIs/bannerApi";
-import {Table,Button,Upload,message,Drawer,Form,Input,Switch, Popconfirm} from "antd";
-import {UploadOutlined,DeleteOutlined,PlusOutlined,} from "@ant-design/icons";
+import {
+  getAllSlides,
+  createSlide,
+  updateSlide,
+  deleteSlide,
+} from "../../APIs/bannerApi";
+import {
+  Table,
+  Button,
+  Upload,
+  message,
+  Drawer,
+  Form,
+  Input,
+  Switch,
+  Popconfirm,
+} from "antd";
+import {
+  UploadOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { getBase64 } from "../../utils/ultils";
 
 const SlideBannerManagement = () => {
   const [slides, setSlides] = useState([]);
+  const [image, setImage] = useState("");
+  const [fileList, setFileList] = useState([]);
+  const [editingSlide, setEditingSlide] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [file, setFile] = useState(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -14,43 +37,109 @@ const SlideBannerManagement = () => {
   }, []);
 
   const fetchSlides = async () => {
-    const res = await getAllSlides();
-    if (res.success) {
-      setSlides(res.data.map((s) => ({ ...s, key: s._id })));
-    } else {
-      message.error("Không thể tải danh sách slide!");
+    try {
+      const res = await getAllSlides();
+      if (res.success) {
+        setSlides(res.data.map((s) => ({ ...s, key: s._id })));
+      } else {
+        message.error("Không thể tải danh sách slide!");
+      }
+    } catch (err) {
+      console.error(err);
+      message.error("Lỗi khi tải slide!");
     }
   };
 
-  const handleUpload = async () => {
-    try {
-      const values = await form.validateFields();
+  const openDrawer = (slide = null) => {
+    if (slide) {
+      setEditingSlide(slide);
+      form.setFieldsValue({
+        title: slide.title,
+        link: slide.link,
+        isActive: slide.isActive ?? true,
+      });
 
-      if (!file) return message.error("Vui lòng chọn ảnh");
+      const file = slide.image
+        ? {
+            uid: "-1",
+            name: "image.png",
+            status: "done",
+            url: slide.image,
+          }
+        : [];
 
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("title", values.title);
-      formData.append("link", values.link);
-      formData.append("isActive", values.isActive);
-
-      await createSlide(formData);
-
-      message.success("Thêm slide thành công!");
-      setIsDrawerOpen(false);
-      setFile(null);
+      setFileList(file ? [file] : []);
+      setImage(slide.image || "");
+    } else {
+      setEditingSlide(null);
       form.resetFields();
+      setImage("");
+      setFileList([]);
+    }
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = () => {
+    form.resetFields();
+    setImage("");
+    setFileList([]);
+    setIsDrawerOpen(false);
+  };
+
+  const handleSubmit = async (values) => {
+    const slideData = {
+      ...values,
+      image: image || (editingSlide?.image ?? ""),
+    };
+
+    try {
+      if (editingSlide) {
+        await updateSlide(editingSlide._id, slideData);
+        message.success("Cập nhật slide thành công!");
+      } else {
+        await createSlide(slideData);
+        message.success("Thêm slide thành công!");
+      }
+      handleCloseDrawer();
       fetchSlides();
     } catch (error) {
-      message.error("Lỗi khi thêm slide");
+      console.error(error);
+      message.error("Lỗi khi thêm/cập nhật slide!");
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Xác nhận xoá slide này?")) {
+    try {
       await deleteSlide(id);
+      message.success("Xóa slide thành công!");
       fetchSlides();
+    } catch (error) {
+      console.error(error);
+      message.error("Lỗi khi xóa slide!");
     }
+  };
+
+  const handleImageChange = async ({ fileList: newFileList }) => {
+    if (!newFileList.length) {
+      setImage("");
+      setFileList([]);
+      return;
+    }
+
+    const file = newFileList[0];
+
+    if (!file.url && !file.preview) {
+      try {
+        const preview = await getBase64(file.originFileObj);
+        file.preview = preview;
+      } catch (error) {
+        console.error("Lỗi khi đọc file:", error);
+        message.error("Không thể đọc file ảnh!");
+      }
+    }
+
+    setImage(file.url || file.preview || "");
+    setFileList([file]);
   };
 
   const columns = [
@@ -60,7 +149,8 @@ const SlideBannerManagement = () => {
       title: "Ảnh",
       dataIndex: "image",
       key: "image",
-      render: (img) => <img src={img} alt="Slide" width={100} />,
+      render: (img) =>
+        img && <img width={100} height={50} src={img} alt="Slide" />,
     },
     {
       title: "Hiển thị",
@@ -70,19 +160,38 @@ const SlideBannerManagement = () => {
     {
       title: "Hành động",
       render: (_, record) => (
-        <Popconfirm
-                        title="Bạn có chắc chắn muốn xóa nhân viên này?"
-                        onConfirm={() => handleDelete(record._id)}
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        okButtonProps={{
-                        style: { backgroundColor: 'blue', color: 'white', borderRadius: '5px' }
-                    }}
-                    >
-                        <DeleteOutlined
-                            style={{ color: "red", fontSize: "20px", cursor: "pointer" }}
-                        />
-                    </Popconfirm>
+        <span>
+          <Popconfirm
+            title="Bạn có chắc chắn muốn xóa slide này?"
+            onConfirm={() => handleDelete(record._id)}
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{
+              style: {
+                backgroundColor: "blue",
+                color: "white",
+                borderRadius: "5px",
+              },
+            }}
+          >
+            <DeleteOutlined
+              style={{
+                color: "red",
+                fontSize: "20px",
+                cursor: "pointer",
+              }}
+            />
+          </Popconfirm>
+          <EditOutlined
+            onClick={() => openDrawer(record)}
+            style={{
+              marginLeft: 10,
+              color: "blue",
+              fontSize: "20px",
+              cursor: "pointer",
+            }}
+          />
+        </span>
       ),
     },
   ];
@@ -93,11 +202,7 @@ const SlideBannerManagement = () => {
       <Button
         className="mt-5 bg-blue-500"
         icon={<PlusOutlined />}
-        onClick={() => {
-          form.resetFields();
-          setFile(null);
-          setIsDrawerOpen(true);
-        }}
+        onClick={() => openDrawer()}
       >
         Thêm Slide
       </Button>
@@ -110,11 +215,12 @@ const SlideBannerManagement = () => {
       />
 
       <Drawer
-        title="Thêm Slide"
-        onClose={() => setIsDrawerOpen(false)}
+        title={editingSlide ? "Cập nhật Slide" : "Thêm Slide"}
+        onClose={handleCloseDrawer}
         open={isDrawerOpen}
+        width={400}
       >
-        <Form layout="vertical" form={form}>
+        <Form layout="vertical" form={form} onFinish={handleSubmit}>
           <Form.Item
             label="Tiêu đề"
             name="title"
@@ -122,6 +228,7 @@ const SlideBannerManagement = () => {
           >
             <Input />
           </Form.Item>
+
           <Form.Item
             label="Liên kết"
             name="link"
@@ -132,14 +239,20 @@ const SlideBannerManagement = () => {
 
           <Form.Item label="Hình ảnh">
             <Upload
-              beforeUpload={(file) => {
-                setFile(file);
-                return false;
-              }}
-              showUploadList={file ? [{ name: file.name }] : false}
+              beforeUpload={() => false}
+              fileList={fileList}
+              onChange={handleImageChange}
+              showUploadList
             >
               <Button icon={<UploadOutlined />}>Chọn hình ảnh</Button>
             </Upload>
+            {image && (
+              <img
+                src={image}
+                alt="Preview"
+                style={{ width: 100, height: 100, marginTop: 10 }}
+              />
+            )}
           </Form.Item>
 
           <Form.Item
@@ -151,9 +264,11 @@ const SlideBannerManagement = () => {
             <Switch />
           </Form.Item>
 
-          <Button className="bg-blue-500" onClick={handleUpload} block>
-            Thêm Slide
-          </Button>
+          <Form.Item>
+            <Button className="bg-blue-500" block htmlType="submit">
+              {editingSlide ? "Cập nhật" : "Thêm Slide"}
+            </Button>
+          </Form.Item>
         </Form>
       </Drawer>
     </div>

@@ -16,3 +16,7 @@ export const deleteSlide = async (id) => {
     await axios.delete(`${API_URL}/delete/${id}`);
     return true;
 };
+export const updateSlide = async (id, data) => {
+        const response = await axios.put(`${API_URL}/update/${id}`, data);
+        return response.data;
+};
