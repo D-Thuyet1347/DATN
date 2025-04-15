@@ -19,6 +19,7 @@ import VoucherManagement from '../components/ComponentManagement/VoucherManageme
 import AccountManagement from '../components/ComponentManagement/AccountManagement';
 import Dashboard from '../components/ComponentManagement/Dashboard';
 import { IoHomeOutline } from 'react-icons/io5';
+import BookingManagement from '../components/ComponentManagement/BookingManagement';
 
 const items = [
   { key: 'dashboard', label: 'Dashboard', icon: <TbLayoutDashboard style={{fontSize:'24px'}} /> },
@@ -38,6 +39,7 @@ const items = [
       { key: 'service', label: 'Quản lý dịch vụ' },
       { key: 'product', label: 'Quản lý sản phẩm' },
       { key: 'order', label: 'Quản lý đơn hàng' },
+      { key: 'booking', label: 'Quản lý đặt lịch' },
       { key: 'voucher', label: 'Quản lý voucher' },
     ],
   },
@@ -87,6 +89,8 @@ const Admin = () => {
         return <OrderManagement />;
       case 'voucher':
         return <VoucherManagement />;
+      case 'booking':
+        return <BookingManagement />;
       default:
         return <Dashboard />;
     }

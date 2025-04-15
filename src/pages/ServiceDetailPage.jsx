@@ -36,7 +36,7 @@ const ServiceDetailPage = () => {
             alert('Vui lòng đăng nhập để đặt lịch!');
             navigate('/login');
         } else {
-            navigate(`/book-service/${id}`);
+            navigate(`/book-service/${id}`, { state: { service } });
         }
     };
 

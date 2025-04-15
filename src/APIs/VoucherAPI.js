@@ -1,45 +1,85 @@
-import axios from "axios";
+import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:4000/api/';
+const API_BASE_URL = process.env.REACT_APP_API_KEY || 'http://localhost:4000/api/';
 
 const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    }
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Các hàm cho voucher
 export const addVoucher = async (voucherData) => {
-    const res = await api.post('vouchers/add', voucherData);
-    return res.data;
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.post('/vouchers', voucherData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm voucher:', error);
+    throw error;
+  }
 };
 
-
 export const getVouchers = async ({ applicableTo = '', search = '' } = {}) => {
+  try {
     const params = {};
-    if (applicableTo) params.applicableTo = applicableTo; // Thêm query param applicableTo
-    if (search) params.search = search; // Thêm query param tìm kiếm (nếu cần)
-    const res = await api.get('vouchers/list', { params });
-    return res.data;
+    if (applicableTo) params.applicableTo = applicableTo;
+    if (search) params.search = search;
+    const response = await api.get('/vouchers', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách voucher:', error);
+    throw error;
+  }
 };
 
 export const getVoucherByCode = async (voucherCode) => {
-    const res = await api.get(`vouchers/code/${voucherCode}`);
-    return res.data;
+  try {
+    const response = await api.get(`/vouchers/code/${voucherCode}`);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy voucher:', error);
+    throw error;
+  }
 };
 
 export const deleteVoucher = async (id) => {
-    const res = await api.delete(`vouchers/${id}`);
-    return res.data;
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.delete(`/vouchers/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi xóa voucher:', error);
+    throw error;
+  }
 };
 
 export const redeemVoucher = async (voucherCode) => {
-    const res = await api.post(`vouchers/redeem/${voucherCode}`);
-    return res.data;
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.post(`/vouchers/redeem/${voucherCode}`, {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi áp dụng voucher:', error);
+    throw error;
+  }
 };
 
 export const updateVoucher = async (id, voucherData) => {
-    const res = await api.put(`vouchers/${id}`, voucherData);
-    return res.data;
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.put(`/vouchers/${id}`, voucherData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi cập nhật voucher:', error);
+    throw error;
+  }
 };

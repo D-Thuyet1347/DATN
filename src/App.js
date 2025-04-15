@@ -27,6 +27,7 @@ import SearchResultPage from './pages/SearchResult';
 import { Page404 } from './pages/Page404';
 import SearchPage from './pages/SearchResult';
 import StripeCheckout from './pages/StripeCheckout';
+import BookServicePage from './pages/BookServicePage';
 
 function App() {
   return (
@@ -48,7 +49,6 @@ function App() {
           <Route path="/payment" element={<Payment />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/schedule" element={<Schedule />} />
           <Route path="/blogview" element={<BlogViewer />} />
           <Route path="/service/:id" element={<ServiceDetailPage />} />
           <Route path="/product/:id" element={<ProductDetailPage/>} />
@@ -57,12 +57,14 @@ function App() {
           <Route path="/stripe-checkout" element={<StripeCheckout />} />
           <Route path="*" element={<Page404 />} />
           <Route path="/search" element={<SearchPage/>}  />
-          
+          <Route path="/book-service" element={<BookServicePage />} />
+          <Route path="/book-service/:id" element={<BookServicePage />} />     
           {/* <Route path="/myvc" element={<MyVouchers />} /> */}
           <Route path="/myvc" element={<PrivateRoute element={<MyVouchers />} requiredRole="user" />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"admin"} />} />
+          <Route path="/schedule" element={<PrivateRoute element={<Schedule />} requiredRole={"employee"} />} />
           {/* Router riêng dành cho employee */}
         </Routes>
       </AuthProvider>

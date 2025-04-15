@@ -22,13 +22,7 @@ const MyOrdersTab = () => {
           message.error('Vui lòng đăng nhập để xem đơn hàng');
           return;
         }
-
-        console.log('Fetching orders with token:', token, 'userId:', userId);
         const rawOrders = await getOrders(token);
-        console.log('Raw orders from API:', rawOrders);
-        console.log('Orders received:', rawOrders);
-
-        // Định dạng dữ liệu từ API để khớp với bảng
         const formattedOrders = rawOrders.map(order => ({
           orderId: order.orderId || 'N/A',
           orderDate: order.orderDate ? new Date(order.orderDate).toLocaleDateString('vi-VN') : 'N/A',
@@ -36,9 +30,7 @@ const MyOrdersTab = () => {
           total: order.total || 0,
           status: order.status ? order.status.toLowerCase() : 'unknown'
         }));
-
         setOrders(formattedOrders);
-
         if (formattedOrders.length === 0) {
           message.info('Bạn chưa có đơn hàng nào.');
         }

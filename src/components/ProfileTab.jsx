@@ -32,12 +32,10 @@ const ProfileTab = () => {
 
     // --- Hàm Fetch User Data ---
     const fetchUser = useCallback(async (id) => {
-        console.log("Bắt đầu fetch thông tin user với ID:", id);
         setIsLoading(true);
         setError('');
         try {
             const response = await getUser(id);
-            console.log("Phản hồi từ API getUser:", response);
             if (response.success && response.data) {
                 const userData = response.data;
                 setUser(userData); // Lưu trữ user object

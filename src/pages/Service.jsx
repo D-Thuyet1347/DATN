@@ -4,13 +4,14 @@ import { getAllServices } from '../APIs/ServiceAPI';
 import { SVcategories } from '../utils/data';
 import { motion } from 'framer-motion'
 import { Pagination } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const Service = () => {
   const [filter, setFilter] = useState('Tất cả dịch vụ')
   const [data, setData] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 3;
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchData();
     setCurrentPage(1); // reset về trang 1 mỗi khi filter thay đổi
@@ -36,6 +37,10 @@ const Service = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  const handleBookNow = (service) => {
+    navigate('/book-service', { state: { service } });
+  };
+
 
   return (
     <div className='mt-5'>
@@ -74,6 +79,7 @@ const Service = () => {
                 duration={db.duration}
                 description={db.description}
                 image={db.image}
+                onBookNow={() => handleBookNow(db)}
               />
             ))
           ) : (

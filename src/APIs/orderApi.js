@@ -3,7 +3,6 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
 export const getOrders = async (token) => {
-  try {
       const response = await axios.get(
           `${API_URL}/api/order/userorders`,
           {
@@ -12,21 +11,7 @@ export const getOrders = async (token) => {
               },
           }
       );
-
-      console.log('API response:', response.data);
-      
-      // Đảm bảo trả về data đúng cấu trúc
-      if (response.data.success && response.data.data) {
           return response.data.data;
-      }
-      throw new Error(response.data.message || 'Invalid response format');
-  } catch (error) {
-      console.error('Error in getOrders:', error);
-      if (error.response?.status === 401) {
-          throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại');
-      }
-      throw new Error(error.message || 'Lỗi khi tải đơn hàng');
-  }
 };
 export const listOrder = async () => {
     try {

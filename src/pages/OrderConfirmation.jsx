@@ -32,7 +32,6 @@ const OrderItem = ({ name, price, quantity, image }) => {
     );
 };
 
-
 const OrderConfirmation = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -48,13 +47,15 @@ const OrderConfirmation = () => {
         ],
         total: 850000,
         address: '123 Đường ABC, Quận 1, TP.HCM',
+        discount: 0,
+        voucher: null
     };
 
     const order = orderDetails || defaultOrder;
 
-    const subtotal = order.items.reduce((sum, item) => sum + (item.PricePD * (item.quantity || 1)), 0);
+    const subtotal = order.items.reduce((sum, item) => sum + (Number(item.PricePD || item.price) * (item.quantity || 1)), 0);
     const shippingFee = 30000;
-    const discount = 0;
+    const discount = order.discount || 0;
     const total = subtotal + shippingFee - discount;
 
     const handleBackToHome = () => {
@@ -62,30 +63,30 @@ const OrderConfirmation = () => {
     };
 
     const handleViewOrders = async () => {
-      try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-              navigate('/login');
-              return;
-          }
-  
-          const orders = await getOrders(token);
-          
-          navigate('/profile', {
-              state: {
-                  activeTab: 'myorders',
-                  refreshedOrders: orders
-              },
-          });
-      } catch (error) {
-          console.error('Error:', error);
-          navigate('/profile', {
-              state: {
-                  activeTab: 'myorders',
-              },
-          });
-      }
-  };
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
+            const orders = await getOrders(token);
+            
+            navigate('/profile', {
+                state: {
+                    activeTab: 'myorders',
+                    refreshedOrders: orders
+                },
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            navigate('/profile', {
+                state: {
+                    activeTab: 'myorders',
+                },
+            });
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -96,7 +97,7 @@ const OrderConfirmation = () => {
                     <Title level={2} className="mt-4 text-green-600">Đặt Hàng Thành Công!</Title>
                     <Text className="text-lg text-gray-600">
                         Cảm ơn bạn đã đặt hàng. Mã đơn hàng của bạn là{' '}
-                        <Text strong>#{order._id || Math.floor(Math.random() * 1000000)}</Text>
+                        <Text strong>#{order.orderId || Math.floor(Math.random() * 1000000)}</Text>
                     </Text>
                 </div>
 
@@ -148,7 +149,7 @@ const OrderConfirmation = () => {
                                             </svg>
                                             <Text>Thanh toán khi nhận hàng (COD)</Text>
                                         </>
-                                    ) : order.paymentMethod === 'bank' ? (
+                                    ) : order.paymentMethod === 'card' ? (
                                         <>
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -166,8 +167,7 @@ const OrderConfirmation = () => {
                                             <Text>Chuyển khoản ngân hàng</Text>
                                         </>
                                     ) : (
-                                        <>
-                                        </>
+                                        <Text>Không xác định</Text>
                                     )}
                                 </div>
                             </div>
@@ -178,10 +178,10 @@ const OrderConfirmation = () => {
                                 {order.items.map((item) => (
                                     <OrderItem
                                         key={item._id}
-                                        name={item.ProductName}
-                                        price={item.PricePD * (item.quantity || 1)}
+                                        name={item.ProductName || item.name}
+                                        price={(Number(item.PricePD || item.price) * (item.quantity || 1))}
                                         quantity={item.quantity || 1}
-                                        image={item.ImagePD}
+                                        image={item.ImagePD || item.image}
                                     />
                                 ))}
                             </div>
@@ -199,10 +199,12 @@ const OrderConfirmation = () => {
                                     <Text type="secondary">Phí vận chuyển</Text>
                                     <Text>{shippingFee.toLocaleString('vi-VN')}₫</Text>
                                 </div>
-                                <div className="flex justify-between">
-                                    <Text type="secondary">Giảm giá</Text>
-                                    <Text type="danger">-{discount.toLocaleString('vi-VN')}₫</Text>
-                                </div>
+                                {discount > 0 && (
+                                    <div className="flex justify-between">
+                                        <Text type="secondary">Giảm giá ({order.voucher?.code})</Text>
+                                        <Text type="danger">-{discount.toLocaleString('vi-VN')}₫</Text>
+                                    </div>
+                                )}
                                 <Divider className="my-2" />
                                 <div className="flex justify-between">
                                     <Text strong className="text-base">Tổng cộng</Text>

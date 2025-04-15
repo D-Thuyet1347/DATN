@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {  Divider, Image } from 'antd';
+import { Divider, Image } from 'antd';
 import { CreditCard, Truck, ArrowLeft, CheckCircle } from 'lucide-react';
 import { errorToast, toastContainer } from '../utils/toast';
-import { placeOrder } from '../APIs/orderApi'; // Import API
-
+import { placeOrder } from '../APIs/orderApi';
 
 const PaymentMethod = ({ id, name, icon, selected, onSelect }) => {
   return (
@@ -37,14 +36,28 @@ const Payment = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { cartItems = {}, products = [] } = location.state || {};
-
-  // Tính toán tổng tiền
+  const { cartItems = {}, products = [], selectedVoucher = null } = location.state || {};
+  
   const subtotal = products.reduce((total, product) => 
-    cartItems[product._id] ? total + (product.PricePD * cartItems[product._id]) : total, 
-  0);
+    cartItems[product._id] ? total + (Number(product.PricePD) * cartItems[product._id]) : total, 
+    0
+  );
+
+  const calculateDiscount = () => {
+    if (!selectedVoucher) return 0;
+
+    let discountAmount = subtotal * ((Number(selectedVoucher.discount) || 0) / 100);
+
+    if (selectedVoucher.maximumDiscount && discountAmount > (Number(selectedVoucher.maximumDiscount) || 0)) {
+      discountAmount = Number(selectedVoucher.maximumDiscount) || 0;
+    }
+
+    return discountAmount;
+  };
+
+  const discount = calculateDiscount();
   const shippingFee = 30000;
-  const total = subtotal + shippingFee;
+  const total = subtotal + shippingFee - discount;
 
   useEffect(() => {
     if (Object.keys(cartItems).length === 0) {
@@ -61,7 +74,7 @@ const Payment = () => {
     if (!formData.fullName.trim()) {
       throw new Error('Vui lòng nhập họ tên');
     }
-    if (!formData.phone.match()) {
+    if (!formData.phone.match(/^[0-9]{10,11}$/)) {
       throw new Error('Số điện thoại không hợp lệ');
     }
     if (!formData.address.trim()) {
@@ -83,7 +96,7 @@ const Payment = () => {
         _id: product._id,
         name: product.ProductName,
         price: product.PricePD,
-        quantity: cartItems[product._id],
+        quantity: cartItems[product._id], // Include quantity from cartItems
         image: product.ImagePD
       }));
   
@@ -96,7 +109,9 @@ const Payment = () => {
           address: formData.address
         },
         paymentMethod: selectedPayment,
-        note: formData.note
+        note: formData.note,
+        voucher: selectedVoucher ? selectedVoucher._id : null,
+        discount: discount
       };
   
       const response = await placeOrder(orderData, token);
@@ -108,13 +123,15 @@ const Payment = () => {
         } else if (selectedPayment === 'cod') {
           navigate('/order-confirmation', {
             state: {
-            orderDetails: {
-              ...formData,
-              paymentMethod: selectedPayment,
-              items: products.filter(p => cartItems[p._id]),
-              total,
-              orderId: response.orderId
-            }
+              orderDetails: {
+                ...formData,
+                paymentMethod: selectedPayment,
+                items: orderItems, // Pass the updated items array with quantities
+                total,
+                orderId: response.orderId,
+                discount: discount,
+                voucher: selectedVoucher
+              }
             }
           });
         }
@@ -134,13 +151,11 @@ const Payment = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       {toastContainer()}
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Thanh Toán</h1>
           <p className="text-gray-600">Hoàn tất đơn hàng của bạn</p>
         </div>
 
-        {/* Progress Steps */}
         <div className="flex justify-center mb-12">
           <div className="w-full max-w-md">
             <div className="flex items-center">
@@ -175,7 +190,6 @@ const Payment = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-2/3">
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm overflow-hidden">
-              {/* Shipping Information */}
               <div className="p-6 border-b">
                 <div className="flex items-center mb-4">
                   <Truck className="text-blue-600 mr-2" size={20} />
@@ -244,7 +258,6 @@ const Payment = () => {
                 </div>
               </div>
               
-              {/* Payment Method */}
               <div className="p-6">
                 <div className="flex items-center mb-4">
                   <CreditCard className="text-blue-600 mr-2" size={20} />
@@ -276,7 +289,6 @@ const Payment = () => {
             </form>
           </div>
           
-          {/* Right Column - Order Summary */}
           <div className="lg:w-1/3">
             <div className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-4">
               <div className="p-6 border-b">
@@ -284,7 +296,6 @@ const Payment = () => {
               </div>
               
               <div className="p-6">
-                {/* Order Items */}
                 <div className="space-y-4 mb-6">
                   {products.filter(p => cartItems[p._id]).map(product => (
                     <div key={product._id} className="flex items-start">
@@ -301,13 +312,12 @@ const Payment = () => {
                         <p className="text-sm text-gray-500">Số lượng: {cartItems[product._id]}</p>
                       </div>
                       <div className="ml-4 text-sm font-medium text-gray-900">
-                        {(product.PricePD * cartItems[product._id]).toLocaleString('vi-VN')}₫
+                        {(Number(product.PricePD) * cartItems[product._id]).toLocaleString('vi-VN')}₫
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                {/* Order Summary */}
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Tạm tính</span>
@@ -319,10 +329,12 @@ const Payment = () => {
                     <span className="text-sm font-medium">{shippingFee.toLocaleString('vi-VN')}₫</span>
                   </div>
                   
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Giảm giá</span>
-                    {/* <span className="text-sm font-medium text-red-500">-{discount.toLocaleString('vi-VN')}₫</span> */}
-                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Giảm giá ({selectedVoucher?.code})</span>
+                      <span className="text-sm font-medium text-red-500">-{discount.toLocaleString('vi-VN')}₫</span>
+                    </div>
+                  )}
                   
                   <Divider className="my-2" />
                   
@@ -332,7 +344,6 @@ const Payment = () => {
                   </div>
                 </div>
                 
-                {/* Action Buttons */}
                 <div className="mt-6 space-y-3">
                   <button
                     type="button"
@@ -362,3 +373,5 @@ const Payment = () => {
 };
 
 export default Payment;
+
+
