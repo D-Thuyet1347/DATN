@@ -6,7 +6,6 @@ import Home from './pages/Home';
 import Service from './pages/Service';
 import Products from './pages/Products';
 import Booknow from './pages/Booknow';
-import Bookings from './pages/Bookings';
 import Contacts from './pages/Contacts';
 import About from './pages/About';
 import Cart from './pages/Cart';
@@ -28,6 +27,8 @@ import { Page404 } from './pages/Page404';
 import SearchPage from './pages/SearchResult';
 import StripeCheckout from './pages/StripeCheckout';
 import BookServicePage from './pages/BookServicePage';
+import ServicePage from './pages/ServicePage';
+import ProductsPage from './pages/ProductPage';
 
 function App() {
   return (
@@ -37,9 +38,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/service" element={<Service />} />
+          <Route path="/servicepage" element={<ServicePage />} />
           <Route path="/product" element={<Products />} />
+          <Route path="/productpage" element={<ProductsPage />} />
           <Route path="/booknow" element={<Booknow />} />
-          <Route path="/booking" element={<Bookings />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contacts />} />
           <Route path="/cart" element={<Cart />} />
@@ -58,8 +60,8 @@ function App() {
           <Route path="*" element={<Page404 />} />
           <Route path="/search" element={<SearchPage/>}  />
           <Route path="/book-service" element={<BookServicePage />} />
-          <Route path="/book-service/:id" element={<BookServicePage />} />     
-          {/* <Route path="/myvc" element={<MyVouchers />} /> */}
+          <Route path="/book-service/:id" element={<BookServicePage />} />  
+          <Route path="/verify/success" element={<StripeCheckout />} />   
           <Route path="/myvc" element={<PrivateRoute element={<MyVouchers />} requiredRole="user" />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />

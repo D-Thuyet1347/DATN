@@ -1,36 +1,47 @@
 import axios from 'axios';
+import moment from 'moment';  // Add this line at the top of the file
+
 
 // Đặt base URL của API
 const API_URL = 'http://localhost:4000/api/booking';
 
-
-// Hàm tạo mới một booking
 export const bookService = async (bookingData) => {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.post(`${API_URL}/add`, bookingData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
       },
+      timeout: 10000
     });
+    
+    if (response.data && response.data.success === false) {
+      throw new Error(response.data.message || 'Đặt lịch thất bại');
+    }
     
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi đặt lịch:', error);
-    let errorMessage = 'Có lỗi xảy ra khi đặt lịch';
+    console.error('Chi tiết lỗi:', {
+      message: error.message,
+      response: error.response?.data,
+      config: error.config
+    });
     
+    let errorMessage = 'Có lỗi xảy ra khi đặt lịch';
     if (error.response) {
       errorMessage = error.response.data?.message || 
-                    `Lỗi từ máy chủ (${error.response.status})`;
-      console.error('Response error:', error.response.data);
-    } else if (error.request) {
-      errorMessage = 'Không nhận được phản hồi từ máy chủ';
+                   `Lỗi từ máy chủ (${error.response.status})`;
+    } else if (error.message) {
+      errorMessage = error.message;
     }
     
     throw new Error(errorMessage);
   }
 };
+
+
+
 
 // Hàm lấy tất cả bookings
 export const getAllBookings = async () => {
@@ -43,10 +54,10 @@ export const getAllBookings = async () => {
   }
 };
 
-export const updateBookingStatus = async (bookingId, statusData) => {
+export const updateBookingStatus = async (bookingId, status) => {
       const response = await axios.put(
           `${API_URL}/status`, 
-          { bookingId, ...statusData }
+          { bookingId, ...status }
       );
       return response.data;
 
@@ -93,5 +104,22 @@ export const deleteBooking = async (id) => {
   } catch (error) {
     console.error('Lỗi khi xóa booking:', error);
     throw error.response?.data || { message: 'Có lỗi xảy ra khi xóa booking' };
+  }
+};
+// Thêm hàm kiểm tra lịch nhân viên
+export const checkEmployeeAvailability = async (employeeId, date, time, duration) => {
+  try {
+    const response = await axios.get(`${API_URL}/check-availability`, {
+      params: { 
+        employeeId, 
+        date: moment(date).format('YYYY-MM-DD'), 
+        time: moment(time).format('HH:mm'),
+        duration 
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error checking availability:', error);
+    throw error;
   }
 };

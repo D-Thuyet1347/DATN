@@ -13,6 +13,7 @@ import MyOrdersTab from '../components/MyOrdersTab';
 import ChangePasswordTab from '../components/ChangePassword';
 import DashboardTab from '../components/DashboardTab';
 import ScheduleTab from '../components/ScheduleTab';
+import Header from '../components/Header';
 
 function Profile() {
     const location = useLocation();
@@ -54,8 +55,10 @@ function Profile() {
     };
 
     return (
-        <div className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-            <div className="flex w-[1100px] bg-white rounded-3xl shadow-xl overflow-hidden">
+        <>
+        <Header />
+        <div className=" mt-[-40px] min-h-screen flex items-center justify-center p-4">
+            <div className="flex w-[1500px] bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div className="w-64 flex-shrink-0 bg-gradient-to-b from-pink-200 to-purple-300 rounded-l-3xl">
                     <Menu
                         mode="inline"
@@ -70,6 +73,7 @@ function Profile() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 

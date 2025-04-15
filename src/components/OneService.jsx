@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const OneService = ({ name, title, price, duration, description, image, onBookNow,id }) => {
+const OneService = ({ name, title, price, duration, description, image,id }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-white h-[354px] w-[310px] rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <img src={image} alt={name} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="text-xl font-semibold mb-2">{name}</h3>
         <p className="text-gray-600 mb-2">{title}</p>
-        <p className="text-gray-700 mb-2">{description}</p>
+        <p className="text-gray-700 mb-2 truncate max-w-xs">{description}</p>
         <div className="flex justify-between items-center mb-4">
           <span className="font-bold text-lg text-maincolor">{price.toLocaleString()} VNĐ</span>
           <span className="text-gray-500">{duration} phút</span>

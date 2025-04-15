@@ -87,6 +87,10 @@ const SlideBannerManagement = () => {
   };
 
   const handleSubmit = async (values) => {
+    if (!editingSlide && !image) {
+      message.warning("Vui lòng chọn hình ảnh cho slide!");
+      return;
+    }
     const slideData = {
       ...values,
       image: image || (editingSlide?.image ?? ""),
@@ -130,8 +134,7 @@ const SlideBannerManagement = () => {
 
     if (!file.url && !file.preview) {
       try {
-        const preview = await getBase64(file.originFileObj);
-        file.preview = preview;
+        file.preview = await getBase64(file.originFileObj);
       } catch (error) {
         console.error("Lỗi khi đọc file:", error);
         message.error("Không thể đọc file ảnh!");
@@ -200,7 +203,7 @@ const SlideBannerManagement = () => {
     <div className="mt-3">
       <h2>Quản lý Slide Banner</h2>
       <Button
-        className="mt-5 bg-blue-500"
+        type="primary"
         icon={<PlusOutlined />}
         onClick={() => openDrawer()}
       >
@@ -259,13 +262,12 @@ const SlideBannerManagement = () => {
             label="Hiển thị"
             name="isActive"
             valuePropName="checked"
-            initialValue={true}
           >
             <Switch />
           </Form.Item>
 
           <Form.Item>
-            <Button className="bg-blue-500" block htmlType="submit">
+            <Button type="primary" block htmlType="submit">
               {editingSlide ? "Cập nhật" : "Thêm Slide"}
             </Button>
           </Form.Item>

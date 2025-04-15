@@ -71,7 +71,7 @@ const OrderConfirmation = () => {
             }
 
             const orders = await getOrders(token);
-            
+                console.log('Orders:', orders);
             navigate('/profile', {
                 state: {
                     activeTab: 'myorders',
@@ -118,11 +118,11 @@ const OrderConfirmation = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <Text type="secondary" className="block text-sm">Họ và tên</Text>
-                                        <Text>{order.fullName}</Text>
+                                        <Text>{order.firstName}{''}{order.lastName}</Text>
                                     </div>
                                     <div>
                                         <Text type="secondary" className="block text-sm">Số điện thoại</Text>
-                                        <Text>{order.phone}</Text>
+                                        <Text>{order.phoneNumber}</Text>
                                     </div>
                                     <div className="md:col-span-2">
                                         <Text type="secondary" className="block text-sm">Địa chỉ nhận hàng</Text>
@@ -215,7 +215,7 @@ const OrderConfirmation = () => {
                             </div>
                             <div className="mt-6 space-y-3">
                                 <Button
-                                    type="primary"
+                                    className='bg-blue-600 text-white'
                                     block
                                     size="large"
                                     icon={<Home size={18} className="mr-2" />}

@@ -1,36 +1,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getUser, updateUser } from '../APIs/userApi'; // Sử dụng API đã cấu hình
-import { jwtDecode } from "jwt-decode"; // Import đúng
-import { toast } from 'react-toastify'; // Sử dụng toast từ parent hoặc import riêng
+import { getUser, updateUser } from '../APIs/userApi'; 
+import { jwtDecode } from "jwt-decode"; 
+import { toast } from 'react-toastify'; 
 
 const BACKEND_URL = process.env.REACT_APP_API_KEY ? process.env.REACT_APP_API_KEY.replace("/api", "") : "http://localhost:4000";
 const DEFAULT_AVATAR = 'https://placehold.co/150?text=No+Image';
 
 const ProfileTab = () => {
-    // State cho dữ liệu người dùng và trạng thái
-    const [user, setUser] = useState(null); // Lưu trữ object user đầy đủ
+    const [user, setUser] = useState(null); 
     const [userId, setUserId] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
-    const [error, setError] = useState(''); // Lỗi chung của component
-
-    // State cho chế độ chỉnh sửa và form
+    const [isLoading, setIsLoading] = useState(true); 
+    const [error, setError] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
-        phone: '',
+        phoneNumber: '',
         address: '',
         email: '',
         dateOfBirth: '',
     });
-    const [imageFile, setImageFile] = useState(null); // State cho file ảnh mới chọn
-    const [previewImage, setPreviewImage] = useState(DEFAULT_AVATAR); // State cho URL ảnh hiển thị
-
-    // State cho thông báo cập nhật
+    const [imageFile, setImageFile] = useState(null); 
+    const [previewImage, setPreviewImage] = useState(DEFAULT_AVATAR); 
     const [updateError, setUpdateError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
-    // --- Hàm Fetch User Data ---
     const fetchUser = useCallback(async (id) => {
         setIsLoading(true);
         setError('');
@@ -38,12 +32,11 @@ const ProfileTab = () => {
             const response = await getUser(id);
             if (response.success && response.data) {
                 const userData = response.data;
-                setUser(userData); // Lưu trữ user object
-                // Cập nhật state form với dữ liệu mới nhất
+                setUser(userData); 
                 setFormData({
                     firstName: userData.firstName || '',
                     lastName: userData.lastName || '',
-                    phone: userData.phone || '',
+                    phoneNumber: userData.phoneNumber || '',
                     address: userData.address || '',
                     email: userData.email || '',
                     dateOfBirth: userData.dateOfBirth ? formatDateForInput(userData.dateOfBirth) : '',
@@ -65,9 +58,7 @@ const ProfileTab = () => {
         } finally {
             setIsLoading(false);
         }
-    }, []); // useCallback vì nó không phụ thuộc state ngoài `id` được truyền vào
-
-    // --- useEffect để lấy userId từ token và fetch data lần đầu ---
+    }, []); 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -76,9 +67,8 @@ const ProfileTab = () => {
 
         try {
             const decodedToken = jwtDecode(token);
-            const idFromToken = decodedToken.id; // <--- KIỂM TRA DÒNG NÀY
+            const idFromToken = decodedToken.id; 
 
-            // Thêm log để kiểm tra ID lấy được
             console.log("Decoded Token:", decodedToken);
             console.log("ID lấy từ Token:", idFromToken); // <-- XEM LOG NÀY
 
@@ -90,15 +80,14 @@ const ProfileTab = () => {
                 return;
             }
 
-            setUserId(idFromToken); // Lưu ID hợp lệ
-            fetchUser(idFromToken); // Gọi fetch với ID ĐÚNG
+            setUserId(idFromToken);
+            fetchUser(idFromToken); 
 
         } catch (error) {
-            // ... xử lý lỗi giải mã ...
+ 
         }
-    }, [fetchUser]); // Dependency fetchUser đã đúng
+    }, [fetchUser]); 
 
-    // --- Hàm định dạng ngày tháng YYYY-MM-DD ---
     const formatDateForInput = (dateString) => {
         if (!dateString) return '';
         try {
@@ -133,13 +122,10 @@ const ProfileTab = () => {
                  toast.error("Loại file ảnh không hợp lệ (chỉ chấp nhận jpeg, png, gif).");
                  return;
              }
-
-            setImageFile(file); // Lưu File object vào state
-            // Tạo URL tạm thời để xem trước ảnh mới
+            setImageFile(file); 
             const previewUrl = URL.createObjectURL(file);
             setPreviewImage(previewUrl);
-             // Nhớ thu hồi URL cũ nếu có để tránh rò rỉ bộ nhớ
-             // URL.revokeObjectURL(previousPreviewUrl); // Cần quản lý URL cũ
+          
         }
     };
 
@@ -151,12 +137,12 @@ const ProfileTab = () => {
 
     const handleCancel = () => {
         setIsEditing(false);
-        // Reset form về dữ liệu user hiện tại (trong state 'user')
+      
         if (user) {
             setFormData({
                 firstName: user.firstName || '',
                 lastName: user.lastName || '',
-                phone: user.phone || '',
+                phoneNumber: user.phoneNumber || '',
                 address: user.address || '',
                 email: user.email || '',
                 dateOfBirth: user.dateOfBirth ? formatDateForInput(user.dateOfBirth) : '',
@@ -183,7 +169,7 @@ const ProfileTab = () => {
         const dataToSend = new FormData();
         dataToSend.append('firstName', formData.firstName);
         dataToSend.append('lastName', formData.lastName);
-        dataToSend.append('phone', formData.phone);
+        dataToSend.append('phoneNumber', formData.phoneNumber);
         dataToSend.append('address', formData.address);
 
         dataToSend.append('dateOfBirth', formData.dateOfBirth);
@@ -204,7 +190,7 @@ const ProfileTab = () => {
                  setFormData({
                     firstName: response.data.firstName || '',
                     lastName: response.data.lastName || '',
-                    phone: response.data.phone || '',
+                    phoneNumber: response.data.phoneNumber || '',
                     address: response.data.address || '',
                     email: response.data.email || '',
                     dateOfBirth: response.data.dateOfBirth ? formatDateForInput(response.data.dateOfBirth) : '',
@@ -297,7 +283,6 @@ const ProfileTab = () => {
                  {/* Cột thông tin */}
                 <div className="md:w-2/3">
                     {isEditing ? (
-                        // --- Form chỉnh sửa ---
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
@@ -310,8 +295,8 @@ const ProfileTab = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="phone">Số điện thoại:</label>
-                                <input id="phone" type="tel" name="phone" value={formData.phone} onChange={handleInputChange} disabled={isLoading} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100" />
+                                <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="phoneNumber">Số điện thoại:</label>
+                                <input id="phoneNumber" type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} disabled={isLoading} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100" />
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="address">Địa chỉ:</label>
@@ -336,10 +321,9 @@ const ProfileTab = () => {
                             </div>
                         </div>
                     ) : (
-                        // --- Chế độ hiển thị ---
-                         <div className="space-y-3 text-gray-700 text-base"> {/* Tăng cỡ chữ */}
+                         <div className="space-y-3 text-gray-700 text-base">
                             <p><strong className="font-semibold text-gray-800">Họ và tên:</strong> {user.firstName || ''} {user.lastName || '(Chưa cập nhật)'}</p>
-                            <p><strong className="font-semibold text-gray-800">Số điện thoại:</strong> {user.phone || '(Chưa cập nhật)'}</p>
+                            <p><strong className="font-semibold text-gray-800">Số điện thoại:</strong> {user.phoneNumber || '(Chưa cập nhật)'}</p>
                             <p><strong className="font-semibold text-gray-800">Địa chỉ:</strong> {user.address || '(Chưa cập nhật)'}</p>
                             <p><strong className="font-semibold text-gray-800">Email:</strong> {user.email}</p>
                             <p><strong className="font-semibold text-gray-800">Ngày sinh:</strong> {user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString('vi-VN') : '(Chưa cập nhật)'}</p>

@@ -15,7 +15,8 @@
     "profile": "Hồ sơ",
     "logout": "Đăng xuất",
     "login": "Đăng nhập / Đăng ký",
-    "voucher": "Mã giảm giá"
+    "voucher": "Mã giảm giá",
+    "admin": "Quản trị viên"
   },
   "profileMenu": {
     "personalInfo": "Thông tin cá nhân",

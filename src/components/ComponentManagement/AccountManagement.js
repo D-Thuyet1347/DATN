@@ -21,10 +21,14 @@ const AccountManagement = () => {
   useEffect(() => {
     if (searchQuery) {
       const lowercasedQuery = searchQuery.toLowerCase();
-      const filtered = data.filter((item) =>
-        (item.firstName?.toLowerCase().includes(lowercasedQuery) ||
-         item.email?.toLowerCase().includes(lowercasedQuery))
-      );
+      const filtered = data.filter((item) => {
+        const fullName = `${item.firstName || ''} ${item.lastName || ''}`.toLowerCase();
+        return (
+          fullName.includes(lowercasedQuery) ||
+          item.email?.toLowerCase().includes(lowercasedQuery)
+        );
+      });
+      
       setFilteredData(filtered);
     } else {
       setFilteredData(data);
@@ -59,7 +63,7 @@ const AccountManagement = () => {
     try {
       const values = await form.validateFields();
       await updateUserRole(selectedUser._id, values);
-      successToast('Cập nhật role thành công!');
+      successToast('Cập nhật thành công!');
       setIsEditOpen(false);
       fetchAccount();
     } catch (error) {
@@ -82,7 +86,11 @@ const AccountManagement = () => {
   };
 
   const columns = [
-    { title: 'Tên tài khoản', dataIndex: 'firstName', key: 'firstName' },
+    {
+      title: 'Tên tài khoản',
+      key: 'fullName',
+      render: (_, record) => `${record.firstName || ''} ${record.lastName || ''}`.trim(),
+    },
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'Vai trò', dataIndex: 'role', key: 'role' },
     {
@@ -102,7 +110,7 @@ const AccountManagement = () => {
       ),
     },
   ];
-
+  
   return (
     <div className="mt-3">
       {toastContainer()}
@@ -134,6 +142,12 @@ const AccountManagement = () => {
             label="Tên"
             rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}
           >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="lastName"
+            label="Họ"
+            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}>
             <Input />
           </Form.Item>
           <Form.Item

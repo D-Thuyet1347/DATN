@@ -16,8 +16,7 @@ const Products = () => {
   const [loading, setLoading] = useState(false);
   const [cartMessage, setCartMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 8; // Số sản phẩm mỗi trang
-  const { id } = useParams();
+  const pageSize = 4; 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +90,7 @@ const Products = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8 ml-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 mt-8 ml-4">
           {paginatedProducts.length > 0 ? (
             paginatedProducts.map((product, index) => (
               <OneProduct
@@ -121,7 +120,6 @@ const Products = () => {
               total={filteredProducts.length}
               onChange={(page) => {
                 setCurrentPage(page);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               showSizeChanger={false}
             />

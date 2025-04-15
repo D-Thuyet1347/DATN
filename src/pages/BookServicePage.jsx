@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { DatePicker, TimePicker, Select, Button, Form, message, Spin, Card, Descriptions } from 'antd'
+import { DatePicker, TimePicker, Select, Button, Form, message, Spin, Card, Descriptions, Modal } from 'antd'
 import moment from 'moment'
 import { listBranch } from '../APIs/brand'
-import { listEmployee } from '../APIs/employee'
+import { listEmployee, getEmployeeBookings } from '../APIs/employee'
 import { bookService } from '../APIs/booking'
+import { errorToast, successToast, toastContainer } from '../utils/toast'
 
 const { Option } = Select
 
@@ -19,11 +19,13 @@ const BookServicePage = () => {
   const [employeeLoading, setEmployeeLoading] = useState(false)
   const [service, setService] = useState(null)
   const [serverError, setServerError] = useState(null)
+  const [employeeBookings, setEmployeeBookings] = useState([])
+  const [checkingAvailability, setCheckingAvailability] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      message.error('Vui lòng đăng nhập để đặt lịch');
+      errorToast('Vui lòng đăng nhập để đặt lịch');
       navigate('/login', { state: { from: location } });
       return;
     }
@@ -46,13 +48,11 @@ const BookServicePage = () => {
       if (Array.isArray(response.data)) {
         setBranches(response.data)
       } else {
-        console.error('Invalid branch data format:', response)
-        message.error('Dữ liệu chi nhánh không đúng định dạng')
+        errorToast('Dữ liệu chi nhánh không đúng định dạng')
         setBranches([])
       }
     } catch (error) {
-      console.error('Error fetching branches:', error)
-      message.error('Không thể tải danh sách chi nhánh')
+      errorToast('Không thể tải danh sách chi nhánh')
     } finally {
       setLoading(false)
     }
@@ -69,26 +69,19 @@ const BookServicePage = () => {
       const response = await listEmployee()
       
       if (!Array.isArray(response.data)) {
-        console.error('Invalid employee data format:', response)
-        message.error('Dữ liệu nhân viên không đúng định dạng')
+        errorToast('Dữ liệu nhân viên không đúng định dạng')
         setEmployees([])
         return
       }
       
-      // Chuẩn hóa dữ liệu nhân viên
       const normalizedEmployees = response.data.map(emp => ({
         ...emp,
-        // Chuẩn hóa branch info
         branchInfo: emp.branch || emp.BranchID,
-        // Chuẩn hóa user info
         userInfo: emp.user || emp.User,
-        // Chuẩn hóa status (nếu cần)
         status: emp.status || 'active'
       }))
   
-      // Lọc nhân viên
       const filteredEmployees = normalizedEmployees.filter(emp => {
-        // Lấy branchId của nhân viên (xử lý cả object và string)
         const empBranchId = 
           (typeof emp.branchInfo === 'object' ? emp.branchInfo?._id : emp.branchInfo) || 
           emp.BranchID?._id || 
@@ -97,15 +90,28 @@ const BookServicePage = () => {
         return empBranchId === branchId && emp.status === 'active'
       })
   
-      console.log('Filtered employees:', filteredEmployees)
       setEmployees(filteredEmployees)
     } catch (error) {
-      console.error('Error fetching employees:', error)
-      message.error('Không thể tải danh sách nhân viên')
+      errorToast('Không thể tải danh sách nhân viên')
     } finally {
       setEmployeeLoading(false)
     }
   }
+
+  const fetchEmployeeBookings = async (employeeId, date) => {
+    if (!employeeId || !date) return;
+    
+    try {
+      const response = await getEmployeeBookings(employeeId, date.format('YYYY-MM-DD'));
+      if (Array.isArray(response.data)) {
+        setEmployeeBookings(response.data);
+      } else {
+        setEmployeeBookings([]);
+      }
+    } catch (error) {
+      setEmployeeBookings([]);
+    }
+  };
 
   const handleBranchChange = (branchId) => {
     form.setFieldsValue({ employee: undefined })
@@ -115,29 +121,139 @@ const BookServicePage = () => {
       setEmployees([])
     }
   }
+  const handleEmployeeChange = (employeeId) => {
+    const date = form.getFieldValue('date');
+    if (employeeId && date) {
+      fetchEmployeeBookings(employeeId, date);
+    }
+  };
+  const handleDateChange = (date) => {
+    const employeeId = form.getFieldValue('employee');
+    if (employeeId && date) {
+      fetchEmployeeBookings(employeeId, date);
+    }
+  };
+  const isTimeSlotAvailable = (employeeId, date, time, duration) => {
+    if (!employeeId || !date || !time || !duration) return true;
+    
+    const selectedDate = date.format('YYYY-MM-DD');
+    const selectedTime = time.format('HH:mm');
+    const selectedStart = convertTimeToMinutes(selectedTime);
+    const selectedEnd = selectedStart + duration;
+    
+    // Lọc các lịch đặt trong cùng ngày
+    const dayBookings = employeeBookings.filter(
+      booking => booking.date === selectedDate
+    );
+    
+    for (const booking of dayBookings) {
+      const bookingStart = convertTimeToMinutes(booking.time);
+      const bookingEnd = bookingStart + (booking.duration || service.duration);
+      if (
+        (selectedStart >= bookingStart && selectedStart < bookingEnd) ||
+        (selectedEnd > bookingStart && selectedEnd <= bookingEnd) ||
+        (selectedStart <= bookingStart && selectedEnd >= bookingEnd)
+      ) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
 
+  const convertTimeToMinutes = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  // const checkAvailabilityBeforeSubmit = async () => {
+  //   const values = await form.validateFields();
+    
+  //   if (!service || !service._id || !service.duration) {
+  //     errorToast('Thiếu thông tin dịch vụ');
+  //     return false;
+  //   }
+    
+  //   const { branch, employee, date, time } = values;
+    
+  //   if (!branch || !employee || !date || !time) {
+  //     errorToast('Vui lòng điền đầy đủ thông tin đặt lịch');
+  //     return false;
+  //   }
+    
+  //   setCheckingAvailability(true);
+    
+  //   try {
+  //     const isAvailable = isTimeSlotAvailable(
+  //       employee, 
+  //       date, 
+  //       time, 
+  //       service.duration
+  //     );
+      
+  //     if (!isAvailable) {
+  //       errorToast({
+  //         title: 'Khung giờ không khả dụng',
+  //         content: 'Nhân viên đã có lịch trong khung giờ này. Vui lòng chọn thời gian khác.',
+  //       });
+  //       return false;
+  //     }
+      
+  //     return true;
+  //   } catch (error) {
+  //     errorToast('Có lỗi khi kiểm tra khung giờ');
+  //     return false;
+  //   } finally {
+  //     setCheckingAvailability(false);
+  //   }
+  // };
+  const checkAvailabilityBeforeSubmit = async () => {
+    const values = await form.validateFields();
+    
+    if (!service || !service._id || !service.duration) {
+      errorToast('Thiếu thông tin dịch vụ');
+      return false;
+    }
+    
+    const { branch, employee, date, time } = values;
+    
+    if (!branch || !employee || !date || !time) {
+      errorToast('Vui lòng điền đầy đủ thông tin đặt lịch');
+      return false;
+    }
+    
+    setCheckingAvailability(true);
+    
+    try {
+      const isAvailable = isTimeSlotAvailable(employee, date, time, service.duration);
+      
+      if (!isAvailable) {
+        errorToast('Nhân viên đã có lịch trong khung giờ này. Vui lòng chọn thời gian khác.');
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      errorToast('Có lỗi khi kiểm tra khung giờ');
+      return false;
+    } finally {
+      setCheckingAvailability(false);
+    }
+  };
+  
   const onFinish = async (values) => {
     setServerError(null);
-    try {
-      // Kiểm tra người dùng đã đăng nhập
+    
+
+      const isAvailable = await checkAvailabilityBeforeSubmit();
+      if (!isAvailable) return;
+      
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Vui lòng đăng nhập để đặt lịch');
-        navigate('/login', { state: { from: location } });
+        errorToast('Vui lòng đăng nhập để đặt lịch');
+        navigate('/sign-in', { state: { from: location } });
         return;
       }
-      
-      // Kiểm tra dữ liệu đầu vào
-      if (!service || !service._id) {
-        message.error('Thiếu thông tin dịch vụ');
-        return;
-      }
-      
-      if (!values.branch || !values.employee || !values.date || !values.time) {
-        message.error('Vui lòng điền đầy đủ thông tin đặt lịch');
-        return;
-      }
-      
       setLoading(true);
       const bookingData = {
         service: service._id,
@@ -145,29 +261,71 @@ const BookServicePage = () => {
         employee: values.employee,
         date: values.date.format('YYYY-MM-DD'),
         time: values.time.format('HH:mm'),
+        duration: service.duration,
         notes: values.notes || '',
       };
-  
-      console.log('Dữ liệu gửi đi:', bookingData); // Debug
-  
-      const response = await bookService(bookingData);
-      if (response && (response.success || response._id)) {
-        message.success('Đặt lịch thành công!');
-        navigate('/profile', { state: { activeTab: 'schedule' } });
-      } else {
-        message.error(response?.message || 'Đặt lịch thất bại');
+      try {
+        const response = await bookService(bookingData);
+        if (response?.success) {
+          successToast('Đặt lịch thành công!');
+          navigate('/profile', { state: { activeTab: 'schedule' } });
+        } else {
+          const errorMsg = response?.message || 'Đặt lịch thất bại!';
+          errorToast(errorMsg);
+          setServerError(errorMsg);
+        }
+      } catch (err) {
+        errorToast('Nhân viên này đã được đặt!');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Booking error:', error);
-      setServerError(error.message);
-      message.error(
-        error.message.includes('404') 
-          ? 'Endpoint API không tồn tại. Vui lòng liên hệ quản trị viên.'
-          : error.message
-      );
-    } finally {
-      setLoading(false);
+      
+  };
+
+  
+  // Disable các khung giờ đã bận trong TimePicker
+  const disabledTime = (current) => {
+    if (!employeeBookings.length || !current) {
+      return {};
     }
+    
+    const selectedDate = form.getFieldValue('date')?.format('YYYY-MM-DD');
+    if (!selectedDate) return {};
+    
+    const dayBookings = employeeBookings.filter(
+      booking => booking.date === selectedDate
+    );
+    
+    const disabledHours = [];
+    const disabledMinutes = {};
+    
+    dayBookings.forEach(booking => {
+      const start = convertTimeToMinutes(booking.time);
+      const end = start + (booking.duration || service.duration);
+      
+      // Tính toán các khung giờ bị chiếm
+      for (let time = start; time < end; time += 30) {
+        const hour = Math.floor(time / 60);
+        const minute = time % 60;
+        
+        if (!disabledHours.includes(hour)) {
+          disabledHours.push(hour);
+        }
+        
+        if (!disabledMinutes[hour]) {
+          disabledMinutes[hour] = [];
+        }
+        
+        if (!disabledMinutes[hour].includes(minute)) {
+          disabledMinutes[hour].push(minute);
+        }
+      }
+    });
+    
+    return {
+      disabledHours: () => disabledHours,
+      disabledMinutes: (hour) => disabledMinutes[hour] || [],
+    };
   };
 
   if (!service) {
@@ -180,6 +338,7 @@ const BookServicePage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+    {toastContainer()}
       <h1 className="text-2xl font-bold mb-6 text-center">Đặt Lịch Dịch Vụ: {service.name}</h1>
       
       {serverError && (
@@ -203,7 +362,7 @@ const BookServicePage = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Thời gian">{service.duration} phút</Descriptions.Item>
               <Descriptions.Item label="Mô tả" className="whitespace-pre-line">
-                {service.description}
+                {service.description || 'Không có mô tả'}
               </Descriptions.Item>
             </Descriptions>
           </Card>
@@ -248,6 +407,7 @@ const BookServicePage = () => {
                   placeholder={employees.length === 0 ? "Không có nhân viên nào" : "Chọn nhân viên"}
                   loading={employeeLoading}
                   disabled={!form.getFieldValue('branch') || employees.length === 0}
+                  onChange={handleEmployeeChange}
                 >
                   {employees.map(employee => {
                     const employeeName = employee.userInfo?.firstName || 
@@ -278,6 +438,7 @@ const BookServicePage = () => {
                     className="w-full"
                     format="DD/MM/YYYY"
                     disabledDate={(current) => current && current < moment().startOf('day')}
+                    onChange={handleDateChange}
                   />
                 </Form.Item>
 
@@ -290,8 +451,9 @@ const BookServicePage = () => {
                     className="w-full"
                     format="HH:mm"
                     minuteStep={30}
-                    disabledHours={() => [0, 1, 2, 3, 4, 5, 6, 7, 19, 20, 21, 22, 23]}
+                    disabledTime={disabledTime}
                     hideDisabledOptions
+                    disabledHours={() => [0, 1, 2, 3, 4, 5, 6, 7, 19, 20, 21, 22, 23]}
                   />
                 </Form.Item>
               </div>
@@ -312,7 +474,7 @@ const BookServicePage = () => {
                   type="primary"
                   htmlType="submit"
                   size="large"
-                  loading={loading}
+                  loading={loading || checkingAvailability}
                   className="bg-maincolor hover:bg-blue-700 w-full md:w-auto"
                   disabled={employees.length === 0 && form.getFieldValue('branch')}
                 >

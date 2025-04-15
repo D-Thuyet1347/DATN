@@ -27,7 +27,6 @@ export const clearCart = async () => {
     return response.data;
 };
 
-
 // Thêm sản phẩm vào giỏ hàng
 export const addToCart = async (itemId, quantity) => {
   const token = localStorage.getItem("token");

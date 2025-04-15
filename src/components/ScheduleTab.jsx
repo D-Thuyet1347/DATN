@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { List, Tag, Spin, message, Button, Modal, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Tag, Typography, message, Button, Modal, Select, Spin } from 'antd';
 import moment from 'moment';
-import { deleteBooking, updateBooking, getBookingUser } from '../APIs/booking';
+import { getBookingUser, deleteBooking, updateBooking } from '../APIs/booking';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+const { Text } = Typography;
 const { Option } = Select;
 
 const ScheduleTab = () => {
@@ -14,10 +15,14 @@ const ScheduleTab = () => {
   const [editStatus, setEditStatus] = useState('');
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
-  console.log('token:', token);
-  console.log('userId:', userId);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const bookingStatusOptions = [
+    { value: 'Đang xử lý', label: 'Đang xử lý', color: 'orange' },
+    { value: 'Đã xác nhận', label: 'Đã xác nhận', color: 'green' },
+    { value: 'Đã hủy', label: 'Đã hủy', color: 'red' },
+  ];
 
   useEffect(() => {
     fetchBookings();
@@ -32,30 +37,32 @@ const ScheduleTab = () => {
   const fetchBookings = async () => {
     try {
       if (!token || !userId) {
-        message.error('Vui lòng đăng nhập để xem đơn hàng');
+        message.error('Vui lòng đăng nhập để xem lịch hẹn');
         return;
       }
 
-      const res = await getBookingUser(token); // Đã sửa: chỉ lấy data, không check .success
-      console.log('Fetched bookings:', res);
-      const bookingsData = res.map((booking) => ({
-        ...booking,
-        date: moment(booking.date).format('YYYY-MM-DD'),
-        time: booking.time || 'N/A',
-        status: booking.status || 'Đang xử lý',
+      const res = await getBookingUser(token);
+      const formatted = res.map((b) => ({
+        ...b,
+        key: b._id,
+        dateFormatted: moment(b.date).format('DD/MM/YYYY'),
+        createdAtFormatted: moment(b.createdAt).format('DD/MM/YYYY HH:mm'),
       }));
-      setBookings(bookingsData);
-      console.log('Bookings data:', bookingsData);
-      console.log('Bookings:', res.data);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-      message.error(error.message || 'Có lỗi xảy ra khi tải dữ liệu');
+      setBookings(formatted);
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+      message.error(err.message || 'Lỗi khi tải lịch hẹn');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelBooking = async (id) => {
+  const getStatusTag = (status) => {
+    const match = bookingStatusOptions.find((s) => s.value === status);
+    return <Tag color={match?.color || 'gray'}>{match?.label || status}</Tag>;
+  };
+
+  const handleCancelBooking = (id) => {
     Modal.confirm({
       title: 'Xác nhận hủy lịch hẹn',
       content: 'Bạn có chắc chắn muốn hủy lịch hẹn này?',
@@ -66,65 +73,98 @@ const ScheduleTab = () => {
           await deleteBooking(id);
           message.success('Hủy lịch hẹn thành công');
           fetchBookings();
-        } catch (error) {
-          console.error('Error cancelling booking:', error);
-          message.error(error.message || 'Có lỗi khi hủy lịch hẹn');
+        } catch (err) {
+          console.error('Cancel booking error:', err);
+          message.error(err.message || 'Lỗi khi hủy lịch hẹn');
         }
       },
     });
   };
-
-  const showEditModal = (booking) => {
-    setCurrentBooking(booking);
-    setEditStatus(booking.status);
-    setIsModalVisible(true);
-  };
-
   const handleUpdateBooking = async () => {
     try {
       await updateBooking(currentBooking._id, { status: editStatus });
       message.success('Cập nhật trạng thái thành công');
       setIsModalVisible(false);
       fetchBookings();
-    } catch (error) {
-      console.error('Error updating booking:', error);
-      message.error(error.message || 'Có lỗi khi cập nhật');
+    } catch (err) {
+      console.error('Update error:', err);
+      message.error(err.message || 'Lỗi khi cập nhật trạng thái');
     }
-  };
-
-  const getStatusTag = (status) => {
-    const statusMap = {
-      pending: { color: 'orange', text: 'Đang xử lý' },
-      confirmed: { color: 'green', text: 'Đã xác nhận' },
-      completed: { color: 'blue', text: 'Hoàn thành' },
-      cancelled: { color: 'red', text: 'Đã hủy' },
-      'Đang xử lý': { color: 'orange', text: 'Đang xử lý' },
-      'Đã xác nhận': { color: 'green', text: 'Đã xác nhận' },
-      'Hoàn thành': { color: 'blue', text: 'Hoàn thành' },
-      'Đã hủy': { color: 'red', text: 'Đã hủy' },
-    };
-
-    const statusInfo = statusMap[status] || { color: 'gray', text: status };
-    return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
   };
 
   const formatPrice = (price) => {
     return price
-      ? new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND',
-        }).format(price)
+      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
       : 'Liên hệ';
   };
 
-  return (
-    <div className="p-4">
-      <h2 className="text-2xl font-semibold mb-4">Lịch Hẹn Của Tôi</h2>
-
-      {loading ? (
-        <div className="text-center">
-          <Spin size="large" />
+  const columns = [
+    {
+      title: 'Dịch vụ',
+      dataIndex: ['service', 'name'],
+      key: 'service',
+      render: (text) => text || 'Không xác định',
+      
+    },
+    {
+      title: 'Ngày & Giờ',
+      key: 'datetime',
+      className: 'w-[150px]',
+      render: (b) => `${b.dateFormatted} - ${b.time}`,
+    },
+    {
+      title: 'Chi nhánh',
+      dataIndex: ['branch', 'BranchName'],
+      key: 'branch',
+      render: (text) => text || 'Không xác định',
+    },
+    {
+      title: 'Nhân viên',
+      dataIndex: ['employee', 'UserID'],
+      key: 'employee',
+      render: (emp) => emp?.firstName || emp?.name || 'Không xác định',
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => getStatusTag(status),
+    },
+    {
+      title: 'Giá',
+      dataIndex: ['service', 'price'],
+      key: 'price',
+      render: (price) => <Text strong>{formatPrice(price)}</Text>,
+    },
+    {
+      title: 'Ghi chú',
+      dataIndex: 'notes',
+      key: 'notes',
+      render: (text) => text || '-',
+    },
+    {
+      title: 'Hành động',
+      key: 'actions',
+      render: (booking) => (
+        <div className="space-x-2">
+          <Button
+            size="small"
+            danger
+            onClick={() => handleCancelBooking(booking._id)}
+            disabled={booking.status === 'Đã hủy'}
+          >
+            Hủy
+          </Button>
         </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="my-bookings-tab">
+      <h2 className="text-2xl font-semibold mb-4">Lịch Hẹn Của Tôi</h2>
+      {loading ? (
+        <div className="text-center"><Spin size="large" /></div>
       ) : bookings.length === 0 ? (
         <p className="text-center text-gray-500">
           Bạn chưa có lịch hẹn nào.{' '}
@@ -133,54 +173,11 @@ const ScheduleTab = () => {
           </Button>
         </p>
       ) : (
-        <List
-          itemLayout="vertical"
+        <Table
+          columns={columns}
           dataSource={bookings}
-          renderItem={(booking) => (
-            <List.Item className="bg-white rounded-lg shadow-sm mb-4 p-4">
-              <List.Item.Meta
-                title={
-                  <span className="font-medium text-lg">
-                    {booking.service?.name || 'Dịch vụ không xác định'}
-                  </span>
-                }
-                description={
-                  <div className="space-y-1">
-                    <div>
-                      <span className="font-medium">Ngày: </span>
-                      {moment(booking.date).format('DD/MM/YYYY')} - {booking.time}
-                    </div>
-                    <div>
-                      <span className="font-medium">Chi nhánh: </span>
-                      {booking.branch?.BranchName || 'Không xác định'}
-                    </div>
-                    <div>
-                      <span className="font-medium">Nhân viên: </span>
-                      {booking.employee?.UserID?.firstName || 'Không xác định'}
-                    </div>
-                    <div>
-                      <span className="font-medium">Trạng thái: </span>
-                      {getStatusTag(booking.status)}
-                    </div>
-                    <div>
-                      <span className="font-medium">Giá: </span>
-                      {formatPrice(booking.service?.price)}
-                    </div>
-                    <div>
-                      <span className="font-medium">Ngày tạo: </span>
-                      {moment(booking.createdAt).format('DD/MM/YYYY HH:mm')}
-                    </div>
-                  </div>
-                }
-              />
-              {booking.notes && (
-                <div className="mt-2">
-                  <p className="font-medium">Ghi chú:</p>
-                  <p className="text-gray-600">{booking.notes}</p>
-                </div>
-              )}
-            </List.Item>
-          )}
+          pagination={{ pageSize: 5 }}
+          scroll={{ x: true }}
         />
       )}
 
@@ -191,41 +188,30 @@ const ScheduleTab = () => {
         onCancel={() => setIsModalVisible(false)}
       >
         {currentBooking && (
-          <div className="space-y-4">
-            <div>
-              <p className="font-semibold">Thông tin dịch vụ</p>
-              <p>Tên dịch vụ: {currentBooking.service?.name || 'Không xác định'}</p>
-              <p>Giá: {formatPrice(currentBooking.service?.price)}</p>
-            </div>
+          <div className="space-y-3">
+            <p><strong>Dịch vụ:</strong> {currentBooking.service?.name}</p>
+            <p><strong>Ngày:</strong> {moment(currentBooking.date).format('DD/MM/YYYY')}</p>
+            <p><strong>Giờ:</strong> {currentBooking.time}</p>
+            <p><strong>Chi nhánh:</strong> {currentBooking.branch?.BranchName}</p>
+            <p><strong>Nhân viên:</strong> {currentBooking.employee?.UserID?.firstName || 'Không xác định'}</p>
 
-            <div>
-              <p className="font-semibold">Thông tin lịch hẹn</p>
-              <p>Ngày: {moment(currentBooking.date).format('DD/MM/YYYY')}</p>
-              <p>Giờ: {currentBooking.time}</p>
-              <p>Chi nhánh: {currentBooking.branch?.BranchName || 'Không xác định'}</p>
-              <span className="font-medium">Nhân viên: </span>
-              {currentBooking.employee?.firstName || currentBooking.employee?.name || 'Không xác định'}
-            </div>
-
-            <div>
-              <p className="font-semibold mb-2">Trạng thái</p>
-              <Select
-                style={{ width: '100%' }}
-                value={editStatus}
-                onChange={(value) => setEditStatus(value)}
-              >
-                <Option value="Đang xử lý">Đang xử lý</Option>
-                <Option value="Đã xác nhận">Đã xác nhận</Option>
-                <Option value="Hoàn thành">Hoàn thành</Option>
-                <Option value="Đã hủy">Đã hủy</Option>
-              </Select>
-            </div>
+            <Select
+              style={{ width: '100%' }}
+              value={editStatus}
+              onChange={setEditStatus}
+            >
+              {bookingStatusOptions.map((opt) => (
+                <Option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </Option>
+              ))}
+            </Select>
 
             {currentBooking.notes && (
-              <div>
-                <p className="font-semibold">Ghi chú</p>
+              <>
+                <p><strong>Ghi chú:</strong></p>
                 <p>{currentBooking.notes}</p>
-              </div>
+              </>
             )}
           </div>
         )}

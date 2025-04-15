@@ -42,7 +42,6 @@ export const getOrderDetail = async (orderId, token) => {
     }
 };
 export const placeOrder = async (orderData, token) => {
-  try {
       const response = await axios.post(
           `${API_URL}/api/order/place`,
           orderData,
@@ -54,10 +53,7 @@ export const placeOrder = async (orderData, token) => {
           }
       );
       return response.data;
-  } catch (error) {
-      console.error('Error placing order:', error);
-      throw error;
-  }
+ 
 };
 
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {Table,Button,Tag,Drawer,Spin,Select,Descriptions,Badge,message,Space,Empty} from "antd";
-import {EditOutlined,ReloadOutlined} from "@ant-design/icons";
+import { Table, Button, Tag, Drawer, Spin, Select, Descriptions, Badge, message, Space, Empty } from "antd";
+import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { listOrder, updateOrderStatus } from "../../APIs/orderApi";
-import { getUser } from "../../APIs/userApi"; // Import API mới
+import { getUser } from "../../APIs/userApi";
 
 const OrderManagement = () => {
   const [state, setState] = useState({
@@ -103,24 +103,26 @@ const OrderManagement = () => {
   };
 
   const orderStatusOptions = [
-    { value: "Processing", label: "Đang xử lý" },
-    { value: "Shipped", label: "Đã gửi" },
-    { value: "Delivered", label: "Đã giao" },
-    { value: "Cancelled", label: "Đã hủy" },
+    { value: "Đang xử lý", label: "Đang xử lý" },
+    { value: "Đã xác nhận", label: "Đã xác nhận" },
+    { value: "Đã giao", label: "Đã giao" },
+    { value: "Đã hủy", label: "Đã hủy" },
   ];
 
   const paymentStatusTag = (status) => {
     const colorMap = {
-      Pending: "orange",
-      Paid: "green",
-      Failed: "red",
-      Refunded: "blue"
+      "Đang xử lý": "orange",
+      "Đã xác nhận": "green",
+      "Đã giao": "blue",
+      "Đã hủy": "red",
+      "Hoàn tiền": "red",
     };
     const labelMap = {
-      Pending: "Chờ thanh toán",
-      Paid: "Đã thanh toán",
-      Failed: "Thất bại",
-      Refunded: "Đã hoàn tiền"
+      "Đang xử lý": "Chờ thanh toán",
+      "Đã xác nhận": "Đã thanh toán",
+      "Đã giao": "Đã giao",
+      "Đã hủy": "Đã hủy",
+      "Hoàn tiền": "Đã hoàn tiền",
     };
     return <Tag color={colorMap[status] || "default"}>{labelMap[status] || status}</Tag>;
   };
@@ -175,10 +177,10 @@ const OrderManagement = () => {
       width: 150,
       render: paymentStatusTag,
       filters: [
-        { text: 'Chờ thanh toán', value: 'Pending' },
-        { text: 'Đã thanh toán', value: 'Paid' },
-        { text: 'Thất bại', value: 'Failed' },
-        { text: 'Đã hoàn tiền', value: 'Refunded' },
+        { text: 'Chờ thanh toán', value: 'Chờ thanh toán' },
+        { text: 'Đã thanh toán', value: 'Đã thanh toán' },
+        { text: 'Thất bại', value: 'Thất bại' },
+        { text: 'Đã hoàn tiền', value: 'Đã hoàn tiền' },
       ],
       onFilter: (value, record) => record.paymentStatus === value,
     },

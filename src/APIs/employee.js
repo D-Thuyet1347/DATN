@@ -26,3 +26,13 @@ export const listEmployee = async () => {
     const response = await employee.get("employee/list");
     return response.data;
 };
+export const getEmployeeBookings = async (employeeId, date) => {
+  try {
+    const response = await axios.get(`/api/employees/${employeeId}/bookings`, {
+      params: { date }
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

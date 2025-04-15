@@ -12,6 +12,7 @@ import {
 import { getProducts } from '../APIs/ProductsApi';
 import { errorToast, successToast, toastContainer } from '../utils/toast';
 import axios from 'axios';
+import Header from '../components/Header';
 
 const API_BASE_URL = 'http://localhost:4000/api/';
 
@@ -51,7 +52,6 @@ const Cart = () => {
       setLoading(false);
     }
   };
-
   const fetchProducts = async () => {
     try {
       const res = await getProducts();
@@ -100,7 +100,7 @@ const Cart = () => {
     }
     await addToCart(productID, quantity);
     fetchData();
-  };
+  };  
 
   const handleRemoveFromCart = async (productID) => {
     await removeFromCart(productID);
@@ -108,10 +108,13 @@ const Cart = () => {
   };
 
   const handleDecreaseItem = async (productID) => {
-    await decreaseToCart(productID);
-    fetchData();
+    if (cartItems[productID] > 1) {
+      await decreaseToCart(productID);
+      fetchData();
+    } else {
+      errorToast('Không thể giảm số lượng xuống dưới 1!');
+    }
   };
-
   const totalQuantity = products.reduce(
     (total, product) => (cartItems[product._id] ? total + cartItems[product._id] : total),
     0
@@ -157,12 +160,10 @@ const Cart = () => {
       errorToast('Voucher chỉ áp dụng cho dịch vụ');
       return;
     }
-
     if (voucher.usageLeft >= voucher.usageLimit) {
       errorToast('Voucher đã hết lượt sử dụng');
       return;
     }
-
     if (subtotal < (voucher.minimumAmount || 0)) {
       errorToast(`Đơn hàng phải có giá trị tối thiểu ${(voucher.minimumAmount || 0).toLocaleString('vi-VN')}₫`);
       return;
@@ -191,6 +192,7 @@ const Cart = () => {
 
   const handleCheckout = () => {
     if (Object.keys(cartItems).length === 0) {
+
       errorToast("Vui lòng chọn sản phẩm trước khi thanh toán");
       return;
     }
@@ -201,7 +203,9 @@ const Cart = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="p-4 mt-[50px] w-full bg-gray-50 min-h-screen">
+    <>
+    <Header />
+      <div className="p-4 mt-[50px] w-full bg-gray-50 min-h-screen">
       {toastContainer()}
       <Card className="w-full max-w-5xl mx-auto">
         <div className="p-4 flex flex-col md:flex-row">
@@ -384,6 +388,7 @@ const Cart = () => {
         </div>
       </Modal>
     </div>
+    </>
   );
 };
 

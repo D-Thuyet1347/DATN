@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Drawer,
@@ -10,18 +10,18 @@ import {
   Spin,
   Form,
   Popconfirm,
-} from "antd";
+  Modal,
+} from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
   ReloadOutlined,
   UploadOutlined,
-} from "@ant-design/icons";
-import { getProducts, addProduct, updateProduct } from "../../APIs/ProductsApi";
-import axios from "axios";
-import { PRcategories } from "../../utils/data";
-import TextArea from "antd/es/input/TextArea";
-import { getBase64 } from "../../utils/ultils";
+} from '@ant-design/icons';
+import { getProducts, addProduct, updateProduct } from '../../APIs/ProductsApi';
+import axios from 'axios';
+import TextArea from 'antd/es/input/TextArea';
+import { getBase64 } from '../../utils/ultils';
 
 const { Option } = Select;
 
@@ -33,6 +33,7 @@ const ProductManagement = () => {
   const [image, setImage] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [isTableLoading, setIsTableLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -45,9 +46,13 @@ const ProductManagement = () => {
       const response = await getProducts();
       if (response.success) {
         setProducts(response.data);
+        const uniqueCategories = [...new Set(response.data.map(product => product.Category))];
+        setCategories(uniqueCategories.map((name, index) => ({ _id: index, name })));
+      } else {
+        setProducts([]);
       }
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+      console.error('Lỗi khi lấy danh sách sản phẩm:', error);
       setProducts([]);
     } finally {
       setIsTableLoading(false);
@@ -68,11 +73,11 @@ const ProductManagement = () => {
       });
     } else {
       const emptyProduct = {
-        ProductName: "",
-        DescriptionPD: "",
-        PricePD: "",
-        StockQuantity: "",
-        Category: "",
+        ProductName: '',
+        DescriptionPD: '',
+        PricePD: '',
+        StockQuantity: '',
+        Category: '',
       };
       setSelectProduct(emptyProduct);
       form.setFieldsValue(emptyProduct);
@@ -82,28 +87,30 @@ const ProductManagement = () => {
     setIsDrawerOpen(true);
   };
 
+ 
+
   const handleUpdateProduct = async (values) => {
     setLoading(true);
     try {
       const updatedData = {
         ...values,
-        ImagePD: image || selectProduct.ImagePD,
+        ImagePD: image || selectProduct?.ImagePD,
       };
 
       if (selectProduct?._id) {
         await updateProduct(selectProduct._id, updatedData);
-        message.success("Cập nhật sản phẩm thành công!");
+        message.success('Cập nhật sản phẩm thành công!');
       } else {
         await addProduct(updatedData);
-        message.success("Thêm sản phẩm thành công!");
+        message.success('Thêm sản phẩm thành công!');
       }
 
       fetchProducts();
       setIsDrawerOpen(false);
       form.resetFields();
     } catch (error) {
-      console.error("Lỗi khi lưu sản phẩm:", error);
-      message.error("Có lỗi xảy ra, vui lòng thử lại.");
+      console.error('Lỗi khi lưu sản phẩm:', error);
+      message.error('Có lỗi xảy ra, vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -111,17 +118,14 @@ const ProductManagement = () => {
 
   const handleDeleteProduct = async (id) => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/product/remove",
-        { id }
-      );
+      const response = await axios.post('http://localhost:4000/api/product/remove', { id });
       if (response.data.success) {
-        message.success("Xóa sản phẩm thành công!");
+        message.success('Xóa sản phẩm thành công!');
         fetchProducts();
       }
     } catch (error) {
-      console.error("Lỗi khi xóa sản phẩm:", error);
-      message.error("Xóa sản phẩm thất bại!");
+      console.error('Lỗi khi xóa sản phẩm:', error);
+      message.error('Xóa sản phẩm thất bại!');
     }
   };
 
@@ -141,16 +145,15 @@ const ProductManagement = () => {
 
   const columns = [
     {
-      title: "Ảnh",
-      dataIndex: "ImagePD",
-      key: "ImagePD",
-      render: (img) =>
-        img && <img width={50} height={50} src={img} alt="Ảnh sản phẩm" />,
+      title: 'Ảnh',
+      dataIndex: 'ImagePD',
+      key: 'ImagePD',
+      render: (img) => img && <img width={50} height={50} src={img} alt="Ảnh sản phẩm" />,
     },
     {
-      title: "Tên sản phẩm",
-      dataIndex: "ProductName",
-      key: "ProductName",
+      title: 'Tên sản phẩm',
+      dataIndex: 'ProductName',
+      key: 'ProductName',
       filters: products.map((product) => ({
         text: product.ProductName,
         value: product.ProductName,
@@ -159,17 +162,17 @@ const ProductManagement = () => {
         record.ProductName?.toLowerCase().includes(value.toLowerCase()),
     },
     {
-      title: "Mô tả",
-      dataIndex: "DescriptionPD",
-      key: "DescriptionPD",
-      className: "w-[500px]",
+      title: 'Mô tả',
+      dataIndex: 'DescriptionPD',
+      key: 'DescriptionPD',
+      className: 'w-[500px]',
     },
-    { title: "Giá", dataIndex: "PricePD", key: "PricePD" },
-    { title: "Số lượng", dataIndex: "StockQuantity", key: "StockQuantity" },
-    { title: "Danh mục", dataIndex: "Category", key: "Category" },
+    { title: 'Giá', dataIndex: 'PricePD', key: 'PricePD' },
+    { title: 'Số lượng', dataIndex: 'StockQuantity', key: 'StockQuantity' },
+    { title: 'Danh mục', dataIndex: 'Category', key: 'Category' },
     {
-      title: "Hành động",
-      key: "action",
+      title: 'Hành động',
+      key: 'action',
       render: (record) => (
         <div>
           <Popconfirm
@@ -178,19 +181,19 @@ const ProductManagement = () => {
             okText="Xóa"
             cancelText="Hủy"
             okButtonProps={{
-              style: { backgroundColor: "blue", color: "white", borderRadius: "5px" },
+              style: { backgroundColor: 'blue', color: 'white', borderRadius: '5px' },
             }}
           >
             <DeleteOutlined
-              style={{ color: "red", fontSize: "20px", cursor: "pointer" }}
+              style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }}
             />
           </Popconfirm>
           <EditOutlined
             style={{
-              color: "blue",
-              fontSize: "20px",
-              marginLeft: "10px",
-              cursor: "pointer",
+              color: 'blue',
+              fontSize: '20px',
+              marginLeft: '10px',
+              cursor: 'pointer',
             }}
             onClick={() => openEditDrawer(record)}
           />
@@ -225,11 +228,7 @@ const ProductManagement = () => {
       </Spin>
 
       <Drawer
-        title={
-          selectProduct && selectProduct._id
-            ? "Chỉnh sửa sản phẩm"
-            : "Thêm sản phẩm"
-        }
+        title={selectProduct && selectProduct._id ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm'}
         placement="right"
         closable
         onClose={() => {
@@ -242,7 +241,7 @@ const ProductManagement = () => {
           <Form.Item
             name="ProductName"
             label="Tên sản phẩm"
-            rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}
+            rules={[{ required: true, message: 'Vui lòng nhập tên sản phẩm!' }]}
           >
             <Input />
           </Form.Item>
@@ -250,7 +249,7 @@ const ProductManagement = () => {
           <Form.Item
             name="DescriptionPD"
             label="Mô tả"
-            rules={[{ required: true, message: "Vui lòng nhập mô tả sản phẩm!" }]}
+            rules={[{ required: true, message: 'Vui lòng nhập mô tả sản phẩm!' }]}
           >
             <TextArea />
           </Form.Item>
@@ -258,7 +257,7 @@ const ProductManagement = () => {
           <Form.Item
             name="PricePD"
             label="Giá"
-            rules={[{ required: true, message: "Vui lòng nhập giá sản phẩm!" }]}
+            rules={[{ required: true, message: 'Vui lòng nhập giá sản phẩm!' }]}
           >
             <Input type="number" />
           </Form.Item>
@@ -266,7 +265,7 @@ const ProductManagement = () => {
           <Form.Item
             name="StockQuantity"
             label="Số lượng"
-            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
+            rules={[{ required: true, message: 'Vui lòng nhập số lượng!' }]}
           >
             <Input type="number" />
           </Form.Item>
@@ -274,12 +273,36 @@ const ProductManagement = () => {
           <Form.Item
             name="Category"
             label="Danh mục"
-            rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
+            rules={[{ required: true, message: 'Vui lòng nhập hoặc chọn danh mục!' }]}
           >
-            <Select>
-              {PRcategories.map((category) => (
-                <Option key={category.id} value={category.name}>
-                  {category.name}
+            <Select
+              placeholder="Chọn hoặc nhập danh mục"
+              allowClear
+              showSearch
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Form.Item name="customCategory" noStyle>
+                    <Input
+                      placeholder="Nhập danh mục mới"
+                      style={{ margin: 8 }}
+                      onPressEnter={(e) => {
+                        const newCategory = e.target.value.trim();
+                        if (newCategory && !categories.find(cat => cat.name === newCategory)) {
+                          setCategories([...categories, { _id: Date.now(), name: newCategory }]);
+                          form.setFieldsValue({ Category: newCategory });
+                        }
+                      }}
+                    />
+                  </Form.Item>
+                </>
+              )}
+            >
+              {categories.map((category) => (
+                <Option key={category._id} value={category.name}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {category.name}
+                  </div>
                 </Option>
               ))}
             </Select>

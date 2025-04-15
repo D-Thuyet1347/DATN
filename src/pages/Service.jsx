@@ -10,11 +10,11 @@ const Service = () => {
   const [filter, setFilter] = useState('Tất cả dịch vụ')
   const [data, setData] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 3;
+  const pageSize = 4;
   const navigate = useNavigate();
   useEffect(() => {
     fetchData();
-    setCurrentPage(1); // reset về trang 1 mỗi khi filter thay đổi
+    setCurrentPage(1); 
   }, [filter]);
 
   const fetchData = async () => {
@@ -26,7 +26,6 @@ const Service = () => {
     }
   }
 
-  // Lọc sản phẩm theo danh mục
   const filteredProducts =
     filter === "Tất cả dịch vụ"
       ? data
@@ -67,7 +66,7 @@ const Service = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 mt-8 ml-[48px] gap-5">
           {paginatedProducts.length > 0 ? (
             paginatedProducts.map((db, index) => (
               <OneService
@@ -88,8 +87,6 @@ const Service = () => {
             </p>
           )}
         </div>
-
-        {/* Pagination */}
         {filteredProducts.length > pageSize && (
           <div className="flex justify-center mt-10">
             <Pagination
@@ -98,7 +95,6 @@ const Service = () => {
               total={filteredProducts.length}
               onChange={(page) => {
                 setCurrentPage(page);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               showSizeChanger={false}
             />

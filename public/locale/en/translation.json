@@ -15,7 +15,8 @@
       "profile": "Profile",
       "blogger": "Blog",
       "logout": "Logout",
-      "login": "Login / Sign Up"
+      "login": "Login / Sign Up",
+      "admin": "Admin"
     },
     "profileMenu": {
       "personalInfo": "Personal Information",

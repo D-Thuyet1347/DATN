@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import user from '../img/user.png';
-import { IoMdSearch } from 'react-icons/io';
-import { FaRegHeart } from 'react-icons/fa6';
-import { IoBagHandleOutline } from 'react-icons/io5';
-import { getUser } from '../APIs/userApi';
-import { jwtDecode } from 'jwt-decode';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import user from "../img/user.png";
+import vi from "../img/vi.png";
+import en from "../img/en.png";
+import logo from "../img/logo.jpg";
+
+import { IoIosReturnRight, IoMdSearch } from "react-icons/io";
+import { FaRegHeart } from "react-icons/fa6";
+import { IoBagHandleOutline } from "react-icons/io5";
+import { getUser } from "../APIs/userApi";
+import { jwtDecode } from "jwt-decode";
+import { useTranslation } from "react-i18next";
 
 const BACKEND_URL = process.env.REACT_APP_API_KEY
-  ? process.env.REACT_APP_API_KEY.replace('/api', '')
-  : 'http://localhost:4000';
+  ? process.env.REACT_APP_API_KEY.replace("/api", "")
+  : "http://localhost:4000";
 
 const DEFAULT_AVATAR = user;
 
@@ -18,17 +22,17 @@ const Header = () => {
   const { t, i18n } = useTranslation();
   const [isMenu, setIsMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [userAvatar, setUserAvatar] = useState('');
-  const [userRole, setUserRole] = useState('');
+  const [userAvatar, setUserAvatar] = useState("");
+  const [userRole, setUserRole] = useState("");
   const navigate = useNavigate();
 
   const handleLanguageChange = () => {
-    const newLang = i18n.language === 'vi' ? 'en' : 'vi';
+    const newLang = i18n.language === "vi" ? "en" : "vi";
     i18n.changeLanguage(newLang);
   };
 
   const fetchUserData = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
@@ -40,96 +44,117 @@ const Header = () => {
             ? `${BACKEND_URL}/uploads/${userData.data.image}`
             : DEFAULT_AVATAR;
           setUserAvatar(imageUrl);
-          localStorage.setItem('userAvatar', imageUrl);
+          localStorage.setItem("userAvatar", imageUrl);
         }
       } catch (error) {
-        console.error('Error decoding token', error);
+        console.error("Error decoding token", error);
       }
     }
   };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setUserAvatar(localStorage.getItem('userAvatar') || DEFAULT_AVATAR);
+      setUserAvatar(localStorage.getItem("userAvatar") || DEFAULT_AVATAR);
     };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) fetchUserData();
   }, []);
 
   const handleLogout = () => {
-    setUserAvatar('');
-    setUserRole('');
+    setUserAvatar("");
+    setUserRole("");
     setIsMenu(false);
-    localStorage.removeItem('userAvatar');
-    localStorage.removeItem('token');
-    navigate('/sign-in');
+    localStorage.removeItem("userAvatar");
+    localStorage.removeItem("token");
+    navigate("/sign-in");
   };
 
   const handleAvatar = () => {
-    navigate('/sign-in');
+    navigate("/sign-in");
     setIsMenu(false);
   };
 
   const handleProfile = () => {
-    navigate('/profile');
+    navigate("/profile");
     setIsMenu(false);
   };
 
   const handleSchedule = () => {
-    navigate('/schedule');
+    navigate("/schedule");
     setIsMenu(false);
   };
 
   const handleSearchClick = () => {
-    navigate('/search');
+    navigate("/search");
   };
 
   return (
     <header
-      className={`sticky z-50 top-0 left-0 w-full shadow-sm transition-all ${
-        isScrolled ? 'text-black py-4 bg-white' : 'bg-transparent text-black p-3'
+      className={`sticky z-50 top-0 bg-transparent left-0 h-[65px] w-full shadow-sm transition-all ${
+        isScrolled
+          ? "text-black py-4 bg-white"
+          : "bg-transparent text-black p-3"
       }`}
     >
       <div className="container relative mx-auto flex justify-between items-center px-6">
         <div className="text-2xl font-bold text-maincolor">
-          <Link to="/">SerenitySpa</Link>
+          <Link className="flex" to="/"><img src={logo} width={60} className=" mt-[-10px] rounded-full" alt="Đây là logo" /> 
+          {' '} <div className="ml-2 text-[26̉px]" style={{ fontFamily: "Dancing Script, serif" }}> Spa Beauty</div>
+          </Link>
         </div>
         <nav className="space-x-6 hidden md:flex">
-          <Link to="/" className="text-gray-600 hover:text-maincolor">
-            {t('header.home')}
+          {
+            userRole === "user" && (
+            <>
+            <Link to="/" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
+            {t("header.home")}
           </Link>
-          <Link to="/service" className="text-gray-600 hover:text-maincolor">
-            {t('header.services')}
+          <Link
+            to="/servicepage"
+            className="text-gray-600 text-[20px] mt-[-7px] hover:text-maincolor"
+          >
+            {t("header.services")}
           </Link>
-          <Link to="/product" className="text-gray-600 hover:text-maincolor">
-            {t('header.products')}
+          <Link
+            to="/productpage"
+            className="text-gray-600 text-[20px] mt-[-7px] hover:text-maincolor"
+          >
+            {t("header.products")}
           </Link>
-          <Link to="/booknow" className="text-gray-600 hover:text-maincolor">
-            {t('header.bookNow')}
+          <Link to="/booknow" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
+            {t("header.bookNow")}
           </Link>
-          <Link to="/blogview" className="text-gray-600 hover:text-maincolor">
-            {t('header.blogger')}
+          <Link to="/blogview" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
+            {t("header.blogger")}
           </Link>
-          <Link to="/spvc" className="text-gray-600 hover:text-maincolor">
-            {t('header.voucher')}
+          <Link to="/spvc" className="text-gray-600 mt-[-7px]  text-[20px] hover:text-maincolor">
+            {t("header.voucher")}
           </Link>
-          <Link to="/about" className="text-gray-600 hover:text-maincolor">
-            {t('header.about')}
+          <Link to="/about" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
+            {t("header.about")}
           </Link>
-          <Link to="/contact" className="text-gray-600 hover:text-maincolor">
-            {t('header.contact')}
+          <Link to="/contact" className="text-gray-600  mt-[-7px] text-[20px] hover:text-maincolor">
+            {t("header.contact")}
           </Link>
+            </>
+            )
+          }
+          {userRole === "admin" && (
+            <Link to="/admin" className="text-gray-600 flex justify-center items-center hover:text-maincolor">
+              {t("header.admin")} <IoIosReturnRight className="text-[24px]" />
+            </Link>
+          )}
         </nav>
         <div className="flex items-center space-x-4">
           <div
@@ -156,7 +181,11 @@ const Header = () => {
             className="cursor-pointer hover:text-maincolor transition"
             onClick={handleLanguageChange}
           >
-            <span className="text-lg">{i18n.language === 'vi' ? '🌍 Tiếng Việt' : '🌍 English'}</span>
+            <img
+              src={i18n.language === "vi" ? vi : en}
+              alt="language"
+              className="w-6 h-6 object-cover"
+            />
           </div>
           <div className="relative">
             {userAvatar ? (
@@ -186,7 +215,7 @@ const Header = () => {
                       >
                         Thông tin cá nhân
                       </li>
-                      {userRole === 'employee' && (
+                      {userRole === "employee" && (
                         <li
                           onClick={handleSchedule}
                           className="px-4 py-2 hover:bg-gray-100 cursor-pointer"

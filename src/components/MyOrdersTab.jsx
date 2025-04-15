@@ -25,7 +25,7 @@ const MyOrdersTab = () => {
         const rawOrders = await getOrders(token);
         const formattedOrders = rawOrders.map(order => ({
           orderId: order.orderId || 'N/A',
-          orderDate: order.orderDate ? new Date(order.orderDate).toLocaleDateString('vi-VN') : 'N/A',
+          orderDate: order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : 'N/A',
           products: order.products || [],
           total: order.total || 0,
           status: order.status ? order.status.toLowerCase() : 'unknown'
