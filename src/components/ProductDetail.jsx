@@ -30,14 +30,17 @@ const ProductDetail = () => {
 
   const handleAddToCart = async (productId, quantity) => {
     try {
-      const res = await addToCart(productId, quantity); // Chỉ thêm sản phẩm vào giỏ hàng
+      const res = await addToCart(productId, quantity);
       if (res.success) {
+        window.dispatchEvent(new Event("cartUpdated"));
+  
         successToast("Sản phẩm đã được thêm vào giỏ hàng!");
       }
     } catch (error) {
       errorToast("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
     }
   };
+  
 
   const handleDecrease = async (productId) => {
     if (quantity > 1) {

@@ -14,12 +14,12 @@ const SignInPage = () => {
   
   const handleSignIn = async (e) => {
     e.preventDefault();
-    successToast("Đăng nhập thành công!");
     const res = await login({ email, password });
-    errorToast("Đăng nhập thất bại!");
     if (res.success) {
+      successToast("Đăng nhập thành công!");
       navigate(res.user.role === "admin" ? "/admin" : "/");
     } else {
+      errorToast("Đăng nhập thất bại!");
     }
   };
   const ForgotPassword = () => {

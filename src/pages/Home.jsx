@@ -24,13 +24,11 @@ const Home = () => {
   }, []);
   return (
      <>
-     <Spin  spinning={isPending} tip="Loading page....." size="large" className="absolute top-10 left-1/2 z-50">
-        <Header />
+      <Header />
         <Hero />
       <BlogViewer />
       <Service />
       <Products />
-    </Spin>
     </>
   );
 };

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Table, Tag, Typography, message } from 'antd';
 import { getOrders } from '../APIs/orderApi';
@@ -8,13 +9,7 @@ const MyOrdersTab = () => {
   const [orders, setOrders] = useState([]);
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
-  const orderStatusOptions = [
-    { value: "Processing", label: "Đang xử lý", color: "orange" },
-    { value: "Shipped", label: "Đã gửi", color: "blue" },
-    { value: "Delivered", label: "Đã giao", color: "green" },
-    { value: "Cancelled", label: "Đã hủy", color: "red" },
-  ];
-  
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -22,15 +17,22 @@ const MyOrdersTab = () => {
           message.error('Vui lòng đăng nhập để xem đơn hàng');
           return;
         }
+
+        console.log('Fetching orders with token:', token, 'userId:', userId);
         const rawOrders = await getOrders(token);
+        console.log('Raw orders from API:', rawOrders);
+        console.log('Orders received:', rawOrders);
+
         const formattedOrders = rawOrders.map(order => ({
           orderId: order.orderId || 'N/A',
-          orderDate: order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : 'N/A',
+          orderDate: order.orderDate ? new Date(order.orderDate).toLocaleDateString('vi-VN') : 'N/A',
           products: order.products || [],
           total: order.total || 0,
           status: order.status ? order.status.toLowerCase() : 'unknown'
         }));
+
         setOrders(formattedOrders);
+
         if (formattedOrders.length === 0) {
           message.info('Bạn chưa có đơn hàng nào.');
         }
@@ -45,7 +47,8 @@ const MyOrdersTab = () => {
 
   const columns = [
     { title: 'Mã đơn hàng', dataIndex: 'orderId', key: 'orderId' },
-    { title: 'Ngày đặt', dataIndex: 'orderDate', key: 'orderDate' },
+    { title: 'Ngày đặt', dataIndex: 'orderDate', key: 'orderDate',
+     },
     {
       title: 'Sản phẩm',
       dataIndex: 'products',
@@ -102,14 +105,32 @@ const MyOrdersTab = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
-        const found = orderStatusOptions.find(opt => opt.value.toLowerCase() === status?.toLowerCase());
-        if (found) {
-          return <Tag color={found.color}>{found.label}</Tag>;
+        const normalizedStatus = status || 'unknown';
+        let color, text;
+        switch (normalizedStatus) {
+          case 'completed':
+            color = 'green';
+            text = 'Hoàn thành';
+            break;
+          case 'shipping':
+            color = 'blue';
+            text = 'Đang giao';
+            break;
+          case 'processing':
+            color = 'orange';
+            text = 'Chờ xử lý';
+            break;
+          case 'cancelled':
+            color = 'red';
+            text = 'Đã hủy';
+            break;
+          default:
+            color = 'gray';
+            text = 'Không xác định';
         }
-        return <Tag color="gray">Không xác định</Tag>;
+        return <Tag color={color}>{text}</Tag>;
       },
-    }
-    
+    },
   ];
 
   return (

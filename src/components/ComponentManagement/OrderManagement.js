@@ -179,7 +179,6 @@ const OrderManagement = () => {
       filters: [
         { text: 'Chờ thanh toán', value: 'Chờ thanh toán' },
         { text: 'Đã thanh toán', value: 'Đã thanh toán' },
-        { text: 'Thất bại', value: 'Thất bại' },
         { text: 'Đã hoàn tiền', value: 'Đã hoàn tiền' },
       ],
       onFilter: (value, record) => record.paymentStatus === value,
@@ -255,8 +254,8 @@ const OrderManagement = () => {
               <Descriptions.Item label="Trạng thái">
                 <Badge
                   status={
-                    state.selectedOrder.orderStatus === 'Delivered' ? 'success' :
-                      state.selectedOrder.orderStatus === 'Cancelled' ? 'error' : 'processing'
+                    state.selectedOrder.orderStatus === 'Đang vận chuyển' ? 'Đã giao' :
+                      state.selectedOrder.orderStatus === 'Đã hủy' ? 'error' : 'Đang xử lý'
                   }
                   text={state.selectedOrder.orderStatus}
                 />

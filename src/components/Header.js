@@ -163,19 +163,13 @@ const Header = () => {
           >
             <IoMdSearch size={22} />
           </div>
-          <div
-            className="cursor-pointer hover:text-maincolor transition"
-            onClick={handleSchedule}
-          >
-            <FaRegHeart size={22} />
-          </div>
           <div className="relative cursor-pointer hover:text-maincolor transition">
             <Link to="/cart">
               <IoBagHandleOutline size={22} />
             </Link>
-            <span className="absolute -top-2 -right-2 bg-maincolor text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            {/* <span className="absolute -top-2 -right-2 bg-maincolor text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               4
-            </span>
+            </span> */}
           </div>
           <div
             className="cursor-pointer hover:text-maincolor transition"

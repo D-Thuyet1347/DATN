@@ -5,6 +5,7 @@ import { SVcategories } from '../utils/data';
 import { motion } from 'framer-motion'
 import { Pagination } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 
 const Service = () => {
   const [filter, setFilter] = useState('Tất cả dịch vụ')
