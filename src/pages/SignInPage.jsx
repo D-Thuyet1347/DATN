@@ -10,17 +10,25 @@ const SignInPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   
   const handleSignIn = async (e) => {
     e.preventDefault();
     const res = await login({ email, password });
-    if (res.success) {
+    if (res.success&& res.token && res.user) {
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("userId", res.user._id || res.user.id); 
       successToast("Đăng nhập thành công!");
-      navigate(res.user.role === "admin" ? "/admin" : "/");
+      if (res.user.role === "admin") {
+        navigate("/admin");
+      } else if (res.user.role === "manager") {
+        navigate("/manager");
+      } else {
+        navigate("/");
+      }
     } else {
       errorToast("Đăng nhập thất bại!");
     }
+    
   };
   const ForgotPassword = () => {
     navigate("/forgot-password");

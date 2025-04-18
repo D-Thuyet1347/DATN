@@ -101,58 +101,90 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky z-50 top-0 bg-transparent left-0 h-[65px] w-full shadow-sm transition-all ${
-        isScrolled
-          ? "text-black py-4 bg-white"
-          : "bg-transparent text-black p-3"
-      }`}
+      className={`fixed z-30 top-0 bg-transparent left-0 h-[65px] w-full shadow-sm transition-all ${
+    isScrolled
+      ? "bg-white text-black shadow-lg p-3"
+      : "bg-transparent text-maincolor p-3"
+  }`}
     >
       <div className="container relative mx-auto flex justify-between items-center px-6">
         <div className="text-2xl font-bold text-maincolor">
-          <Link className="flex" to="/"><img src={logo} width={60} className=" mt-[-10px] rounded-full" alt="Đây là logo" /> 
-          {' '} <div className="ml-2 text-[26̉px]" style={{ fontFamily: "Dancing Script, serif" }}> Spa Beauty</div>
+          <Link className="flex" to="/">
+            <img
+              src={logo}
+              width={60}
+              className=" mt-[-10px] rounded-full"
+              alt="Đây là logo"
+            />{" "}
+            <div
+              className={`ml-2 text-[26]
+              ${isScrolled ? "text-black" : "text-maincolor"}`}
+              style={{ fontFamily: "Dancing Script, serif" }}
+            >
+              {" "}
+              Spa Beauty
+            </div>
           </Link>
         </div>
         <nav className="space-x-6 hidden md:flex">
-          {
-            userRole === "user" && (
             <>
-            <Link to="/" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
-            {t("header.home")}
-          </Link>
-          <Link
-            to="/servicepage"
-            className="text-gray-600 text-[20px] mt-[-7px] hover:text-maincolor"
-          >
-            {t("header.services")}
-          </Link>
-          <Link
-            to="/productpage"
-            className="text-gray-600 text-[20px] mt-[-7px] hover:text-maincolor"
-          >
-            {t("header.products")}
-          </Link>
-          <Link to="/booknow" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
-            {t("header.bookNow")}
-          </Link>
-          <Link to="/blogview" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
-            {t("header.blogger")}
-          </Link>
-          <Link to="/spvc" className="text-gray-600 mt-[-7px]  text-[20px] hover:text-maincolor">
-            {t("header.voucher")}
-          </Link>
-          <Link to="/about" className="text-gray-600 mt-[-7px] text-[20px] hover:text-maincolor">
-            {t("header.about")}
-          </Link>
-          <Link to="/contact" className="text-gray-600  mt-[-7px] text-[20px] hover:text-maincolor">
-            {t("header.contact")}
-          </Link>
+              <Link
+                to="/"
+                className="mt-[-7px] text-[20px] hover:text-maincolor"
+              >
+                {t("header.home")}
+              </Link>
+              <Link
+                to="/servicepage"
+                className="text-[20px] mt-[-7px] hover:text-maincolor"
+              >
+                {t("header.services")}
+              </Link>
+              <Link
+                to="/productpage"
+                className="text-[20px] mt-[-7px] hover:text-maincolor"
+              >
+                {t("header.products")}
+              </Link>
+              <Link
+                to="/blogpage"
+                className="mt-[-7px] text-[20px] hover:text-maincolor"
+              >
+                {t("header.blogger")}
+              </Link>
+              <Link
+                to="/spvc"
+                className="mt-[-7px]  text-[20px] hover:text-maincolor"
+              >
+                {t("header.voucher")}
+              </Link>
+              <Link
+                to="/about"
+                className="mt-[-7px] text-[20px] hover:text-maincolor"
+              >
+                {t("header.about")}
+              </Link>
+              <Link
+                to="/contact"
+                className=" mt-[-7px] text-[20px] hover:text-maincolor"
+              >
+                {t("header.contact")}
+              </Link>
             </>
-            )
-          }
           {userRole === "admin" && (
-            <Link to="/admin" className="text-gray-600 flex justify-center items-center hover:text-maincolor">
-              {t("header.admin")} <IoIosReturnRight className="text-[24px]" />
+            <Link
+              to="/admin"
+              className="flex justify-center mt-[-5px] items-center hover:text-maincolor"
+            >
+              {t("header.admin")} <IoIosReturnRight className="text-[26px]" />
+            </Link>
+          )}
+          {userRole === "manager" && (
+            <Link
+              to="/manager"
+              className="flex justify-center mt-[-5px] items-center hover:text-maincolor"
+            >
+              {t("header.admin")} <IoIosReturnRight className="text-[26px]" />
             </Link>
           )}
         </nav>
@@ -161,11 +193,11 @@ const Header = () => {
             className="cursor-pointer hover:text-maincolor transition"
             onClick={handleSearchClick}
           >
-            <IoMdSearch size={22} />
+            <IoMdSearch size={24} />
           </div>
           <div className="relative cursor-pointer hover:text-maincolor transition">
             <Link to="/cart">
-              <IoBagHandleOutline size={22} />
+              <IoBagHandleOutline size={24} />
             </Link>
             {/* <span className="absolute -top-2 -right-2 bg-maincolor text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               4
@@ -187,7 +219,7 @@ const Header = () => {
                 onClick={() => setIsMenu(!isMenu)}
                 src={userAvatar}
                 alt="Avatar"
-                className="w-8 h-8 rounded-full cursor-pointer object-cover"
+                className="w-9 h-9 rounded-full cursor-pointer object-cover"
                 onError={(e) => (e.target.src = DEFAULT_AVATAR)}
               />
             ) : (
@@ -195,7 +227,7 @@ const Header = () => {
                 onClick={handleAvatar}
                 src={DEFAULT_AVATAR}
                 alt="User"
-                className="w-8 h-8 rounded-full cursor-pointer object-cover"
+                className="w-9 h-9 rounded-full cursor-pointer object-cover"
               />
             )}
             {isMenu && (

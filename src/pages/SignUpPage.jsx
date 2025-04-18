@@ -29,7 +29,7 @@ const SignUpPage = () => {
     }
     try {
       await registerUser({ email, password });
-      successToast("Đăng ký thành công!");
+      successToast("Đăng ký thành công! Chúng tôi đã gửi xác nhận vào Email.");
       navigate("/sign-in");
     } catch (error) {
       successToast("Đăng ký thất bại!");

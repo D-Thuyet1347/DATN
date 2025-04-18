@@ -17,62 +17,50 @@ const ReviewsDetailSP = () => {
   const [userId, setUserId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
 
-  useEffect(() => {
-    const fetchUserAndReviews = async () => {
-      setLoading(true);
-      try {
-        // Lấy userId từ token
-        const token = localStorage.getItem("token");
-        if (token) {
-          const decodedToken = jwtDecode(token);
-          const loggedInUserId = decodedToken.id;
-
-          setUserId(loggedInUserId); // Lưu userId vào state
-
-          // Lấy thông tin người dùng
-          const userData = await getUser(loggedInUserId);
-          if (userData.success) {
-            setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
-          } else {
-            console.error("Không thể lấy thông tin người dùng.");
-          }
+  const fetchUserAndReviews = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        const loggedInUserId = decodedToken.id;
+        setUserId(loggedInUserId); 
+        const userData = await getUser(loggedInUserId);
+        if (userData.success) {
+          setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
+        } else {
+          console.error("Không thể lấy thông tin người dùng.");
         }
+      }
+      const data = await listReviewSP(id);
+      const infoReviewUser = Array.isArray(data.reviews) ? data.reviewsInfoUser : Array.isArray(data) ? data : [];
+      setReviews(infoReviewUser);
 
-        // Lấy danh sách đánh giá sản phẩm
-        const data = await listReviewSP(id);
-        const infoReviewUser = Array.isArray(data.reviews)
-          ? data.reviewsInfoUser
-          : Array.isArray(data)
-          ? data
-          : [];
-        setReviews(infoReviewUser);
-
-        const uniqueUserIds = [
-          ...new Set(infoReviewUser.map((review) => review.userId)),
-        ];
-        const userInfoMap = {};
-        await Promise.all(
-          uniqueUserIds.map(async (userID) => {
-            try {
-              const res = await getUser(userID);
-              if (res.success) {
-                const { firstName, lastName } = res.data;
-                userInfoMap[userID] = `${firstName} ${lastName}`;
-              } else {
-                userInfoMap[userID] = "Người dùng ẩn danh";
-              }
-            } catch {
+      const uniqueUserIds = [...new Set(infoReviewUser.map((review) => review.userId))];
+      const userInfoMap = {};
+      await Promise.all(
+        uniqueUserIds.map(async (userID) => {
+          try {
+            const res = await getUser(userID);
+            if (res.success) {
+              const { firstName, lastName } = res.data;
+              userInfoMap[userID] = `${firstName} ${lastName}`;
+            } else {
               userInfoMap[userID] = "Người dùng ẩn danh";
             }
-          })
-        );
-        setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
-      } catch (error) {
-        console.error("Lỗi khi lấy đánh giá:", error);
-      }
-      setLoading(false);
-    };
+          } catch {
+            userInfoMap[userID] = "Người dùng ẩn danh";
+          }
+        })
+      );
+      setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
+    } catch (error) {
+      console.error("Lỗi khi lấy đánh giá:", error);
+    }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     fetchUserAndReviews();
   }, [id]);
 
@@ -155,7 +143,7 @@ const ReviewsDetailSP = () => {
             Viết đánh giá
           </button>
 
-          {showReview && <ReviewSP />}
+          {showReview && <ReviewSP onAddReview={fetchUserAndReviews} />}
         </div>
 
         {/* Danh sách đánh giá */}

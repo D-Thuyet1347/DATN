@@ -6,7 +6,7 @@ import ReviewsInDeTailSP from '../components/ReviewsDetailSP'
 
 const ProductDetailPage = () => {
   return (
-    <div className='    '>
+    <div className=''>
     <Header />
       <div className='p-10 pt-6'>
         <ProductDetail />

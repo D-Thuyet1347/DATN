@@ -17,20 +17,27 @@ const MyOrdersTab = () => {
           message.error('Vui lòng đăng nhập để xem đơn hàng');
           return;
         }
-
-        console.log('Fetching orders with token:', token, 'userId:', userId);
         const rawOrders = await getOrders(token);
         console.log('Raw orders from API:', rawOrders);
-        console.log('Orders received:', rawOrders);
+        const formattedOrders = rawOrders.map(order => {
+          let formattedDate = 'N/A';
+          if (order.orderDate) {
+            const [day, month, year] = order.orderDate.split('/');
+            if (day && month && year) {
+              formattedDate = new Date(`${year}-${month}-${day}`).toLocaleDateString('vi-VN');
+            }
+          }
+          return {
+            orderId: order.orderId || 'N/A',
+            orderDate: formattedDate,
+            products: order.products || [],
+            total: order.total || 0,
+            status: order.status ? order.status.toLowerCase() : 'unknown'
+          };
+        });
 
-        const formattedOrders = rawOrders.map(order => ({
-          orderId: order.orderId || 'N/A',
-          orderDate: order.orderDate ? new Date(order.orderDate).toLocaleDateString('vi-VN') : 'N/A',
-          products: order.products || [],
-          total: order.total || 0,
-          status: order.status ? order.status.toLowerCase() : 'unknown'
-        }));
-
+        setOrders(formattedOrders);
+  
         setOrders(formattedOrders);
 
         if (formattedOrders.length === 0) {
@@ -47,8 +54,7 @@ const MyOrdersTab = () => {
 
   const columns = [
     { title: 'Mã đơn hàng', dataIndex: 'orderId', key: 'orderId' },
-    { title: 'Ngày đặt', dataIndex: 'orderDate', key: 'orderDate',
-     },
+    { title: 'Ngày đặt', dataIndex: 'orderDate', key: 'orderDate',},
     {
       title: 'Sản phẩm',
       dataIndex: 'products',
@@ -57,14 +63,11 @@ const MyOrdersTab = () => {
         <div>
           {products && products.length > 0 ? (
             products.map((product, index) => {
-              // Sửa định dạng image nếu cần
               const imageSrc = product.image && product.image.startsWith('data:application/octet-stream')
                 ? product.image.replace('data:application/octet-stream', 'data:image/jpeg')
                 : product.image;
-
               return (
                 <div key={product.productId || index} style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-                  {/* Hiển thị hình ảnh */}
                   {imageSrc ? (
                     <img
                       src={imageSrc}
@@ -105,7 +108,7 @@ const MyOrdersTab = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
-        const normalizedStatus = status || 'unknown';
+        const normalizedStatus = status ? status.toLowerCase() : 'unknown'; // Chuẩn hóa trạng thái
         let color, text;
         switch (normalizedStatus) {
           case 'completed':
@@ -130,7 +133,8 @@ const MyOrdersTab = () => {
         }
         return <Tag color={color}>{text}</Tag>;
       },
-    },
+    }
+    
   ];
 
   return (

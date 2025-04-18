@@ -85,7 +85,7 @@ const Payment = () => {
   const subtotal = products.reduce(
     (total, product) =>
       cartItems[product._id]
-        ? total + Number(product.PricePD) * cartItems[product._id]
+        ? total + (parseFloat(String(product.PricePD).replace(/\./g, '').replace(',', '.')) || 0) * (cartItems[product._id] || 0)
         : total,
     0
   );
@@ -101,7 +101,7 @@ const Payment = () => {
     }
     return discountAmount;
   };
-  const discount = calculateDiscount();
+  const discount = calculateDiscount()*1000;
   const shippingFee = 30000;
   const total = subtotal + shippingFee - discount;
   useEffect(() => {
@@ -126,7 +126,6 @@ const Payment = () => {
   };
 
   const handleSubmit = async (e) => {
-    successToast("Đặt hàng thành công");
     e.preventDefault();
     setIsSubmitting(true);
     try {
@@ -134,15 +133,15 @@ const Payment = () => {
       const token = localStorage.getItem("token");
       if (!token) errorToast("Vui lòng đăng nhập để đặt hàng");
       const orderItems = products
-        .filter((p) => cartItems[p._id])
-        .map((product) => ({
+      .filter((p) => cartItems[p._id])
+      .map((product) => ({
           _id: product._id,
           name: product.ProductName,
           price: product.PricePD,
           quantity: cartItems[product._id],
           image: product.ImagePD,
         }));
-      const orderData = {
+        const orderData = {
         items: orderItems,
         totalAmount: total,
         shippingAddress: {
@@ -161,6 +160,7 @@ const Payment = () => {
       }
       const response = await placeOrder(orderData, token);
       if (response.success) {
+        successToast("Đặt hàng thành công");
         const { session_url } = response;
         if (selectedPayment === "card") {
           window.location.href = session_url;
@@ -183,7 +183,7 @@ const Payment = () => {
         localStorage.removeItem("cart");
       }
     } catch (error) {
-      errorToast(error.message || "Lỗi khi đặt hàng");
+      errorToast("Vui lòng đăng nhập.");
     } finally {
       setIsSubmitting(false);
     }
@@ -424,10 +424,7 @@ const Payment = () => {
                           </p>
                         </div>
                         <div className="ml-4 text-sm font-medium text-gray-900">
-                          {(
-                            Number(product.PricePD) * cartItems[product._id]
-                          ).toLocaleString("vi-VN")}
-                          ₫
+                          {(String(product.PricePD)*cartItems[product._id])}.000₫
                         </div>
                       </div>
                     ))}

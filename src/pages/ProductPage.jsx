@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
+import Header from '../components/Header';
 import OneProduct from '../components/OneProduct';
 import { getProducts } from '../APIs/ProductsApi';
-import { motion } from 'framer-motion';
 import { addToCart } from '../APIs/cartApi';
 import { errorToast, successToast, toastContainer } from '../utils/toast';
+import { motion } from 'framer-motion';
 import { Button, Spin } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 const ProductsPage = () => {
   const [filter, setFilter] = useState('Tất cả');
@@ -16,8 +16,7 @@ const ProductsPage = () => {
   const [cartMessage, setCartMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [categoryScrollIndex, setCategoryScrollIndex] = useState(0);
-  const visibleCategories = 6;
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -40,7 +39,6 @@ const ProductsPage = () => {
     fetchData();
   }, []);
 
-
   const filteredProductsPage =
     filter === 'Tất cả'
       ? data
@@ -56,113 +54,92 @@ const ProductsPage = () => {
       errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng!", error);
     }
   };
-  const handleScrollLeft = () => {
-    if (categoryScrollIndex > 0) {
-      setCategoryScrollIndex(categoryScrollIndex - 1);
-    }
-  };
-
-  const handleScrollRight = () => {
-    if (categoryScrollIndex < categories.length - visibleCategories + 1) {
-      setCategoryScrollIndex(categoryScrollIndex + 1);
-    }
-  };
-
 
   return (
-    <motion.div className="mt-2"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 1.2 }}
-    >
-      {toastContainer()}
-      <section className="p-10">
-        <h2 className="text-3xl font-bold text-maincolor text-center">Our ProductsPage</h2>
+    <>
+      <Header />
+      <motion.div
+        className="mt-[50px]"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 1.2 }}
+      >
+        {toastContainer()}
 
-        {cartMessage && <div className="text-center text-red-500 mb-4">{cartMessage}</div>}
+        <section className="px-10 py-6">
+          <h2 className="text-3xl font-bold text-maincolor text-center mb-6">Our ProductsPage</h2>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <Spin tip="Đang tải..." />
-          </div>
-        ) : (
-          <>
-            <div className="relative flex items-center justify-center py-4 mt-8 max-w-4xl mx-auto">
-              {categories.length > visibleCategories && (
-                <Button
-                  icon={<LeftOutlined />}
-                  onClick={handleScrollLeft}
-                  disabled={categoryScrollIndex === 0}
-                  className="absolute left-16 z-10"
-                  size="small"
-                  type="text"
-                />
-              )}
-              <div className="flex space-x-4 overflow-hidden flex-grow justify-center">
-                {categoryScrollIndex === 0 && (
-                  <motion.div
-                    whileTap={{ scale: 0.7 }}
-                    key="all"
+          {cartMessage && (
+            <div className="text-center text-red-500 mb-4">{cartMessage}</div>
+          )}
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <Spin tip="Đang tải..." />
+            </div>
+          ) : (
+            <div className="flex gap-10">
+              {/* Category Filter - Left Sidebar */}
+              <div className="w-46">
+                <h3 className="text-lg font-semibold mb-4">Danh mục</h3>
+                <ul className="space-y-3">
+                  <li
                     onClick={() => setFilter('Tất cả')}
-                    className={`px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap ${
-                      filter === 'Tất cả' ? 'bg-maincolor text-white' : 'bg-gray-200 text-gray-700'
+                    className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                      filter === 'Tất cả'
+                        ? 'bg-maincolor text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                     }`}
                   >
                     Tất cả
-                  </motion.div>
-                )}
-                {categories
-                  .slice(categoryScrollIndex, categoryScrollIndex + visibleCategories)
-                  .map((item) => (
-                    <motion.div
-                      whileTap={{ scale: 0.7 }}
+                  </li>
+                  {categories.map((item) => (
+                    <li
                       key={item._id}
                       onClick={() => setFilter(item.name)}
-                      className={`px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap ${
-                        filter === item.name ? 'bg-maincolor text-white' : 'bg-gray-200 text-gray-700'
+                      className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                        filter === item.name
+                          ? 'bg-maincolor text-white'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                       }`}
                     >
                       {item.name}
-                    </motion.div>
+                    </li>
                   ))}
+                </ul>
               </div>
-              {categories.length > visibleCategories && (
-                <Button
-                  icon={<RightOutlined />}
-                  onClick={handleScrollRight}
-                  disabled={categoryScrollIndex >= categories.length - visibleCategories + 1}
-                  className="absolute right-16 z-10"
-                  size="small"
-                  type="text"
-                />
-              )}
+
+              {/* Product Grid - Right */}
+              <div className="flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {filteredProductsPage.length > 0 ? (
+                    filteredProductsPage.map((product, index) => (
+                      <OneProduct
+                        key={index}
+                        title={product.ProductName}
+                        price={product.PricePD}
+                        description={product.DescriptionPD}
+                        image={product.ImagePD}
+                        productId={product._id}
+                        onAddToCart={() => handleAddToCart(product._id, quantity)}
+                        loading={loading}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-600 col-span-4">
+                      Không có sản phẩm nào trong danh mục này.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8 ml-4">
-          {filteredProductsPage.length > 0 ? (
-            filteredProductsPage.map((product, index) => (
-              <OneProduct
-                key={index}
-                title={product.ProductName}
-                price={product.PricePD}
-                description={product.DescriptionPD}
-                image={product.ImagePD}
-                productId={product._id}
-                onAddToCart={() => handleAddToCart(product._id, quantity)}
-                loading={loading}
-              />
-            ))
-          ) : (
-            <p className="text-center text-gray-600 col-span-4">
-              Không có sản phẩm nào trong danh mục này.
-            </p>
           )}
-        </div>
-        </>
-      )}
-      </section>
-      <Footer />
-    </motion.div>
+        </section>
+
+        <Footer />
+      </motion.div>
+    </>
   );
 };
 

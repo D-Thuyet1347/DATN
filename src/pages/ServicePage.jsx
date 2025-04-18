@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import OneService from '../components/OneService';
 import { getAllServices } from '../APIs/ServiceAPI';
-import { SVcategories } from '../utils/data';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Button, Spin } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { Spin } from 'antd';
+import Header from '../components/Header';
 
 const ServicePage = () => {
   const [filter, setFilter] = useState('Tất cả dịch vụ');
   const [data, setData] = useState([]);
-  const navigate = useNavigate();
-  const [categoryScrollIndex, setCategoryScrollIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState([]);
-  const visibleCategories = 6;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,109 +30,84 @@ const ServicePage = () => {
     fetchData();
   }, []);
 
-  // Lọc dịch vụ theo danh mục
-  const filteredProducts =
-    filter === "Tất cả dịch vụ"
-      ? data
-      : data.filter((product) => product.category === filter);
+  const filteredServices = filter === 'Tất cả dịch vụ'
+    ? data
+    : data.filter((service) => service.category === filter);
 
   const handleBookNow = (service) => {
     navigate('/book-service', { state: { service } });
   };
-  const handleScrollLeft = () => {
-    if (categoryScrollIndex > 0) {
-      setCategoryScrollIndex(categoryScrollIndex - 1);
-    }
-  };
 
-  const handleScrollRight = () => {
-    if (categoryScrollIndex < categories.length - visibleCategories) {
-      setCategoryScrollIndex(categoryScrollIndex + 1);
-    }
-  };
   return (
-    <div className='mt-5'>
-      <section className='p-2'>
-        <h2 className="text-3xl font-bold text-maincolor text-center">Our Services</h2>
-        
+    <>
+      <Header />
+      <div className="mt-[100px] px-6 py-4">
+        <h2 className="text-3xl font-bold text-maincolor text-center mb-6">Our Services</h2>
+
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <Spin tip="Đang tải..." />
           </div>
         ) : (
-          <>
-            <div className="relative flex items-center justify-center py-4 mt-8">
-              {categories.length > visibleCategories && (
-                <Button
-                  icon={<LeftOutlined />}
-                  onClick={handleScrollLeft}
-                  disabled={categoryScrollIndex === 0}
-                  className="absolute left-16 z-10"
-                />
-              )}
-              <div className="flex space-x-4 overflow-hidden">
-                <motion.div
-                  whileTap={{ scale: 0.7 }}
-                  key="all"
+          <div className="flex gap-10">
+            {/* Category Filter - Left */}
+            <div className="w-46">
+              <h3 className="text-lg font-semibold mb-4">Danh mục</h3>
+              <ul className="space-y-3">
+                <li
                   onClick={() => setFilter('Tất cả dịch vụ')}
-                  className={`px-4 py-2 rounded-lg cursor-pointer ${
-                    filter === 'Tất cả dịch vụ' ? 'bg-maincolor text-white' : 'bg-gray-200 text-gray-700'
+                  className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                    filter === 'Tất cả dịch vụ'
+                      ? 'bg-maincolor text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                   }`}
-                  style={{
-                    display: categoryScrollIndex === 0 ? 'block' : 'none',
-                  }}
                 >
                   Tất cả dịch vụ
-                </motion.div>
-                {categories
-                  .slice(categoryScrollIndex, categoryScrollIndex + visibleCategories)
-                  .map((item) => (
-                    <motion.div
-                      whileTap={{ scale: 0.7 }}
-                      key={item._id}
-                      onClick={() => setFilter(item.name)}
-                      className={`px-4 py-2 rounded-lg cursor-pointer ${
-                        filter === item.name ? 'bg-maincolor text-white' : 'bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {item.name}
-                    </motion.div>
-                  ))}
-              </div>
-              {categories.length > visibleCategories && (
-                <Button
-                  icon={<RightOutlined />}
-                  onClick={handleScrollRight}
-                  disabled={categoryScrollIndex >= categories.length - visibleCategories}
-                  className="absolute right-16 z-10"
-                />
-              )}
+                </li>
+                {categories.map((item) => (
+                  <li
+                    key={item._id}
+                    onClick={() => setFilter(item.name)}
+                    className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                      filter === item.name
+                        ? 'bg-maincolor text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    {item.name}
+                  </li>
+                ))}
+              </ul>
             </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((db, index) => (
-              <OneService
-                key={index}
-                name={db.name}
-                id={db._id}
-                title={db.title}
-                price={db.price}
-                duration={db.duration}
-                description={db.description}
-                image={db.image}
-                onBookNow={() => handleBookNow(db)}
-              />
-            ))
-          ) : (
-            <p className="text-center text-gray-600 col-span-3">
-              Không có dịch vụ nào trong danh mục này.
-            </p>
-          )}
-        </div>
-        </>
-      )}
-      </section>
-    </div>
+
+            {/* Service Grid - Right */}
+            <div className="flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {filteredServices.length > 0 ? (
+                  filteredServices.map((db, index) => (
+                    <OneService
+                      key={index}
+                      name={db.name}
+                      id={db._id}
+                      title={db.title}
+                      price={db.price}
+                      duration={db.duration}
+                      description={db.description}
+                      image={db.image}
+                      onBookNow={() => handleBookNow(db)}
+                    />
+                  ))
+                ) : (
+                  <p className="text-center text-gray-600 col-span-4">
+                    Không có dịch vụ nào trong danh mục này.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -3,6 +3,7 @@ import VoucherCard from '../components/VoucherCard';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toastContainer, errorToast, successToast } from '../utils/toast';
+import Header from '../components/Header';
 
 const API_BASE_URL = 'http://localhost:4000/api/';
 
@@ -81,7 +82,9 @@ const MyVouchers = () => {
   });
 
   return (
-    <div className="mt-16 p-10 min-h-screen bg-gray-100">
+    <>
+    <Header />
+      <div className="mt-16 p-10 min-h-screen bg-gray-100">
       {toastContainer()}
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-4">
@@ -200,6 +203,7 @@ const MyVouchers = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

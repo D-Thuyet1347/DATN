@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Hero from "../components/Hero";
-import FeaturedServices from "../components/FeaturedServices";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 import BlogViewer from "../components/BlogViewer";
 import Products from "./Products";
-import { Spin } from "antd";
-import { getProducts } from "../APIs/ProductsApi";
-import Cart from "./Cart";
 import Service from "./Service";
 
 const Home = () => {
-  const [isPending, setIsPending] = useState(false);
-  const fetchAllProducts = async () => {
-    setIsPending(true);
-    const res = await getProducts();
-    if (res.success) {
-      setIsPending(false);
-    }
-  }
-  useEffect(() => {
-    fetchAllProducts();
-  }, []);
   return (
      <>
       <Header />
-        <Hero />
+      <Hero />
       <BlogViewer />
       <Service />
       <Products />

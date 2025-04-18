@@ -1,33 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { getServiceById } from '../APIs/ServiceAPI';
+import { listReviewDV } from '../APIs/ReviewDVAPI'; // Thêm API lấy danh sách đánh giá dịch vụ
+import { FaStar } from 'react-icons/fa'; // Dùng để hiển thị sao
+import { RightOutlined } from '@ant-design/icons';
+import { errorToast, successToast, toastContainer } from '../utils/toast';
 import Header from '../components/Header';
 import ReviewsDeTailDV from '../components/ReviewsDeTailDV';
 
 const ServiceDetailPage = () => {
     const { id } = useParams();
     const [service, setService] = useState(null);
+    const [reviews, setReviews] = useState([]); // Lưu danh sách đánh giá
+    const [averageRating, setAverageRating] = useState(0); // Điểm đánh giá trung bình
+    const [reviewCount, setReviewCount] = useState(0); // Số lượng đánh giá
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchService = async () => {
+        const fetchServiceAndReviews = async () => {
             try {
+                // Lấy thông tin dịch vụ
                 const response = await getServiceById(id);
-                console.log('Dữ liệu từ API:', response);
                 if (response.success) {
                     setService(response.data);
-                    console.log('Dữ liệu dịch vụ:', response.service);
+                }
+
+                // Lấy danh sách đánh giá dịch vụ
+                const reviewData = await listReviewDV(id);
+                if (reviewData.success) {
+                    setReviews(reviewData.data);
+                    setReviewCount(reviewData.data.length);
+                    const totalStars = reviewData.data.reduce((sum, r) => sum + r.rating, 0);
+                    setAverageRating(totalStars / reviewData.data.length);
                 }
                 setLoading(false);
             } catch (error) {
-                console.error('Lỗi:', error);
+                console.error('Lỗi khi tải dữ liệu dịch vụ hoặc đánh giá:', error);
                 setError(error.message || 'Có lỗi xảy ra khi tải dữ liệu');
                 setLoading(false);
             }
         };
-        fetchService();
+
+        fetchServiceAndReviews();
     }, [id]);
 
     const handleBookNow = () => {
@@ -55,16 +71,12 @@ const ServiceDetailPage = () => {
     return (
         <div className="">
             <Header />
-
-            <div className="min-h-screen bg-gray-100 p-8 pt-6">
-                {/* Breadcrumbs */}
+            <div className="min-h-screen mt-[50px] p-8 pt-6">
                 <nav className="text-sm text-gray-500 mb-4">
                     <Link to="/" className="hover:underline">Trang chủ</Link> &gt;{' '}
                     <Link to="/service" className="hover:underline">Dịch vụ</Link> &gt;{' '}
                     <span className="text-gray-800">{service.name || 'Chi tiết dịch vụ'}</span>
                 </nav>
-
-                {/* Banner */}
                 <div
                     className="w-full h-96 bg-cover bg-center"
                     style={{ backgroundImage: `url(${service.image})` }}
@@ -86,27 +98,6 @@ const ServiceDetailPage = () => {
                             <p className="text-gray-600 mb-4">
                                 {service.description || 'Thư giãn và phục hồi cơ thể với liệu pháp massage truyền thống của chúng tôi.'}
                             </p>
-                            <h3 className="text-xl font-semibold text-gray-800 mb-2">Lợi ích</h3>
-                            <ul className="list-none space-y-2">
-                                <li className="flex items-center">
-                                    <span className="text-yellow-500 mr-2">★</span> Giảm căng thẳng và lo âu
-                                </li>
-                                <li className="flex items-center">
-                                    <span className="text-yellow-500 mr-2">★</span> Giảm đau cơ và cải thiện tuần hoàn
-                                </li>
-                                <li className="flex items-center">
-                                    <span className="text-yellow-500 mr-2">★</span> Thúc đẩy thư giãn tinh thần và thể chất
-                                </li>
-                                <li className="flex items-center">
-                                    <span className="text-yellow-500 mr-2">★</span> Nâng cao chất lượng giấc ngủ
-                                </li>
-                                <li className="flex items-center">
-                                    <span className="text-yellow-500 mr-2">★</span> Tăng cường hệ miễn dịch
-                                </li>
-                                <li className="flex items-center">
-                                    <span className="text-yellow-500 mr-2">★</span> Cải thiện tâm trạng và tăng cường năng lượng
-                                </li>
-                            </ul>
                         </div>
 
                         {/* Đánh giá dịch vụ */}
@@ -142,21 +133,6 @@ const ServiceDetailPage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Call to Action */}
-            <div className="text-center bg-footcolor text-white p-10">
-                <h2 className="text-3xl font-bold">Ready to Experience True Relaxation?</h2>
-                <p className="mt-4">
-                    Book your appointment today and discover why our clients keep coming back.
-                    Whether you’re looking for relaxation, rejuvenation, or a little self-care,
-                    we have the perfect treatment for you.
-                </p>
-                <Link to="/booknow">
-                    <button className="bg-white text-maincolor px-6 py-3 rounded-md hover:bg-gray-200 mt-6 flex items-center mx-auto">
-                        Book Now <span className="ml-2 material-icons">arrow_forward</span>
-                    </button>
-                </Link>
             </div>
         </div>
     );

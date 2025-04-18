@@ -4,6 +4,7 @@ import { getVouchers } from '../APIs/VoucherAPI';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toastContainer, successToast, errorToast } from '../utils/toast';
+import Header from '../components/Header';
 
 const API_BASE_URL = 'http://localhost:4000/api/';
 
@@ -92,7 +93,9 @@ const SuperVouchers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 mt-16 p-10">
+    <>
+    <Header />
+        <div className="min-h-screen bg-gray-100 mt-16 p-10">
       {toastContainer()}
       <div className="bg-maincolor text-white text-center py-8">
         <h1 className="text-4xl font-bold">Super Vouchers</h1>
@@ -171,6 +174,7 @@ const SuperVouchers = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getUser } from '../APIs/userApi';
-import {  addReviewDV } from "../APIs/ReviewDVAPI";
+import { addReviewDV } from "../APIs/ReviewDVAPI";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { jwtDecode } from 'jwt-decode';
 import { getServiceById } from '../APIs/ServiceAPI';
+import { errorToast, successToast, toastContainer } from '../utils/toast';
 
-export const ReviewDV = () => {
+export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(null);
   const [comment, setComment] = useState('');
@@ -14,6 +15,7 @@ export const ReviewDV = () => {
   const [userFullName, setUserFullName] = useState('');
   const [service, setService] = useState(null);
   const { id } = useParams();
+
   useEffect(() => {
     const fetchservice = async () => {
       try {
@@ -22,13 +24,12 @@ export const ReviewDV = () => {
           setService(serviceData.data);
         }
       } catch (error) {
-        console.error('Lỗi khi lấy sản phẩm:', error);
+        console.error('Lỗi khi lấy dịch vụ:', error);
       }
     };
     fetchservice();
   }, [id]);
 
-  // Lấy userId từ token
   const getUserIdFromToken = () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -44,7 +45,6 @@ export const ReviewDV = () => {
     return null;
   };
 
-  // Gọi API lấy thông tin user
   useEffect(() => {
     const fetchUserData = async () => {
       const userId = getUserIdFromToken();
@@ -65,14 +65,13 @@ export const ReviewDV = () => {
     fetchUserData();
   }, []);
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!rating || !comment.trim()) {
-      return alert("Vui lòng nhập đầy đủ đánh giá.");
+      return errorToast("Vui lòng nhập đầy đủ đánh giá.");
     }
     if (!service) {
-      return alert("Thiếu thông tin dịch vụ.");
+      return errorToast("Thiếu thông tin dịch vụ.");
     }
 
     const reviewData = {
@@ -81,27 +80,30 @@ export const ReviewDV = () => {
       rating,
       comment
     };
-    console.log("📝 Submitting review with data:", reviewData);
 
-
+    setLoading(true);
     try {
       const res = await addReviewDV(reviewData);
       if (res.success) {
-        alert("✅ Gửi đánh giá thành công!");
+        successToast("Gửi đánh giá thành công!");
         setRating(0);
         setComment('');
+        if (onReviewSubmitted) {
+          onReviewSubmitted();
+        }
       } else {
-        alert("❌ Không thể gửi đánh giá.");
+        errorToast("Không thể gửi đánh giá.");
       }
     } catch (err) {
-      console.error("❌ Lỗi gửi đánh giá:", err);
-      alert("Có lỗi xảy ra.");
+      console.error("Lỗi gửi đánh giá:", err);
+      errorToast("Có lỗi xảy ra.");
     }
+    setLoading(false);
   };
-
 
   return (
     <div className="max-w-md mx-auto p-4 shadow-md rounded border mt-4">
+      {toastContainer()}
       <h1 className="text-2xl font-bold mb-4">Đánh giá sản phẩm</h1>
 
       {userFullName && (

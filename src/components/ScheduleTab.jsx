@@ -93,9 +93,16 @@ const ScheduleTab = () => {
   };
 
   const formatPrice = (price) => {
-    return price
-      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
-      : 'Liên hệ';
+    if (!price) return 'Liên hệ';
+    const numericPrice =
+      typeof price === 'string'
+        ? parseFloat(price.replace(/\./g, '').replace(',', '.'))
+        : price;
+  
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(numericPrice);
   };
 
   const columns = [

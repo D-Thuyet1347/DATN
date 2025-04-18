@@ -7,14 +7,14 @@ import { MdOutlineStarPurple500 } from "react-icons/md";
 import { jwtDecode } from 'jwt-decode';
 import { errorToast, successToast, toastContainer } from '../utils/toast';
 
-export const ReviewSP = () => {
+export const ReviewSP = ({ onAddReview }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(null);
   const [comment, setComment] = useState('');
   const [userId, setUserId] = useState('');
   const [userFullName, setUserFullName] = useState('');
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(false); // <-- Thêm loading
+  const [loading, setLoading] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
@@ -84,19 +84,19 @@ export const ReviewSP = () => {
     };
 
     try {
-      setLoading(true); // Bắt đầu loading
+      setLoading(true);
       const res = await addReviewSP(reviewData);
       if (res.success) {
         successToast("Đánh giá thành công!");
+        onAddReview(); // Gọi lại hàm fetch lại đánh giá
         setRating(0);
         setComment('');
       } else {
         errorToast("Không thể gửi đánh giá.");
       }
     } catch (err) {
-      console.error("❌ Lỗi gửi đánh giá:", err);
     } finally {
-      setLoading(false); // Kết thúc loading
+      setLoading(false);
     }
   };
 
@@ -159,3 +159,4 @@ export const ReviewSP = () => {
     </div>
   );
 };
+

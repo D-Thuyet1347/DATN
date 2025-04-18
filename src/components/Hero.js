@@ -21,8 +21,8 @@ const Hero = () => {
   }, []);
 
   return (
-   <section className="relative w-full h-screen bg-gray-100 overflow-hidden z-20">
-  <div className="absolute inset-0 z-[-1]">
+<section className="relative w-full h-screen bg-gray-100 overflow-hidden z-10">
+  <div className="absolute  z-10 inset-0">
     {heroSlide?.image ? (
       <img
         src={heroSlide.image}
@@ -58,6 +58,7 @@ const Hero = () => {
     </div>
   </div>
 </section>
+
   );
 };
 

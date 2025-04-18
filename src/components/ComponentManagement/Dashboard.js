@@ -1,29 +1,65 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Statistic, DatePicker, Select } from 'antd';
+import React, { use, useCallback, useEffect, useState } from 'react';
+import { Row, Col, Card, Statistic, DatePicker, Select, message } from 'antd';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
-  LineChart, Line, AreaChart, Area, PieChart, Pie, RadarChart, Radar, 
-  PolarGrid, PolarAngleAxis, ResponsiveContainer,
+  LineChart, Line, Area, PieChart, Pie, ResponsiveContainer,
   ComposedChart
 } from 'recharts';
+import { listOrder } from '../../APIs/orderApi';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const Dashboard = () => {
   const [dateRange, setDateRange] = useState([]);
-  const [filterType, setFilterType] = useState('day'); // day, month, year, quarter
+  const [filterType, setFilterType] = useState('day');
+  const [state, setState] = useState({
+    loading: { table: false },
+    orders: [],
+    error: null,
+  });
 
-  const orderData = [
-    { name: 'T2', orders: 10, revenue: 200000, cost: 150000 },
-    { name: 'T3', orders: 14, revenue: 300000, cost: 200000 },
-    { name: 'T4', orders: 18, revenue: 450000, cost: 250000 },
-    { name: 'T5', orders: 8, revenue: 150000, cost: 100000 },
-    { name: 'T6', orders: 16, revenue: 320000, cost: 220000 },
-    { name: 'T7', orders: 20, revenue: 500000, cost: 350000 },
-    { name: 'CN', orders: 12, revenue: 280000, cost: 200000 },
-  ];
+  const fetchOrders = useCallback(async () => {
+    setState((prev) => ({
+      ...prev,
+      loading: { ...prev.loading, table: true },
+      error: null,
+    }));
+    try {
+      const response = await listOrder();
+      if (response.success && Array.isArray(response.data)) {
+        const processedOrders = response.data.map((item) => ({
+          ...item,
+          key: item._id,
+          orderDate: item.orderDate
+            ? new Date(item.orderDate).toLocaleString()
+            : "Không rõ",
+        }));
+        setState((prev) => ({
+          ...prev,
+          orders: processedOrders,
+          loading: { ...prev.loading, table: false },
+        }));
+        message.success(`Đã tải ${processedOrders.length} đơn hàng`);
+      } else {
+        throw new Error(response.message || "Dữ liệu không hợp lệ");
+      }
+    } catch (error) {
+      console.error("Lỗi tải đơn hàng:", error);
+      setState((prev) => ({
+        ...prev,
+        error: error.response?.data?.message || error.message,
+        loading: { ...prev.loading, table: false },
+      }));
+      message.error(error.response?.data?.message || "Không thể tải đơn hàng");
+    }
+  }, []);
+  
 
+  useEffect(() => {
+    fetchOrders();
+  }, []); 
+  
   const handleDateChange = (dates) => {
     setDateRange(dates);
   };
@@ -31,44 +67,26 @@ const Dashboard = () => {
   const handleFilterTypeChange = (value) => {
     setFilterType(value);
   };
-
+  const totalOrders = state.orders.length;
+  const totalRevenue = state.orders.reduce(
+    (sum, order) => sum + (order.totalAmount || 0),
+    0
+  );
   return (
     <div>
       <h2>Dashboard</h2>
       <Row gutter={[16, 16]} style={{ marginBottom: '20px' }}>
-        <Col span={6}><Card><Statistic title="Đơn hàng hôm nay" value={15} /></Card></Col>
-        <Col span={6}><Card><Statistic title="Khách hàng mới" value={8} /></Card></Col>
+        <Col span={6}><Card><Statistic title="Đơn hàng hôm nay" value={totalOrders} /></Card></Col>
+        <Col span={6}><Card><Statistic title="Khách hàng mới" value={12} /></Card></Col>
         <Col span={6}><Card><Statistic title="Dịch vụ đang hoạt động" value={12} /></Card></Col>
-        <Col span={6}><Card><Statistic title="Tổng doanh thu" value={1250000} suffix="₫" /></Card></Col>
-      </Row>
-
-      <Row gutter={[16, 16]} style={{ marginBottom: '20px' }}>
-        <Col span={6}>
-          <RangePicker
-            style={{ width: '100%' }}
-            onChange={handleDateChange}
-            placeholder={['Start date', 'End date']}
-          />
-        </Col>
-        <Col span={6}>
-          <Select
-            value={filterType}
-            onChange={handleFilterTypeChange}
-            style={{ width: '100%' }}
-          >
-            <Option value="day">Ngày</Option>
-            <Option value="month">Tháng</Option>
-            <Option value="year">Năm</Option>
-            <Option value="quarter">Quý</Option>
-          </Select>
-        </Col>
+        <Col span={6}><Card><Statistic title="Tổng doanh thu" value={totalRevenue} suffix="₫" /></Card></Col>
       </Row>
 
       <Row gutter={[16, 16]} style={{ marginTop: '20px' }}>
         <Col span={12}>
           <Card title="Biểu đồ cột đơn hàng">
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={orderData}>
+              <BarChart >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -82,7 +100,7 @@ const Dashboard = () => {
         <Col span={12}>
           <Card title="Biểu đồ đường doanh thu">
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={orderData}>
+              <LineChart>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -102,8 +120,6 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={orderData}
-                  dataKey="orders"
                   nameKey="name"
                   cx="50%"
                   cy="50%"
@@ -119,7 +135,7 @@ const Dashboard = () => {
         <Col span={12}>
           <Card title="Biểu đồ kết hợp">
             <ResponsiveContainer width="100%" height={300}>
-              <ComposedChart data={orderData}>
+              <ComposedChart>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <CartesianGrid strokeDasharray="3 3" />

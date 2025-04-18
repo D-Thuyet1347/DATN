@@ -36,27 +36,17 @@ const OrderConfirmation = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { orderDetails } = location.state || {};
-
-    const defaultOrder = {
-        fullName: 'Nguyễn Văn A',
-        phone: '0912 345 678',
-        paymentMethod: 'cod',
-        items: [
-            { _id: '1', ProductName: 'Kem chống nắng', PricePD: 250000, ImagePD: '/images/sunscreen.jpg', quantity: 2 },
-            { _id: '2', ProductName: 'Serum dưỡng da', PricePD: 350000, ImagePD: '/images/serum.jpg', quantity: 1 },
-        ],
-        total: 850000,
-        address: '123 Đường ABC, Quận 1, TP.HCM',
-        discount: 0,
-        voucher: null
-    };
-
-    const order = orderDetails || defaultOrder;
+    const order = orderDetails;
+    console.log('Order Details:', order);
 
     const subtotal = order.items.reduce((sum, item) => sum + (Number(item.PricePD || item.price) * (item.quantity || 1)), 0);
     const shippingFee = 30000;
     const discount = order.discount || 0;
+    console.log('subtotal:', subtotal);
+    console.log('shippingFee:', shippingFee);
+    console.log('discount:', discount);
     const total = subtotal + shippingFee - discount;
+    console.log('total:', total);
 
     const handleBackToHome = () => {
         navigate('/');

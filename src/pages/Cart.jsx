@@ -64,7 +64,7 @@ const Cart = () => {
       setError('Lỗi khi tải sản phẩm');
     }
   };
-
+  
   const fetchSavedVouchers = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -122,9 +122,12 @@ const Cart = () => {
 
   const subtotal = products.reduce(
     (total, product) =>
-      cartItems[product._id] ? total + (Number(product.PricePD) || 0) * (cartItems[product._id] || 0) : total,
+      cartItems[product._id]
+        ? total + (parseFloat(String(product.PricePD).replace(/\./g, '').replace(',', '.')) || 0) * (cartItems[product._id] || 0)
+        : total,
     0
   );
+  
 
   const handleClearCart = async () => {
     await clearCart();
@@ -165,7 +168,7 @@ const Cart = () => {
       return;
     }
     if (subtotal < (voucher.minimumAmount || 0)) {
-      errorToast(`Đơn hàng phải có giá trị tối thiểu ${(voucher.minimumAmount || 0).toLocaleString('vi-VN')}₫`);
+      errorToast(`Đơn hàng phải có giá trị tối thiểu ${(voucher.minimumAmount || 0).toLocaleString('vi-VN')} ₫`);
       return;
     }
 
@@ -175,18 +178,22 @@ const Cart = () => {
   };
 
   const calculateDiscount = () => {
-    if (!selectedVoucher) return 0;
-
-    let discountAmount = subtotal * ((Number(selectedVoucher.discount) || 0) / 100);
-
-    if (selectedVoucher.maximumDiscount && discountAmount > (Number(selectedVoucher.maximumDiscount) || 0)) {
-      discountAmount = Number(selectedVoucher.maximumDiscount) || 0;
-    }
-
-    return discountAmount;
+    if (!selectedVoucher) return "0";
+  
+    let discountPercent = String(selectedVoucher.discount) || 0;
+    let maxDiscount = String(selectedVoucher.maximumDiscount) || Infinity;
+  
+    let discountAmount = subtotal * (discountPercent / 100);
+  
+    discountAmount = Math.min(discountAmount, maxDiscount);
+  
+    return discountAmount.toLocaleString('vi-VN');
   };
+  
+  
+  
 
-  const discount = calculateDiscount();
+  const discount = calculateDiscount()*1000;
   const shippingFee = 30000;
   const totalPayment = subtotal + shippingFee - discount;
 
@@ -201,7 +208,6 @@ const Cart = () => {
 
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>{error}</div>;
-
   return (
     <>
     <Header />
@@ -239,7 +245,7 @@ const Cart = () => {
                         </p>
                       </div>
                       <div className="w-20 text-right text-gray-400">
-                        {((Number(product.PricePD) || 0) * (cartItems[product._id] || 0)).toLocaleString('vi-VN')}₫
+                      {product.PricePD* cartItems[product._id] }.000 ₫
                       </div>
                       <div className="flex space-x-2 border border-gray-300">
                         <button
@@ -275,7 +281,7 @@ const Cart = () => {
               <Row justify="space-between">
                 <Col span={12}>Tạm tính</Col>
                 <Col span={12} className="text-right">
-                  {subtotal.toLocaleString('vi-VN')}₫
+                  {subtotal.toLocaleString('vi-VN')} ₫
                 </Col>
               </Row>
 
@@ -291,18 +297,20 @@ const Cart = () => {
                   </Button>
                 </Col>
                 <Col span={12} className="text-right">
-                  {discount > 0 ? (
-                    <span className="text-red-500">-{discount.toLocaleString('vi-VN')}₫</span>
-                  ) : (
-                    <span>0₫</span>
-                  )}
+                {discount > 0 ? (
+                  <Text className="text-green-500">
+                    -{discount.toLocaleString('vi-VN')} ₫
+                  </Text>
+                ) : (
+                  <Text className="text-red-500">Không có</Text>
+                )}
                 </Col>
               </Row>
 
               <Row justify="space-between">
                 <Col span={12}>Phí vận chuyển</Col>
                 <Col span={12} className="text-right">
-                  {shippingFee.toLocaleString('vi-VN')}₫
+                  {shippingFee.toLocaleString('vi-VN')} ₫
                 </Col>
               </Row>
 
@@ -314,7 +322,7 @@ const Cart = () => {
                 </Col>
                 <Col span={12} className="text-right">
                   <Text strong className="text-red-500">
-                    {totalPayment >= 0 ? totalPayment.toLocaleString('vi-VN') : 0}₫
+                    {totalPayment.toLocaleString('vi-VN')} ₫
                   </Text>
                 </Col>
               </Row>

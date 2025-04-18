@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
-import { ReviewDV } from "./ReviewDV"; // Có thể đổi lại tên file nếu cần
+import { ReviewDV } from "./ReviewDV";
 import { listReviewDV, removeReviewDV } from "../APIs/ReviewDVAPI";
 import { getUser } from "../APIs/userApi";
 import { useParams } from "react-router-dom";
@@ -15,67 +15,63 @@ const ReviewsDeTailDV = () => {
   const { id } = useParams();
   const [openMenuId, setOpenMenuId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null); // Thêm state để lưu userId
+  const [userId, setUserId] = useState(null);
 
-  useEffect(() => {
-    const fetchUserAndReviews = async () => {
-      setLoading(true);
-      try {
-        // Lấy userId từ token
-        const token = localStorage.getItem("token");
-        if (token) {
-          const decodedToken = jwtDecode(token);
-          const loggedInUserId = decodedToken.id;
+  const fetchUserAndReviews = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        const loggedInUserId = decodedToken.id;
+        setUserId(loggedInUserId);
 
-          setUserId(loggedInUserId); // Lưu userId vào state
-
-          // Lấy thông tin người dùng
-          const userData = await getUser(loggedInUserId);
-          if (userData.success) {
-            setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
-          } else {
-            console.error("Không thể lấy thông tin người dùng.");
-          }
+        const userData = await getUser(loggedInUserId);
+        if (userData.success) {
+          setUserFullName(prev => ({
+            ...prev,
+            [loggedInUserId]: `${userData.data.firstName} ${userData.data.lastName}`
+          }));
         }
+      }
 
-        // Lấy danh sách đánh giá sản phẩm
-        const data = await listReviewDV(id);
-        const infoReviewUser = Array.isArray(data.reviews)
-          ? data.reviewsInfoUser
-          : Array.isArray(data)
-          ? data
-          : [];
-        setReviews(infoReviewUser);
+      const data = await listReviewDV(id);
+      const infoReviewUser = Array.isArray(data.reviews)
+        ? data.reviewsInfoUser
+        : Array.isArray(data)
+        ? data
+        : [];
+      setReviews(infoReviewUser);
 
-        const uniqueUserIds = [
-          ...new Set(infoReviewUser.map((review) => review.userId)),
-        ];
-        const userInfoMap = {};
-        await Promise.all(
-          uniqueUserIds.map(async (userID) => {
-            try {
-              const res = await getUser(userID);
-              if (res.success) {
-                const { firstName, lastName } = res.data;
-                userInfoMap[userID] = `${firstName} ${lastName}`;
-              } else {
-                userInfoMap[userID] = "Người dùng ẩn danh";
-              }
-            } catch {
+      const uniqueUserIds = [
+        ...new Set(infoReviewUser.map((review) => review.userId)),
+      ];
+      const userInfoMap = {};
+      await Promise.all(
+        uniqueUserIds.map(async (userID) => {
+          try {
+            const res = await getUser(userID);
+            if (res.success) {
+              const { firstName, lastName } = res.data;
+              userInfoMap[userID] = `${firstName} ${lastName}`;
+            } else {
               userInfoMap[userID] = "Người dùng ẩn danh";
             }
-          })
-        );
-        setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
-      } catch (error) {
-        console.error("Lỗi khi lấy đánh giá:", error);
-      }
-      setLoading(false);
-    };
+          } catch {
+            userInfoMap[userID] = "Người dùng ẩn danh";
+          }
+        })
+      );
+      setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
+    } catch (error) {
+      console.error("Lỗi khi lấy đánh giá:", error);
+    }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     fetchUserAndReviews();
   }, [id]);
-
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -92,13 +88,16 @@ const ReviewsDeTailDV = () => {
       errorToast("Bạn không thể xoá đánh giá của người khác.");
       return;
     }
+    setLoading(true);
     const res = await removeReviewDV(review._id);
     if (res.success) {
       setReviews((prev) => prev.filter((r) => r._id !== review._id));
       successToast("Xoá đánh giá thành công");
     }
+    setLoading(false);
     setOpenMenuId(null);
   };
+
   const avgRating =
     reviews.length > 0
       ? (
@@ -108,10 +107,8 @@ const ReviewsDeTailDV = () => {
 
   return (
     <div className="mt-8 pl-5">
-    {toastContainer()}
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">
-        Đánh giá dịch vụ
-      </h2>
+      {toastContainer()}
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">Đánh giá dịch vụ</h2>
       <div className="bg-white p-6 rounded-lg shadow-md mb-4">
         <div className="flex items-center mb-4">
           <div className="flex items-center gap-2">
@@ -120,15 +117,10 @@ const ReviewsDeTailDV = () => {
             </span>
             <div className="flex text-yellow-400">
               {[...Array(5)].map((_, i) => (
-                <FaStar
-                  key={i}
-                  className={i < Math.round(avgRating) ? "" : "text-gray-300"}
-                />
+                <FaStar key={i} className={i < Math.round(avgRating) ? "" : "text-gray-300"} />
               ))}
             </div>
-            <span className="ml-2 text-gray-600">
-              ({reviews.length} đánh giá)
-            </span>
+            <span className="ml-2 text-gray-600">({reviews.length} đánh giá)</span>
           </div>
         </div>
         <div className="mb-4">
@@ -161,9 +153,13 @@ const ReviewsDeTailDV = () => {
           Viết đánh giá
         </button>
 
-        {showReview && <ReviewDV />}
+        {showReview && (
+          <ReviewDV setLoading={setLoading} onReviewSubmitted={fetchUserAndReviews} />
+        )}
         <div className="space-y-4 flex-1">
-          {reviews.length === 0 ? (
+          {loading ? (
+            <p>Đang tải...</p>
+          ) : reviews.length === 0 ? (
             <p className="text-gray-600">Không có đánh giá nào.</p>
           ) : (
             reviews.map((review) => (
@@ -196,9 +192,7 @@ const ReviewsDeTailDV = () => {
                   <div
                     className="flex justify-end mt-2 cursor-pointer"
                     onClick={() =>
-                      setOpenMenuId(
-                        openMenuId === review._id ? null : review._id
-                      )
+                      setOpenMenuId(openMenuId === review._id ? null : review._id)
                     }
                   >
                     <RxDotsVertical />
@@ -206,7 +200,7 @@ const ReviewsDeTailDV = () => {
                   {openMenuId === review._id && (
                     <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow z-10">
                       <button
-                        onClick={() => handleRemoveReview(review._id)}
+                        onClick={() => handleRemoveReview(review)}
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                       >
                         Xoá đánh giá

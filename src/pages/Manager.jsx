@@ -44,20 +44,11 @@ const items = [
       { key: 'brand', label: 'Quản lý thương hiệu' },
     ],
   },
-  {
-    key: 'admin',
-    label: 'Admin',
-    icon: <RiAdminLine style={{fontSize:'24px'}} />,
-    children: [
-      { key: 'banner', label: 'Banner trang chủ' },
-      { key: 'account', label: 'Quản lý tài khoản' },
-    ],
-  },
 ];
 
 
 
-const Admin = () => {
+const Manager = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState('1');
   const [collapsed, setCollapsed] = useState(false);
@@ -75,10 +66,6 @@ const Admin = () => {
         return <BlogManagement />;
       case 'brand':
         return <BrandManagement />;
-      case 'banner':
-        return <SlideBannerManagement />;
-      case 'account':
-        return <AccountManagement />;
       case 'employee':
         return <EmployeeManagement />;
       case 'service':
@@ -154,4 +141,4 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+export default Manager;
