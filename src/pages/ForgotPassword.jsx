@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { forgotPassword, verifyCodeAndResetPassword } from "../APIs/userApi";
 import { useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { errorToast, successToast, toastContainer } from "../utils/toast";
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -35,10 +36,10 @@ export const ForgotPassword = () => {
         newPassword,
       });
       if (req.success) {
-        console.log("Đặt lại mật khẩu thành công!");
+        successToast("Đặt lại mật khẩu thành công!");
         navigate("/sign-in");
       } else {
-        console.log("Đặt lại mật khẩu thất bại!");
+        errorToast("Đặt lại mật khẩu thất bại!");
       }
     } catch (error) {
       console.log("Lỗi trong quá trình đặt lại mật khẩu!");
@@ -47,11 +48,11 @@ export const ForgotPassword = () => {
 
   return (
     <div className="flex items-center justify-center  bg-gray-50 p-4">
+    {toastContainer()}
       <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
         <h1 className="text-2xl font-semibold text-center text-gray-700 mb-4">
           Lấy lại mật khẩu
         </h1>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block text-gray-600">Nhập email:</label>
           <input

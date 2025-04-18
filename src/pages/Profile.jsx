@@ -52,7 +52,7 @@ function Profile() {
 
     return (
         <>
-        <Header />
+        <Header className="!bg-white !text-black !shadow-md" />
         <div className=" mt-[100px]  flex items-center justify-center p-4">
             <div className="flex w-[1500px] bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div className="w-64 flex-shrink-0 bg-gradient-to-b from-pink-200 to-purple-300 rounded-l-3xl">

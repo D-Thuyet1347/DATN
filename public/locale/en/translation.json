@@ -16,7 +16,10 @@
       "blogger": "Blog",
       "logout": "Logout",
       "login": "Login / Sign Up",
-      "admin": "Admin"
+      "admin": "Admin",
+      "featured blog": "Featured Blog",
+      "featured Services": "Featured Services",
+      "featured Products": "Featured Products"
     },
     "profileMenu": {
       "personalInfo": "Personal Information",

@@ -147,7 +147,7 @@ const SlideBannerManagement = () => {
 
   const columns = [
     { title: "Tiêu đề", dataIndex: "title", key: "title" },
-    { title: "Liên kết", dataIndex: "link", key: "link" },
+    { title: "Nội dung", dataIndex: "link", key: "link" },
     {
       title: "Ảnh",
       dataIndex: "image",
@@ -155,11 +155,11 @@ const SlideBannerManagement = () => {
       render: (img) =>
         img && <img width={100} height={50} src={img} alt="Slide" />,
     },
-    {
-      title: "Hiển thị",
-      dataIndex: "isActive",
-      render: (val) => (val ? "✅" : "❌"),
-    },
+    // {
+    //   title: "Hiển thị",
+    //   dataIndex: "isActive",
+    //   render: (val) => (val ? "✅" : "❌"),
+    // },
     {
       title: "Hành động",
       render: (_, record) => (
@@ -203,7 +203,7 @@ const SlideBannerManagement = () => {
     <div className="mt-3">
       <h2>Quản lý Slide Banner</h2>
       <Button
-        type="primary"
+        className="bg-blue-500 mt-5"
         icon={<PlusOutlined />}
         onClick={() => openDrawer()}
       >
@@ -233,9 +233,9 @@ const SlideBannerManagement = () => {
           </Form.Item>
 
           <Form.Item
-            label="Liên kết"
+            label="Nội dung"
             name="link"
-            rules={[{ required: true, message: "Vui lòng nhập link" }]}
+            rules={[{ required: true, message: "Vui lòng nhập nội dung" }]}
           >
             <Input />
           </Form.Item>
@@ -258,16 +258,16 @@ const SlideBannerManagement = () => {
             )}
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             label="Hiển thị"
             name="isActive"
             valuePropName="checked"
           >
             <Switch />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
-            <Button type="primary" block htmlType="submit">
+            <Button className="bg-blue-500" block htmlType="submit">
               {editingSlide ? "Cập nhật" : "Thêm Slide"}
             </Button>
           </Form.Item>

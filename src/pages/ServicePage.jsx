@@ -40,7 +40,7 @@ const ServicePage = () => {
 
   return (
     <>
-      <Header />
+      <Header className="!bg-white !text-black !shadow-md" />
       <div className="mt-[100px] px-6 py-4">
         <h2 className="text-3xl font-bold text-maincolor text-center mb-6">Our Services</h2>
 

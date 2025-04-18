@@ -70,7 +70,7 @@ const ServiceDetailPage = () => {
 
     return (
         <div className="">
-            <Header />
+            <Header className="!bg-white !text-black !shadow-md" />
             <div className=" mt-[50px] p-8 pt-6">
                 <nav className="text-sm text-gray-500 mb-4">
                     <Link to="/" className="hover:underline">Trang chủ</Link> &gt;{' '}

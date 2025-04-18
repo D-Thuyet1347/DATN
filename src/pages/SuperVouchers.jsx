@@ -94,7 +94,7 @@ const SuperVouchers = () => {
 
   return (
     <>
-    <Header />
+    <Header className="!bg-white !text-black !shadow-md" />
         <div className=" bg-gray-100 mt-16 p-10">
       {toastContainer()}
       <div className="bg-maincolor text-white text-center py-8">

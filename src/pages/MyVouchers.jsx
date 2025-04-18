@@ -83,7 +83,7 @@ const MyVouchers = () => {
 
   return (
     <>
-    <Header />
+    <Header className="!bg-white !text-black !shadow-md" />
       <div className="mt-16 p-10  bg-gray-100">
       {toastContainer()}
       <div className="container mx-auto py-6">

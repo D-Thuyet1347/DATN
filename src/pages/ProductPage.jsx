@@ -57,7 +57,7 @@ const ProductsPage = () => {
 
   return (
     <>
-      <Header />
+      <Header className="!bg-white !text-black !shadow-md" />
       <motion.div
         className="mt-[50px]"
         initial={{ opacity: 0, y: 50 }}

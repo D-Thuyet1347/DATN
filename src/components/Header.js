@@ -18,7 +18,7 @@ const BACKEND_URL = process.env.REACT_APP_API_KEY
 
 const DEFAULT_AVATAR = user;
 
-const Header = () => {
+const Header = ({className=''}) => {
   const { t, i18n } = useTranslation();
   const [isMenu, setIsMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -101,12 +101,10 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed z-30 top-0 bg-transparent left-0 h-[65px] w-full shadow-sm transition-all ${
-    isScrolled
-      ? "bg-white text-black shadow-lg p-3"
-      : "bg-transparent text-maincolor p-3"
-  }`}
-    >
+    className={`fixed z-30 top-0 left-0 h-[65px] w-full shadow-sm transition-all 
+      ${isScrolled ? "bg-white text-black shadow-lg p-3" : "bg-transparent text-white p-3"}
+      ${className}`}
+      > 
       <div className="container relative mx-auto flex justify-between items-center px-6">
         <div className="text-2xl font-bold text-maincolor">
           <Link className="flex" to="/">
@@ -118,7 +116,7 @@ const Header = () => {
             />{" "}
             <div
               className={`ml-2 text-[26]
-              ${isScrolled ? "text-black" : "text-maincolor"}`}
+              ${isScrolled ? "text-black" : "text-blue"}`}
               style={{ fontFamily: "Dancing Script, serif" }}
             >
               {" "}

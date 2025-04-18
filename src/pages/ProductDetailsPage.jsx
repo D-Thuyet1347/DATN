@@ -7,7 +7,7 @@ import ReviewsInDeTailSP from '../components/ReviewsDetailSP'
 const ProductDetailPage = () => {
   return (
     <div className=''>
-    <Header />
+    <Header className="!bg-white !text-black !shadow-md" />
       <div className='p-10 pt-6'>
         <ProductDetail />
         <ReviewsInDeTailSP />

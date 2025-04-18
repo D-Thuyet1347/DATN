@@ -210,7 +210,7 @@ const Cart = () => {
   if (error) return <div>{error}</div>;
   return (
     <>
-    <Header />
+    <Header className="!bg-white !text-black !shadow-md" />
       <div className="p-4 mt-[50px] w-full bg-gray-50 ">
       {toastContainer()}
       <Card className="w-full max-w-5xl mx-auto">
@@ -218,7 +218,7 @@ const Cart = () => {
           <div className="w-full md:w-2/3 space-y-4">
             <div className="flex items-center space-x-2">
               <Checkbox />
-              <span className="text-gray-500">tất cả ({Object.keys(cartItems).length} sản phẩm)</span>
+              <span className="text-gray-500">tất cả ({Object.keys(cartItems).length} loại sản phẩm)</span>
               <Button
                 type="link"
                 className="text-blue-500 hover:text-blue-700"
@@ -375,8 +375,8 @@ const Cart = () => {
                 {voucher.minOrder && <p className="text-sm text-gray-600">{voucher.minOrder}</p>}
                 <p className="text-sm text-gray-500">{voucher.expiry}</p>
                 <Button
-                  type="primary"
-                  className="mt-4 w-full"
+                  
+                  className="mt-4 bg-blue-500 w-full"
                   onClick={() => applyVoucher(voucher)}
                   disabled={voucher.tags.includes('Hết hạn')}
                 >

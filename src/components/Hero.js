@@ -40,21 +40,12 @@ const Hero = () => {
 
   <div className="container mx-auto h-full flex items-center justify-between px-6 relative z-10">
     <div className="max-w-lg text-white">
-      <span className="text-sm uppercase">{heroSlide?.title || "Luxury Spa Experience"}</span>
-      <h1 className="text-5xl font-bold mt-2">
-        Discover True Serenity for Body and Mind
+      <h1 className="text-4xl font-bold mt-2 mb-2  ">
+      {heroSlide?.title}
       </h1>
-      <p className="mt-4">
-        Experience the perfect blend of traditional techniques and modern AI-driven innovations for ultimate relaxation and rejuvenation.
-      </p>
-      <div className="mt-6 flex space-x-4">
-        <Link to="booknow">
-          <button className="bg-maincolor text-white px-6 py-3 rounded-md hover:bg-blue-800 flex items-center">
-            Book Appointment <span className="ml-2 material-icons">arrow_forward</span>
-          </button>
-        </Link>
-        <button className="text-white hover:underline">AI Consultation</button>
-      </div>
+      <p className="mt-4 leading-relaxed text-justify">
+      {heroSlide?.link}
+      </p>     
     </div>
   </div>
 </section>

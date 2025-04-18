@@ -165,7 +165,7 @@ const ScheduleTab = () => {
           </Button>
         </div>
       ),
-    },
+    }
   ];
 
   return (
