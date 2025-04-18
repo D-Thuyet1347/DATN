@@ -101,7 +101,7 @@ const Payment = () => {
     }
     return discountAmount;
   };
-  const discount = calculateDiscount()*1000;
+  const discount = calculateDiscount();
   const shippingFee = 30000;
   const total = subtotal + shippingFee - discount;
   useEffect(() => {
@@ -192,7 +192,7 @@ const Payment = () => {
   const handleBackToCart = () => navigate("/cart");
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className=" bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       {toastContainer()}
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">

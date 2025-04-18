@@ -7,7 +7,7 @@ const StripeCheckout = () => {
     navigate('/');
   }
   return (
-    <div className="flex items-center justify-center min-h-screen ">
+    <div className="flex items-center justify-center ">
       <div className="flex flex-col items-center">
         <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg">
           <CheckCircle  className="text-green-500 w-12 h-12" />

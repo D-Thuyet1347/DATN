@@ -111,19 +111,19 @@ const MyOrdersTab = () => {
         const normalizedStatus = status ? status.toLowerCase() : 'unknown'; // Chuẩn hóa trạng thái
         let color, text;
         switch (normalizedStatus) {
-          case 'completed':
+          case 'đã giao':
             color = 'green';
             text = 'Hoàn thành';
             break;
-          case 'shipping':
+          case 'đang giao':
             color = 'blue';
             text = 'Đang giao';
             break;
-          case 'processing':
+          case 'đang xử lý':
             color = 'orange';
             text = 'Chờ xử lý';
             break;
-          case 'cancelled':
+          case 'đã hủy':
             color = 'red';
             text = 'Đã hủy';
             break;
@@ -131,6 +131,7 @@ const MyOrdersTab = () => {
             color = 'gray';
             text = 'Không xác định';
         }
+        
         return <Tag color={color}>{text}</Tag>;
       },
     }
@@ -142,7 +143,7 @@ const MyOrdersTab = () => {
       <Table
         columns={columns}
         dataSource={orders}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 2 }}
         scroll={{ x: true }}
       />
     </div>

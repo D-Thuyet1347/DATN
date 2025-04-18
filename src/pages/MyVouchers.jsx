@@ -84,7 +84,7 @@ const MyVouchers = () => {
   return (
     <>
     <Header />
-      <div className="mt-16 p-10 min-h-screen bg-gray-100">
+      <div className="mt-16 p-10  bg-gray-100">
       {toastContainer()}
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-4">

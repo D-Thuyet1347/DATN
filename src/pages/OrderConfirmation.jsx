@@ -39,7 +39,11 @@ const OrderConfirmation = () => {
     const order = orderDetails;
     console.log('Order Details:', order);
 
-    const subtotal = order.items.reduce((sum, item) => sum + (Number(item.PricePD || item.price) * (item.quantity || 1)), 0);
+    const subtotal = order.items.reduce((sum, item) => {
+        const rawPrice = item.PricePD || item.price || '0';
+        const parsedPrice = parseFloat(String(rawPrice).replace(/\./g, '').replace(',', '.')) || 0;
+        return sum + parsedPrice * (item.quantity || 1);
+      }, 0);
     const shippingFee = 30000;
     const discount = order.discount || 0;
     console.log('subtotal:', subtotal);
@@ -56,7 +60,7 @@ const OrderConfirmation = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                navigate('/login');
+                navigate('/sign');
                 return;
             }
 
@@ -79,7 +83,7 @@ const OrderConfirmation = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className=" bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             {toastContainer()}
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-8">
@@ -169,7 +173,7 @@ const OrderConfirmation = () => {
                                     <OrderItem
                                         key={item._id}
                                         name={item.ProductName || item.name}
-                                        price={(Number(item.PricePD || item.price) * (item.quantity || 1))}
+                                        price={(parseFloat(String(item.price).replace(/\./g, '').replace(',', '.')) * (item.quantity || 1))}
                                         quantity={item.quantity || 1}
                                         image={item.ImagePD || item.image}
                                     />

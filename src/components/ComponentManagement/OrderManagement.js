@@ -1,10 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, Button, Tag, Drawer, Spin, Select, Descriptions, Badge, message, Space, Empty } from "antd";
+import {
+  Table, Button, Tag, Drawer, Spin, Select, Descriptions,
+  Badge, message, Space, Empty
+} from "antd";
 import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { listOrder, updateOrderStatus } from "../../APIs/orderApi";
 import { getUser } from "../../APIs/userApi";
 
 const OrderManagement = () => {
+  // ===== State =====
   const [state, setState] = useState({
     orders: [],
     selectedOrder: null,
@@ -16,24 +20,58 @@ const OrderManagement = () => {
     },
     error: null
   });
-
   const [userFullName, setUserFullName] = useState("Không rõ");
 
+  // ===== Options =====
+  const orderStatusOptions = [
+    { value: "Đang xử lý", label: "Đang xử lý" },
+    { value: "Đã xác nhận", label: "Đã xác nhận" },
+    { value: "Đã giao", label: "Đã giao" },
+    { value: "Đã hủy", label: "Đã hủy" },
+  ];
+
+  // ===== Helper: render tag trạng thái thanh toán =====
+  const paymentStatusTag = (status) => {
+    const colorMap = {
+      "Đang xử lý": "orange",
+      "Đã xác nhận": "green",
+      "Đã giao": "blue",
+      "Đã hủy": "red",
+      "Hoàn tiền": "red",
+    };
+    const labelMap = {
+      "Đang xử lý": "Chờ thanh toán",
+      "Đã xác nhận": "Đã thanh toán",
+      "Đã giao": "Đã giao",
+      "Đã hủy": "Đã hủy",
+      "Hoàn tiền": "Đã hoàn tiền",
+    };
+    return <Tag color={colorMap[status] || "default"}>{labelMap[status] || status}</Tag>;
+  };
+
+  // ===== Fetch Orders =====
   const fetchOrders = useCallback(async () => {
-    setState(prev => ({ ...prev, loading: { ...prev.loading, table: true }, error: null }));
+    setState(prev => ({
+      ...prev,
+      loading: { ...prev.loading, table: true },
+      error: null
+    }));
+
     try {
       const response = await listOrder();
       if (response.success && Array.isArray(response.data)) {
         const processedOrders = response.data.map(item => ({
           ...item,
           key: item._id,
-          orderDate: item.orderDate ? new Date(item.orderDate).toLocaleString() : 'Không rõ'
+          orderDate: item.orderDate ? new Date(item.orderDate).toLocaleString() : "Không rõ"
         }));
+
         setState(prev => ({
           ...prev,
           orders: processedOrders,
           loading: { ...prev.loading, table: false }
         }));
+
         message.success(`Đã tải ${processedOrders.length} đơn hàng`);
       } else {
         throw new Error(response.message || "Dữ liệu không hợp lệ");
@@ -53,8 +91,10 @@ const OrderManagement = () => {
     fetchOrders();
   }, [fetchOrders]);
 
+  // ===== Handle Update Status =====
   const handleStatusChange = async (orderId, newStatus) => {
     setState(prev => ({ ...prev, loading: { ...prev.loading, status: true } }));
+
     try {
       const response = await updateOrderStatus(orderId, { orderStatus: newStatus });
       if (response.success) {
@@ -77,6 +117,7 @@ const OrderManagement = () => {
     }
   };
 
+  // ===== Handle View Details =====
   const handleViewDetails = async (order) => {
     setState(prev => ({
       ...prev,
@@ -102,40 +143,16 @@ const OrderManagement = () => {
     }
   };
 
-  const orderStatusOptions = [
-    { value: "Đang xử lý", label: "Đang xử lý" },
-    { value: "Đã xác nhận", label: "Đã xác nhận" },
-    { value: "Đã giao", label: "Đã giao" },
-    { value: "Đã hủy", label: "Đã hủy" },
-  ];
-
-  const paymentStatusTag = (status) => {
-    const colorMap = {
-      "Đang xử lý": "orange",
-      "Đã xác nhận": "green",
-      "Đã giao": "blue",
-      "Đã hủy": "red",
-      "Hoàn tiền": "red",
-    };
-    const labelMap = {
-      "Đang xử lý": "Chờ thanh toán",
-      "Đã xác nhận": "Đã thanh toán",
-      "Đã giao": "Đã giao",
-      "Đã hủy": "Đã hủy",
-      "Hoàn tiền": "Đã hoàn tiền",
-    };
-    return <Tag color={colorMap[status] || "default"}>{labelMap[status] || status}</Tag>;
-  };
-
+  // ===== Columns =====
   const columns = [
     {
       title: "Mã đơn hàng",
       dataIndex: "_id",
       key: "_id",
-      render: (id) => id ? `${id.substring(0, 8)}...` : 'Không rõ',
-      filters: state.orders.map((order) => ({
-        text: order._id ? `${order._id.substring(0, 8)}...` : 'Không rõ',
-        value: order._id,
+      render: (id) => id ? `${id.substring(0, 8)}...` : "Không rõ",
+      filters: state.orders.map(order => ({
+        text: order._id ? `${order._id.substring(0, 8)}...` : "Không rõ",
+        value: order._id
       })),
       onFilter: (value, record) => record._id === value,
     },
@@ -164,10 +181,7 @@ const OrderManagement = () => {
           disabled={state.loading.status}
         />
       ),
-      filters: orderStatusOptions.map(opt => ({
-        text: opt.label,
-        value: opt.value,
-      })),
+      filters: orderStatusOptions.map(opt => ({ text: opt.label, value: opt.value })),
       onFilter: (value, record) => record.orderStatus === value,
     },
     {
@@ -177,16 +191,16 @@ const OrderManagement = () => {
       width: 150,
       render: paymentStatusTag,
       filters: [
-        { text: 'Chờ thanh toán', value: 'Chờ thanh toán' },
-        { text: 'Đã thanh toán', value: 'Đã thanh toán' },
-        { text: 'Đã hoàn tiền', value: 'Đã hoàn tiền' },
+        { text: "Chờ thanh toán", value: "Chờ thanh toán" },
+        { text: "Đã thanh toán", value: "Đã thanh toán" },
+        { text: "Đã hoàn tiền", value: "Đã hoàn tiền" },
       ],
       onFilter: (value, record) => record.paymentStatus === value,
     },
     {
       title: "Thao tác",
       key: "actions",
-      fixed: 'right',
+      fixed: "right",
       width: 100,
       render: (_, record) => (
         <Space size="small">
@@ -203,9 +217,10 @@ const OrderManagement = () => {
     },
   ];
 
+  // ===== Render =====
   return (
     <div className="mt-3">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Quản lý đơn hàng</h1>
         <Button icon={<ReloadOutlined />} onClick={fetchOrders} loading={state.loading.table}>
           Tải lại
@@ -231,13 +246,15 @@ const OrderManagement = () => {
                   </span>
                 }
               />
-            ) : <Empty description="Không có đơn hàng nào" />
+            ) : (
+              <Empty description="Không có đơn hàng nào" />
+            ),
           }}
         />
       </Spin>
 
       <Drawer
-        title={state.selectedOrder ? `Chi tiết đơn hàng - ${state.selectedOrder._id.substring(0, 8)}...` : 'Chi tiết đơn hàng'}
+        title={state.selectedOrder ? `Chi tiết đơn hàng - ${state.selectedOrder._id.substring(0, 8)}...` : "Chi tiết đơn hàng"}
         placement="right"
         width={700}
         closable
@@ -252,19 +269,13 @@ const OrderManagement = () => {
               <Descriptions.Item label="Khách hàng">{userFullName}</Descriptions.Item>
               <Descriptions.Item label="Ngày đặt hàng">{state.selectedOrder.orderDate}</Descriptions.Item>
               <Descriptions.Item label="Trạng thái">
-                <Badge
-                  status={
-                    state.selectedOrder.orderStatus === 'Đang vận chuyển' ? 'Đã giao' :
-                      state.selectedOrder.orderStatus === 'Đã hủy' ? 'error' : 'Đang xử lý'
-                  }
-                  text={state.selectedOrder.orderStatus}
-                />
+                <Badge status="processing" text={state.selectedOrder.orderStatus} />
               </Descriptions.Item>
               <Descriptions.Item label="Tình trạng thanh toán">
                 {paymentStatusTag(state.selectedOrder.paymentStatus)}
               </Descriptions.Item>
               <Descriptions.Item label="Phương thức thanh toán">
-                {state.selectedOrder.paymentMethod || 'Không rõ'}
+                {state.selectedOrder.paymentMethod || "Không rõ"}
               </Descriptions.Item>
               <Descriptions.Item label="Tổng tiền">
                 ${(state.selectedOrder.totalAmount || 0).toFixed(2)}

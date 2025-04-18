@@ -11,7 +11,6 @@ import {
 import ProfileTab from '../components/ProfileTab';
 import MyOrdersTab from '../components/MyOrdersTab';
 import ChangePasswordTab from '../components/ChangePassword';
-import DashboardTab from '../components/DashboardTab';
 import ScheduleTab from '../components/ScheduleTab';
 import Header from '../components/Header';
 
@@ -29,7 +28,6 @@ function Profile() {
         { key: 'profile', icon: <EditOutlined />, label: 'Hồ sơ' },
         { key: 'myorders', icon: <HomeOutlined />, label: 'Đơn hàng' },
         { key: 'changepassword', icon: <LockOutlined />, label: 'Đổi mật khẩu' },
-        { key: 'dashboard', icon: <ShoppingCartOutlined />, label: 'Bảng điều khiển' },
         { key: 'schedule', icon: <ClockCircleOutlined />, label: 'Lịch hẹn' },
     ];
 
@@ -45,8 +43,6 @@ function Profile() {
                 return <MyOrdersTab />;
             case 'changepassword':
                 return <ChangePasswordTab />;
-            case 'dashboard':
-                return <DashboardTab />;
             case 'schedule':
                 return <ScheduleTab />;
             default:
@@ -57,7 +53,7 @@ function Profile() {
     return (
         <>
         <Header />
-        <div className=" mt-[-40px] min-h-screen flex items-center justify-center p-4">
+        <div className=" mt-[100px]  flex items-center justify-center p-4">
             <div className="flex w-[1500px] bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div className="w-64 flex-shrink-0 bg-gradient-to-b from-pink-200 to-purple-300 rounded-l-3xl">
                     <Menu

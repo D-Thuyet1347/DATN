@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   Table,
   Button,
-  Tag,
   Drawer,
   Spin,
   Select,
@@ -13,8 +12,8 @@ import {
   Empty,
 } from "antd";
 import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
-import { getAllBookings } from "../../APIs/booking"; 
-import { updateBookingStatus } from "../../APIs/booking"; 
+import { getAllBookings } from "../../APIs/booking";
+import { updateBookingStatus } from "../../APIs/booking";
 import moment from "moment";
 
 const BookingManagement = () => {
@@ -29,7 +28,6 @@ const BookingManagement = () => {
     },
     error: null,
   });
-
 
   const fetchBookings = useCallback(async () => {
     setState((prev) => ({
@@ -83,25 +81,27 @@ const BookingManagement = () => {
       ...prev,
       loading: { ...prev.loading, status: true },
     }));
-  
+
     try {
-      const response = await updateBookingStatus(bookingId, { status: newStatus });
-  
+      const response = await updateBookingStatus(bookingId, {
+        status: newStatus,
+      });
+
       if (response?.success) {
-        // Cập nhật lại trạng thái trong danh sách booking
         setState((prev) => ({
           ...prev,
           bookings: prev.bookings.map((booking) =>
-            booking._id === bookingId ? { ...booking, status: newStatus } : booking
+            booking._id === bookingId
+              ? { ...booking, status: newStatus }
+              : booking
           ),
-          // Nếu đang xem chi tiết booking, cập nhật luôn trong drawer
           selectedBooking:
             prev.selectedBooking && prev.selectedBooking._id === bookingId
               ? { ...prev.selectedBooking, status: newStatus }
               : prev.selectedBooking,
           loading: { ...prev.loading, status: false },
         }));
-  
+
         message.success("Cập nhật trạng thái thành công");
       } else {
         throw new Error(response.message || "Không thể cập nhật");
@@ -115,23 +115,23 @@ const BookingManagement = () => {
       }));
     }
   };
-  
 
   const bookingStatusOptions = [
     { value: "Đang xử lý", label: "Đang xử lý" },
     { value: "Đã xác nhận", label: "Đã xác nhận" },
     { value: "Đã hủy", label: "Đã hủy" },
+    { value: "Đã hoàn thành", label: "Đã hoàn thành" },
   ];
   const columns = [
     {
       title: "Mã lịch hẹn",
       dataIndex: "_id",
       key: "_id",
-      render: (id) => (id ? `${id.slice(0,9)}` : "Không rõ"),
-    filters: state.bookings.map((booking) => ({
-  text: booking._id ? `${booking._id.slice(0,9)}` : "Không rõ",
-  value: booking._id,
-})),
+      render: (id) => (id ? `${id.slice(0, 9)}` : "Không rõ"),
+      filters: state.bookings.map((booking) => ({
+        text: booking._id ? `${booking._id.slice(0, 9)}` : "Không rõ",
+        value: booking._id,
+      })),
 
       onFilter: (value, record) => record._id === value,
     },
@@ -156,12 +156,12 @@ const BookingManagement = () => {
       ),
     },
     {
-      title: 'Nhân viên',
-      dataIndex: ['employee', 'UserID'],
-      key: 'employee',
-      render: (emp) => `${emp?.firstName} ${emp?.lastName}` || 'Không xác định',
+      title: "Nhân viên",
+      dataIndex: ["employee", "UserID"],
+      key: "employee",
+      render: (emp) => `${emp?.firstName} ${emp?.lastName}` || "Không xác định",
     },
-    
+
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -169,13 +169,13 @@ const BookingManagement = () => {
       width: 150,
       render: (status, record) => (
         <Select
-  value={status}
-  style={{ width: 140 }}
-  onChange={(value) => handleStatusChange(record._id, value)}
-  loading={state.loading.status}
-  options={bookingStatusOptions}
-  disabled={state.loading.status}
-/>
+          value={status}
+          style={{ width: 140 }}
+          onChange={(value) => handleStatusChange(record._id, value)}
+          loading={state.loading.status}
+          options={bookingStatusOptions}
+          disabled={state.loading.status}
+        />
       ),
       filters: bookingStatusOptions.map((opt) => ({
         text: opt.label,
@@ -270,14 +270,11 @@ const BookingManagement = () => {
                 {state.selectedBooking._id}
               </Descriptions.Item>
               <Descriptions.Item label="Khách hàng">
-              {state.selectedBooking.user.firstName}
-                {" "}
+                {state.selectedBooking.user.firstName}{" "}
                 {state.selectedBooking.user.lastName}
               </Descriptions.Item>
               <Descriptions.Item label="Ngày đặt lịch">
-                {moment(state.selectedBooking.date).format(
-                  "DD/MM/YYYY"
-                )}
+                {moment(state.selectedBooking.date).format("DD/MM/YYYY")}
               </Descriptions.Item>
               <Descriptions.Item label="Ngày đăng ký">
                 {moment(state.selectedBooking.createdAt).format(
@@ -285,24 +282,26 @@ const BookingManagement = () => {
                 )}
               </Descriptions.Item>
               <Descriptions.Item label="Tên nhân viên">
-                {state.selectedBooking.employee?.UserID?.firstName}
-                {" "}
+                {state.selectedBooking.employee?.UserID?.firstName}{" "}
                 {state.selectedBooking.employee?.UserID?.lastName}
               </Descriptions.Item>
 
               <Descriptions.Item label="Trạng thái">
-  <Badge
-    status={
-      state.selectedBooking.status === "Đã xác nhận"
-        ? "success"
-        : state.selectedBooking.status === "Đã hủy"
-        ? "error"
-        : "processing"
-    }
-    text={state.selectedBooking.status}
-  />
-</Descriptions.Item>
-
+                <Badge
+                  status={
+                    state.selectedBooking.status === "Đang xử lý"
+                      ? "processing"
+                      : state.selectedBooking.status === "Đã xác nhận"
+                      ? "warning"
+                      : state.selectedBooking.status === "Đã hoàn thành"
+                      ? "success"
+                      : state.selectedBooking.status === "Đã hủy"
+                      ? "error"
+                      : "default"
+                  }
+                  text={state.selectedBooking.status}
+                />
+              </Descriptions.Item>
             </Descriptions>
           ) : (
             <Empty description="Chưa chọn lịch hẹn" />

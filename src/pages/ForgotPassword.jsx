@@ -46,7 +46,7 @@ export const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
+    <div className="flex items-center justify-center  bg-gray-50 p-4">
       <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
         <h1 className="text-2xl font-semibold text-center text-gray-700 mb-4">
           Lấy lại mật khẩu

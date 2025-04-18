@@ -95,7 +95,7 @@ const SuperVouchers = () => {
   return (
     <>
     <Header />
-        <div className="min-h-screen bg-gray-100 mt-16 p-10">
+        <div className=" bg-gray-100 mt-16 p-10">
       {toastContainer()}
       <div className="bg-maincolor text-white text-center py-8">
         <h1 className="text-4xl font-bold">Super Vouchers</h1>

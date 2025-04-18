@@ -133,6 +133,7 @@ const AccountManagement = () => {
         title="Chỉnh sửa tài khoản"
         placement="right"
         closable
+
         onClose={() => setIsEditOpen(false)}
         open={isEditOpen}
       >
@@ -142,13 +143,13 @@ const AccountManagement = () => {
             label="Tên"
             rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}
           >
-            <Input />
+            <Input  disabled />
           </Form.Item>
           <Form.Item
             name="lastName"
             label="Họ"
             rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}>
-            <Input />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             name="email"
@@ -158,7 +159,7 @@ const AccountManagement = () => {
               { type: 'email', message: 'Email không hợp lệ' },
             ]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             name="role"

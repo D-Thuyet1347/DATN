@@ -211,7 +211,7 @@ const Cart = () => {
   return (
     <>
     <Header />
-      <div className="p-4 mt-[50px] w-full bg-gray-50 min-h-screen">
+      <div className="p-4 mt-[50px] w-full bg-gray-50 ">
       {toastContainer()}
       <Card className="w-full max-w-5xl mx-auto">
         <div className="p-4 flex flex-col md:flex-row">

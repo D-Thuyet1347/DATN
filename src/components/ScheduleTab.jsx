@@ -20,7 +20,8 @@ const ScheduleTab = () => {
 
   const bookingStatusOptions = [
     { value: 'Đang xử lý', label: 'Đang xử lý', color: 'orange' },
-    { value: 'Đã xác nhận', label: 'Đã xác nhận', color: 'green' },
+    { value: 'Đã xác nhận', label: 'Đã xác nhận', color: 'blue' },
+    { value: 'Đã hoàn thành', label: 'Đã hoàn thành', color: 'green' },
     { value: 'Đã hủy', label: 'Đã hủy', color: 'red' },
   ];
 

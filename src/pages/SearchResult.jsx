@@ -58,9 +58,9 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className=" ">
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mt-[40px] mx-auto px-4 py-8">
         {/* Thanh tìm kiếm */}
         <form onSubmit={handleSearch} className="mb-8">
           <div className="flex items-center max-w-2xl mx-auto">

@@ -71,7 +71,7 @@ const ServiceDetailPage = () => {
     return (
         <div className="">
             <Header />
-            <div className="min-h-screen mt-[50px] p-8 pt-6">
+            <div className=" mt-[50px] p-8 pt-6">
                 <nav className="text-sm text-gray-500 mb-4">
                     <Link to="/" className="hover:underline">Trang chủ</Link> &gt;{' '}
                     <Link to="/service" className="hover:underline">Dịch vụ</Link> &gt;{' '}
