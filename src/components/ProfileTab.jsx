@@ -3,7 +3,7 @@ import { getUser, updateUser } from '../APIs/userApi';
 import { jwtDecode } from "jwt-decode"; 
 import { toast } from 'react-toastify'; 
 
-const BACKEND_URL = process.env.REACT_APP_API_KEY ? process.env.REACT_APP_API_KEY.replace("/api", "") : "http://localhost:4000";
+const BACKEND_URL = process.env.REACT_APP_API_KEY ? process.env.REACT_APP_API_KEY.replace("/api", "") : "https://backend-fu3h.onrender.com/";
 const DEFAULT_AVATAR = 'https://placehold.co/150?text=No+Image';
 
 const ProfileTab = () => {
@@ -52,7 +52,7 @@ const ProfileTab = () => {
                 toast.error(response.message || 'Không thể tải dữ liệu người dùng.');
             }
         } catch (err) { // Bắt lỗi từ exception (ví dụ network error)
-            console.error("Lỗi nghiêm trọng khi fetch user:", err);
+            
             setError('Lỗi kết nối hoặc lỗi hệ thống khi tải dữ liệu.');
             toast.error('Lỗi kết nối hoặc lỗi hệ thống khi tải dữ liệu.');
         } finally {
@@ -98,7 +98,7 @@ const ProfileTab = () => {
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         } catch (e) {
-            console.error("Lỗi định dạng ngày:", e);
+            
             return '';
         }
     };
@@ -214,7 +214,7 @@ const ProfileTab = () => {
                  }
             }
         } catch (err) { // Lỗi nghiêm trọng (network,...)
-            console.error("Lỗi nghiêm trọng khi cập nhật:", err);
+            
             setUpdateError('Lỗi kết nối hoặc hệ thống khi cập nhật.');
             toast.error('Lỗi kết nối hoặc hệ thống khi cập nhật.');
         } finally {

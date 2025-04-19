@@ -1,9 +1,6 @@
 import axios from "axios";
-
-// const API_BASE_URL = process.env.REACT_APP_API_KEY || "http://localhost:4000/api";
-
 const employee = axios.create({
-  baseURL: "http://localhost:4000/api",
+  baseURL: "https://backend-fu3h.onrender.com/api/",
   headers: { "Content-Type": "application/json" }
 });
 
@@ -27,12 +24,9 @@ export const listEmployee = async () => {
     return response.data;
 };
 export const getEmployeeBookings = async (employeeId, date) => {
-  try {
-    const response = await axios.get(`/api/employees/${employeeId}/bookings`, {
+    const response = await employee.get(`employee/${employeeId}/bookings`, {
       params: { date }
     });
     return response.data;
-  } catch (error) {
-    throw error;
-  }
 };
+

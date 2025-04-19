@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000/api'; 
+const API_URL = 'https://backend-fu3h.onrender.com/api'; 
 
 export const getCart = async () => {
-  try {
     const token = localStorage.getItem("token");
     const response = await axios.get(`${API_URL}/cart/get`, {
       headers: {
@@ -11,10 +10,7 @@ export const getCart = async () => {
       },
     });
     return response.data;
-  } catch (error) {
-    console.error("Lỗi khi lấy giỏ hàng:", error);
-    throw error;
-  }
+ 
 };
 
 export const clearCart = async () => {

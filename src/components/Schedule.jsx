@@ -70,7 +70,7 @@ const Schedule = () => {
         });
       setData(transformed);
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      
       errorToast(error.message || 'Có lỗi xảy ra khi tải dữ liệu');
     } finally {
       setLoading(false);
@@ -93,7 +93,7 @@ const Schedule = () => {
           }
         }
       } catch (error) {
-        console.error('Error decoding token', error);
+        
       }
     }
   };

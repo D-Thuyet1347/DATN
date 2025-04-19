@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 
 const BACKEND_URL = process.env.REACT_APP_API_KEY
   ? process.env.REACT_APP_API_KEY.replace("/api", "")
-  : "http://localhost:4000";
+  : "https://backend-fu3h.onrender.com/";
 
 const DEFAULT_AVATAR = user;
 
@@ -47,7 +47,7 @@ const Header = ({className=''}) => {
           localStorage.setItem("userAvatar", imageUrl);
         }
       } catch (error) {
-        console.error("Error decoding token", error);
+        
       }
     }
   };

@@ -43,7 +43,6 @@ const SearchPage = () => {
         setProducts(filteredProducts);
       } catch (err) {
         setError('Không thể tải kết quả tìm kiếm.');
-        console.error(err);
       } finally {
         setLoading(false);
       }

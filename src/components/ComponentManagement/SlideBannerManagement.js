@@ -23,6 +23,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { getBase64 } from "../../utils/ultils";
+import { errorToast, toastContainer } from "../../utils/toast";
 
 const SlideBannerManagement = () => {
   const [slides, setSlides] = useState([]);
@@ -42,11 +43,11 @@ const SlideBannerManagement = () => {
       if (res.success) {
         setSlides(res.data.map((s) => ({ ...s, key: s._id })));
       } else {
-        message.error("Không thể tải danh sách slide!");
+        errorToast("Không thể tải danh sách slide!");
       }
     } catch (err) {
-      console.error(err);
-      message.error("Lỗi khi tải slide!");
+      
+      errorToast("Lỗi khi tải slide!");
     }
   };
 
@@ -107,8 +108,8 @@ const SlideBannerManagement = () => {
       handleCloseDrawer();
       fetchSlides();
     } catch (error) {
-      console.error(error);
-      message.error("Lỗi khi thêm/cập nhật slide!");
+      
+      errorToast("Lỗi khi thêm/cập nhật slide!");
     }
   };
 
@@ -118,8 +119,8 @@ const SlideBannerManagement = () => {
       message.success("Xóa slide thành công!");
       fetchSlides();
     } catch (error) {
-      console.error(error);
-      message.error("Lỗi khi xóa slide!");
+      
+      errorToast("Lỗi khi xóa slide!");
     }
   };
 
@@ -136,8 +137,8 @@ const SlideBannerManagement = () => {
       try {
         file.preview = await getBase64(file.originFileObj);
       } catch (error) {
-        console.error("Lỗi khi đọc file:", error);
-        message.error("Không thể đọc file ảnh!");
+        
+        errorToast("Không thể đọc file ảnh!");
       }
     }
 
@@ -155,11 +156,6 @@ const SlideBannerManagement = () => {
       render: (img) =>
         img && <img width={100} height={50} src={img} alt="Slide" />,
     },
-    // {
-    //   title: "Hiển thị",
-    //   dataIndex: "isActive",
-    //   render: (val) => (val ? "✅" : "❌"),
-    // },
     {
       title: "Hành động",
       render: (_, record) => (
@@ -201,6 +197,7 @@ const SlideBannerManagement = () => {
 
   return (
     <div className="mt-3">
+    {toastContainer()}
       <h2>Quản lý Slide Banner</h2>
       <Button
         className="bg-blue-500 mt-5"

@@ -6,6 +6,7 @@ import {
 import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { listOrder, updateOrderStatus } from "../../APIs/orderApi";
 import { getUser } from "../../APIs/userApi";
+import { errorToast, successToast, toastContainer } from "../../utils/toast";
 
 const OrderManagement = () => {
   // ===== State =====
@@ -72,18 +73,18 @@ const OrderManagement = () => {
           loading: { ...prev.loading, table: false }
         }));
 
-        message.success(`Đã tải ${processedOrders.length} đơn hàng`);
+        successToast(`Đã tải ${processedOrders.length} đơn hàng`);
       } else {
         throw new Error(response.message || "Dữ liệu không hợp lệ");
       }
     } catch (error) {
-      console.error("Lỗi tải đơn hàng:", error);
+      
       setState(prev => ({
         ...prev,
         error: error.response?.data?.message || error.message,
         loading: { ...prev.loading, table: false }
       }));
-      message.error(error.response?.data?.message || "Không thể tải đơn hàng");
+      errorToast(error.response?.data?.message || "Không thể tải đơn hàng");
     }
   }, []);
 
@@ -109,8 +110,8 @@ const OrderManagement = () => {
         throw new Error(response.message || "Cập nhật thất bại");
       }
     } catch (error) {
-      console.error("Lỗi cập nhật trạng thái:", error);
-      message.error(error.response?.data?.message || "Không thể cập nhật trạng thái");
+     
+      errorToast(error.response?.data?.message || "Không thể cập nhật trạng thái");
       fetchOrders();
     } finally {
       setState(prev => ({ ...prev, loading: { ...prev.loading, status: false } }));
@@ -143,7 +144,6 @@ const OrderManagement = () => {
     }
   };
 
-  // ===== Columns =====
   const columns = [
     {
       title: "Mã đơn hàng",
@@ -217,9 +217,9 @@ const OrderManagement = () => {
     },
   ];
 
-  // ===== Render =====
   return (
     <div className="mt-3">
+    {toastContainer()}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Quản lý đơn hàng</h1>
         <Button icon={<ReloadOutlined />} onClick={fetchOrders} loading={state.loading.table}>

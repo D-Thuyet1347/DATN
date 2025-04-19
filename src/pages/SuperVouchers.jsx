@@ -6,7 +6,7 @@ import axios from 'axios';
 import { toastContainer, successToast, errorToast } from '../utils/toast';
 import Header from '../components/Header';
 
-const API_BASE_URL = 'http://localhost:4000/api/';
+const API_BASE_URL = 'https://backend-fu3h.onrender.com/api/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -117,9 +117,11 @@ const SuperVouchers = () => {
       </div>
 
       <div className="container mx-auto py-6">
-        <div className="text-sm text-gray-600 mb-4">
-          <span>Trang chủ</span> <span className="text-blue-600">Super Vouchers</span>
-        </div>
+         <nav className="text-sm text-gray-500 mt-[10px] ml-[50px] mb-[20px]">
+                                          <Link to="/" className="hover:underline">Trang chủ</Link> &gt;{' '}
+                                          <Link to="/blogpage" className="hover:underline">Mã giảm giá</Link> &gt;{' '}
+                                          
+                                      </nav>
 
         <div className="relative mb-6 flex items-center gap-4">
           <input

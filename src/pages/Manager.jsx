@@ -41,7 +41,6 @@ const items = [
       { key: 'order', label: 'Quản lý đơn hàng' },
       { key: 'booking', label: 'Quản lý đặt lịch' },
       { key: 'voucher', label: 'Quản lý voucher' },
-      { key: 'brand', label: 'Quản lý thương hiệu' },
     ],
   },
 ];
@@ -64,8 +63,6 @@ const Manager = () => {
         return navigate('/');
       case 'blog':
         return <BlogManagement />;
-      case 'brand':
-        return <BrandManagement />;
       case 'employee':
         return <EmployeeManagement />;
       case 'service':

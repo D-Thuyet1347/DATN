@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { getAllBlogs } from "../APIs/blogApi";
 import { message } from "antd";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
+import { errorToast, toastContainer } from "../utils/toast";
 
 const BlogPage = () => {
     const [publishedBlogs, setPublishedBlogs] = useState([]);
@@ -18,33 +22,41 @@ const BlogPage = () => {
                 const filteredBlogs = allBlogs.filter(blog => blog.isPublished);
                 setPublishedBlogs(filteredBlogs);
             } else {
-                message.error("Không lấy được dữ liệu blog!");
+                errorToast("Không lấy được dữ liệu blog!");
             }
         } catch (error) {
-            console.error("Error fetching blogs: ", error);
-            message.error("Lỗi tải danh sách bài viết!");
+            
+            errorToast("Lỗi tải danh sách bài viết!");
         }
     };
 
     return (
-        <motion.div
-            className="container m-auto px-2 mt-7"
+       <>
+       <Header className="!bg-white !text-black !shadow-md" />
+       {toastContainer()}
+         <motion.div
+            className="container m-auto px-2 mt-[40px] py-4"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 1.2 }}
         >
+                 <nav className="text-sm text-gray-500 mt-[30px] ml-[50px]">
+                                  <Link to="/" className="hover:underline">Trang chủ</Link> &gt;{' '}
+                                  <Link to="/blogpage" className="hover:underline">Bài viết</Link> &gt;{' '}
+                                  
+                              </nav>
             <h1
                 className="text-2xl text-[40px] font-bold mb-6 text-center"
                 style={{ fontFamily: "Dancing Script, serif" }}
             >
                 Bài viết nổi bật
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center px-10">
+            <div className="grid grid-row-1 sm:grid-row-2 lg:grid-row-3 gap-6 justify-center px-10">
                 {publishedBlogs.map((blog) => (
                     <div
                         key={blog._id}
-                        className="border border-gray-300 w-full rounded-lg bg-white p-4 shadow-md"
+                        className="border border-gray-300 w-[700px] h-[500px] rounded-lg  bg-white p-4 shadow-md"
                     >
                         <div>
                             <div className="flex items-center mb-4">
@@ -58,14 +70,14 @@ const BlogPage = () => {
                                     <span>{new Date(blog.createdAt).toLocaleString()}</span>
                                 </div>
                             </div>
-                            <div className="mt-2">
-                                <h2 className="text-xl font-semibold mb-2">{blog.title}</h2>
-                                <p className="text-base h-[80px] mb-4 overflow-hidden text-ellipsis">{blog.content}</p>
+                            <div className="">
+                                <h2 className="text-xl font-semibold ">{blog.title}</h2>
+                                <p className="text-base h-[80px]  overflow-hidden text-ellipsis">{blog.content}</p>
                                 {blog.image && (
                                     <img
                                         src={blog.image}
                                         alt="Post"
-                                        className="w-full h-[192px] object-cover rounded-lg mt-4"
+                                        className="w-full h-[320px] object-cover mt-[-15px] rounded-lg"
                                     />
                                 )}
                             </div>
@@ -74,6 +86,8 @@ const BlogPage = () => {
                 ))}
             </div>
         </motion.div>
+        <Footer />
+       </>
     );
 };
 

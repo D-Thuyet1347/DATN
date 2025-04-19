@@ -6,6 +6,7 @@ import { errorToast, successToast, toastContainer } from "../utils/toast";
 import { placeOrder } from "../APIs/orderApi";
 import { jwtDecode } from "jwt-decode";
 import { getUser, updateUser } from "../APIs/userApi";
+import { redeemVoucher } from "../APIs/VoucherAPI";
 
 const PaymentMethod = ({ id, name, icon, selected, onSelect }) => {
   return (
@@ -114,24 +115,41 @@ const Payment = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   const validateForm = () => {
-    if (!formData.lastName.trim() && !formData.firstName.trim()) {
-      errorToast("Vui lòng nhập họ tên");
+    if (!formData.lastName.trim() ) {
+      errorToast("Vui lòng nhập đầy đủ thông tin");
+      return false;
+    }
+    if(!formData.firstName.trim()) {
+      errorToast("Vui lòng nhập đầy đủ thông tin");
+      return false; 
     }
     if (!formData.phoneNumber.match(/^\d{10}$/)) {
-      errorToast('Số điện thoại không hợp lệ');
+      errorToast("Vui lòng nhập đầy đủ thông tin");
+      return false;
     }
     if (!formData.address.trim()) {
-      errorToast("Vui lòng nhập địa chỉ");
+      errorToast("Vui lòng nhập đầy đủ thông tin");
+      return false;
     }
+    return true;
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      validateForm();
+      if (!validateForm()) {
+        setIsSubmitting(false);
+        return;
+      }
+  
       const token = localStorage.getItem("token");
-      if (!token) errorToast("Vui lòng đăng nhập để đặt hàng");
+      if (!token) {
+        errorToast("Vui lòng đăng nhập để đặt hàng");
+        setIsSubmitting(false);
+        return;
+      }
       const orderItems = products
       .filter((p) => cartItems[p._id])
       .map((product) => ({
@@ -154,6 +172,9 @@ const Payment = () => {
         voucher: selectedVoucher ? selectedVoucher._id : null,
         discount: discount,
       };
+      if (selectedVoucher) {
+        await redeemVoucher(selectedVoucher.code);
+      }
       const resData = await updateUser(userId, token);
       if (resData.success) {
         setFormData(resData.data);

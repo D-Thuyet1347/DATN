@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toastContainer, errorToast, successToast } from '../utils/toast';
 import Header from '../components/Header';
 
-const API_BASE_URL = 'http://localhost:4000/api/';
+const API_BASE_URL = 'https://backend-fu3h.onrender.com/api/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -64,7 +64,7 @@ const ReviewsDeTailDV = () => {
       );
       setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
     } catch (error) {
-      console.error("Lỗi khi lấy đánh giá:", error);
+      
     }
     setLoading(false);
   };

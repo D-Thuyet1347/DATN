@@ -23,6 +23,7 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { getBase64 } from "../../utils/ultils";
+import { errorToast, toastContainer } from "../../utils/toast";
 
 const BlogManagement = () => {
   const [blogs, setBlogs] = useState([]);
@@ -45,11 +46,11 @@ const BlogManagement = () => {
       if (response.success && Array.isArray(response.data)) {
         setBlogs(response.data.map((item) => ({ ...item, key: item._id })));
       } else {
-        message.error("Không lấy được dữ liệu blog!");
+        errorToast("Không lấy được dữ liệu blog!");
       }
     } catch (error) {
-      console.error("Error fetching blogs: ", error);
-      message.error("Lỗi tải danh sách bài viết!");
+      
+      errorToast("Lỗi tải danh sách bài viết!");
     }
     setIsTableLoading(false);
   };
@@ -93,8 +94,8 @@ const BlogManagement = () => {
       handleCloseDrawer();
       fetchBlogs();
     } catch (error) {
-      console.error(error);
-      message.error("Lỗi khi thêm/cập nhật bài viết!");
+      
+      errorToast("Lỗi khi thêm/cập nhật bài viết!");
     }
   };
 
@@ -104,8 +105,8 @@ const BlogManagement = () => {
       message.success("Xóa bài viết thành công!");
       fetchBlogs();
     } catch (error) {
-      console.error(error);
-      message.error("Lỗi khi xóa bài viết!");
+      
+      errorToast("Lỗi khi xóa bài viết!");
     }
   };
 
@@ -121,8 +122,8 @@ const BlogManagement = () => {
       try {
         file.preview = await getBase64(file.originFileObj);
       } catch (error) {
-        console.error("Lỗi khi đọc file: ", error);
-        message.error("Không thể đọc file ảnh!");
+      
+        errorToast("Không thể đọc file ảnh!");
       }
     }
     setImage(file.url || file.preview);
@@ -182,6 +183,7 @@ const BlogManagement = () => {
   return (
     <div>
       <h1>Quản lý Blog</h1>
+      {toastContainer()}
       <Button className="mt-5 bg-blue-500" onClick={() => openDrawer()}>
         Thêm bài viết
       </Button>

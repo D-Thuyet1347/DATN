@@ -41,7 +41,7 @@ const items = [
       { key: 'order', label: 'Quản lý đơn hàng' },
       { key: 'booking', label: 'Quản lý đặt lịch' },
       { key: 'voucher', label: 'Quản lý voucher' },
-      { key: 'brand', label: 'Quản lý thương hiệu' },
+    
     ],
   },
   {
@@ -51,6 +51,7 @@ const items = [
     children: [
       { key: 'banner', label: 'Banner trang chủ' },
       { key: 'account', label: 'Quản lý tài khoản' },
+      { key: 'brand', label: 'Quản lý chi nhánh' },
     ],
   },
 ];

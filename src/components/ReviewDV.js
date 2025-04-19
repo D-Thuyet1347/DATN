@@ -24,7 +24,7 @@ export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
           setService(serviceData.data);
         }
       } catch (error) {
-        console.error('Lỗi khi lấy dịch vụ:', error);
+        
       }
     };
     fetchservice();
@@ -38,7 +38,7 @@ export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
         const userId = decodedToken.id;
         return userId;
       } catch (error) {
-        console.error("Lỗi giải mã token:", error);
+        
         return null;
       }
     }
@@ -55,10 +55,10 @@ export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
             setUserId(userData.data._id);
             setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
           } else {
-            console.error("Không thể lấy thông tin người dùng.");
+            
           }
         } catch (error) {
-          console.error("Lỗi khi lấy thông tin người dùng:", error);
+          
         }
       }
     };
@@ -95,7 +95,7 @@ export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
         errorToast("Không thể gửi đánh giá.");
       }
     } catch (err) {
-      console.error("Lỗi gửi đánh giá:", err);
+      
       errorToast("Có lỗi xảy ra.");
     }
     setLoading(false);

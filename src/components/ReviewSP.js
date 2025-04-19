@@ -25,7 +25,7 @@ export const ReviewSP = ({ onAddReview }) => {
           setProduct(productData.data);
         }
       } catch (error) {
-        console.error('Lỗi khi lấy sản phẩm:', error);
+        
       }
     };
     fetchProduct();
@@ -38,7 +38,7 @@ export const ReviewSP = ({ onAddReview }) => {
         const decodedToken = jwtDecode(token);
         return decodedToken.id;
       } catch (error) {
-        console.error("Lỗi giải mã token:", error);
+        
         return null;
       }
     }
@@ -55,10 +55,10 @@ export const ReviewSP = ({ onAddReview }) => {
             setUserId(userData.data._id);
             setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
           } else {
-            console.error("Không thể lấy thông tin người dùng.");
+            
           }
         } catch (error) {
-          console.error("Lỗi khi lấy thông tin người dùng:", error);
+          
         }
       }
     };

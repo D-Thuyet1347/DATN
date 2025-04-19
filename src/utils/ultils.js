@@ -3,7 +3,7 @@ export const getBase64 = (file) =>
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
+      reader.onerror = (error) => reject
     });
     export const renderOptions = (arr) =>{
       let results = []

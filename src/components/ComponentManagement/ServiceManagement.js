@@ -3,6 +3,7 @@ import { Button, Drawer, Table, Select, message, Input, Upload, Spin, Form, Moda
 import { DeleteOutlined, EditOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { getAllServices, createService, updateService, deleteService } from '../../APIs/ServiceAPI';
 import { getBase64 } from '../../utils/ultils';
+import { errorToast, toastContainer } from '../../utils/toast';
 
 const { Option } = Select;
 
@@ -35,7 +36,7 @@ const ServiceManagement = () => {
         setCategories([]);
       }
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách dịch vụ:', error);
+      
       setServices([]);
       setCategories([]);
     }
@@ -64,8 +65,8 @@ const ServiceManagement = () => {
       message.success('Xóa dịch vụ thành công!');
       fetchServices();
     } catch (error) {
-      console.error('Lỗi khi xóa dịch vụ:', error);
-      message.error('Xóa dịch vụ thất bại!');
+  
+      errorToast('Xóa dịch vụ thất bại!');
     }
   };
 
@@ -96,11 +97,10 @@ const ServiceManagement = () => {
       fetchServices();
       setIsDrawerOpen(false);
     } catch (error) {
-      console.error('Lỗi khi lưu dịch vụ:', error);
-      message.error('Có lỗi xảy ra, vui lòng thử lại.');
+    
+      errorToast('Có lỗi xảy ra, vui lòng thử lại.');
     }
   };
-
   const columns = [
     { title: 'Tên', dataIndex: 'name', key: 'name' },
     { title: 'Mô tả', dataIndex: 'description', key: 'description' },
@@ -130,11 +130,11 @@ const ServiceManagement = () => {
       ),
     },
   ];
-
   return (
-    <div className="pt-16 p-4">
+    <div className="pt-4 p-4">
+    {toastContainer()}
       <h2>Quản Lý Dịch Vụ</h2>
-      <Button className="bg-blue-600" onClick={() => openEditDrawer()}>
+      <Button className="bg-blue-600 mt-5" onClick={() => openEditDrawer()}>
         Thêm Dịch Vụ
       </Button>
       <Button
@@ -146,9 +146,8 @@ const ServiceManagement = () => {
         Tải lại
       </Button>
 
-      <Spin className="mt-9" tip="Đang tải..." spinning={isTableLoading}>
+      <Spin className="mt-2" tip="Đang tải..." spinning={isTableLoading}>
         <Table
-          style={{ marginTop: 20 }}
           dataSource={services}
           columns={columns}
           pagination={{ pageSize: 5 }}
@@ -224,13 +223,6 @@ const ServiceManagement = () => {
                 <Option key={category._id} value={category.name}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {category.name}
-                    {/* <DeleteOutlined
-                      style={{ color: 'red', cursor: 'pointer' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteCategory(category.name);
-                      }}
-                    /> */}
                   </div>
                 </Option>
               ))}

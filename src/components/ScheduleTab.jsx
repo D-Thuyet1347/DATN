@@ -3,6 +3,7 @@ import { Table, Tag, Typography, message, Button, Modal, Select, Spin } from 'an
 import moment from 'moment';
 import { getBookingUser, deleteBooking, updateBooking } from '../APIs/booking';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { errorToast, toastContainer } from '../utils/toast';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -38,7 +39,7 @@ const ScheduleTab = () => {
   const fetchBookings = async () => {
     try {
       if (!token || !userId) {
-        message.error('Vui lòng đăng nhập để xem lịch hẹn');
+        errorToast('Vui lòng đăng nhập để xem lịch hẹn');
         return;
       }
 
@@ -51,8 +52,8 @@ const ScheduleTab = () => {
       }));
       setBookings(formatted);
     } catch (err) {
-      console.error('Error fetching bookings:', err);
-      message.error(err.message || 'Lỗi khi tải lịch hẹn');
+      
+      errorToast(err.message || 'Lỗi khi tải lịch hẹn');
     } finally {
       setLoading(false);
     }
@@ -75,12 +76,13 @@ const ScheduleTab = () => {
           message.success('Hủy lịch hẹn thành công');
           fetchBookings();
         } catch (err) {
-          console.error('Cancel booking error:', err);
-          message.error(err.message || 'Lỗi khi hủy lịch hẹn');
+          
+          errorToast(err.message || 'Lỗi khi hủy lịch hẹn');
         }
       },
     });
   };
+
   const handleUpdateBooking = async () => {
     try {
       await updateBooking(currentBooking._id, { status: editStatus });
@@ -88,22 +90,20 @@ const ScheduleTab = () => {
       setIsModalVisible(false);
       fetchBookings();
     } catch (err) {
-      console.error('Update error:', err);
-      message.error(err.message || 'Lỗi khi cập nhật trạng thái');
+      
+      errorToast(err.message || 'Lỗi khi cập nhật trạng thái');
     }
   };
 
-  const formatPrice = (price) => {
-    if (!price) return 'Liên hệ';
+  const formatPrice = (totalAmount) => {
+    if (!totalAmount && totalAmount !== 0) return 'Chưa xác định';
+
     const numericPrice =
-      typeof price === 'string'
-        ? parseFloat(price.replace(/\./g, '').replace(',', '.'))
-        : price;
-  
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(numericPrice);
+      typeof totalAmount === 'string'
+        ? parseFloat(totalAmount.replace(/\./g, '').replace(',', '.'))
+        : totalAmount;
+
+    return numericPrice.toLocaleString('vi-VN') + 'đ';
   };
 
   const columns = [
@@ -112,7 +112,6 @@ const ScheduleTab = () => {
       dataIndex: ['service', 'name'],
       key: 'service',
       render: (text) => text || 'Không xác định',
-      
     },
     {
       title: 'Ngày & Giờ',
@@ -140,9 +139,12 @@ const ScheduleTab = () => {
     },
     {
       title: 'Giá',
-      dataIndex: ['service', 'price'],
-      key: 'price',
-      render: (price) => <Text strong>{formatPrice(price)}</Text>,
+      key: 'totalAmount',
+      render: (booking) => (
+        <div>
+          {formatPrice(booking.totalAmount)}
+        </div>
+      ),
     },
     {
       title: 'Ghi chú',
@@ -165,18 +167,19 @@ const ScheduleTab = () => {
           </Button>
         </div>
       ),
-    }
+    },
   ];
 
   return (
     <div className="my-bookings-tab">
+    {toastContainer()}
       <h2 className="text-2xl font-semibold mb-4">Lịch Hẹn Của Tôi</h2>
       {loading ? (
         <div className="text-center"><Spin size="large" /></div>
       ) : bookings.length === 0 ? (
         <p className="text-center text-gray-500">
           Bạn chưa có lịch hẹn nào.{' '}
-          <Button type="link" onClick={() => navigate('/services')} className="p-0">
+          <Button type="link" onClick={() => navigate('/servicepage')} className="p-0">
             Đặt lịch ngay
           </Button>
         </p>
@@ -202,6 +205,7 @@ const ScheduleTab = () => {
             <p><strong>Giờ:</strong> {currentBooking.time}</p>
             <p><strong>Chi nhánh:</strong> {currentBooking.branch?.BranchName}</p>
             <p><strong>Nhân viên:</strong> {currentBooking.employee?.UserID?.firstName || 'Không xác định'}</p>
+            <p><strong>Tổng tiền:</strong> {formatPrice(currentBooking.totalAmount)}</p>
 
             <Select
               style={{ width: '100%' }}

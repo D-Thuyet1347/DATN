@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
-import OneProduct from '../components/OneProduct';
-import { getProducts } from '../APIs/ProductsApi';
-import { addToCart } from '../APIs/cartApi';
-import { errorToast, successToast, toastContainer } from '../utils/toast';
-import { motion } from 'framer-motion';
-import { Button, Spin } from 'antd';
+import React, { useEffect, useState } from "react";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
+import OneProduct from "../components/OneProduct";
+import { getProducts } from "../APIs/ProductsApi";
+import { addToCart } from "../APIs/cartApi";
+import { errorToast, successToast, toastContainer } from "../utils/toast";
+import { motion } from "framer-motion";
+import { Button, Spin } from "antd";
+import { Link } from "react-router-dom";
 
 const ProductsPage = () => {
-  const [filter, setFilter] = useState('Tất cả');
+  const [filter, setFilter] = useState("Tất cả");
   const [data, setData] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [cartMessage, setCartMessage] = useState('');
+  const [cartMessage, setCartMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
 
@@ -24,13 +25,15 @@ const ProductsPage = () => {
         const res = await getProducts();
         if (res.success) {
           setData(res.data);
-          const uniqueCategories = [...new Set(res.data.map((product) => product.Category))];
-          setCategories(uniqueCategories.map((name, index) => ({ _id: index, name })));
+          const uniqueCategories = [
+            ...new Set(res.data.map((product) => product.Category)),
+          ];
+          setCategories(
+            uniqueCategories.map((name, index) => ({ _id: index, name }))
+          );
         } else {
-          console.error('Không thể lấy dữ liệu sản phẩm');
         }
       } catch (error) {
-        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
       } finally {
         setIsLoading(false);
       }
@@ -40,18 +43,23 @@ const ProductsPage = () => {
   }, []);
 
   const filteredProductsPage =
-    filter === 'Tất cả'
+    filter === "Tất cả"
       ? data
       : data.filter((product) => product.Category === filter);
 
   const handleAddToCart = async (productId, quantity) => {
     try {
       const res = await addToCart(productId, quantity);
-      if (res.success) {
+
+      if (res?.success) {
         successToast("Sản phẩm đã được thêm vào giỏ hàng!");
       }
     } catch (error) {
-      errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng!", error);
+      if (error?.response?.status === 401) {
+        errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+      } else {
+        errorToast("Sản phẩm đã hết hàng!");
+      }
     }
   };
 
@@ -68,7 +76,19 @@ const ProductsPage = () => {
         {toastContainer()}
 
         <section className="px-10 py-6">
-          <h2 className="text-3xl font-bold text-maincolor text-center mb-6">Our ProductsPage</h2>
+          <nav className="text-sm text-gray-500 mt-4">
+            <Link to="/" className="hover:underline">
+              Trang chủ
+            </Link>{" "}
+            &gt;{" "}
+            <Link to="/productpage" className="hover:underline">
+              Sản phẩm
+            </Link>{" "}
+            &gt;{" "}
+          </nav>
+          <h2 className="text-3xl font-bold text-maincolor text-center mb-6">
+            Our ProductsPage
+          </h2>
 
           {cartMessage && (
             <div className="text-center text-red-500 mb-4">{cartMessage}</div>
@@ -85,11 +105,11 @@ const ProductsPage = () => {
                 <h3 className="text-lg font-semibold mb-4">Danh mục</h3>
                 <ul className="space-y-3">
                   <li
-                    onClick={() => setFilter('Tất cả')}
+                    onClick={() => setFilter("Tất cả")}
                     className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
-                      filter === 'Tất cả'
-                        ? 'bg-maincolor text-white'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      filter === "Tất cả"
+                        ? "bg-maincolor text-white"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                     }`}
                   >
                     Tất cả
@@ -100,8 +120,8 @@ const ProductsPage = () => {
                       onClick={() => setFilter(item.name)}
                       className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
                         filter === item.name
-                          ? 'bg-maincolor text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                          ? "bg-maincolor text-white"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                       }`}
                     >
                       {item.name}
@@ -122,7 +142,9 @@ const ProductsPage = () => {
                         description={product.DescriptionPD}
                         image={product.ImagePD}
                         productId={product._id}
-                        onAddToCart={() => handleAddToCart(product._id, quantity)}
+                        onAddToCart={() =>
+                          handleAddToCart(product._id, quantity)
+                        }
                         loading={loading}
                       />
                     ))

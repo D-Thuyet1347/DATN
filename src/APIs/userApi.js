@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_KEY || 'http://localhost:4000/api';
+const API_BASE_URL = process.env.REACT_APP_API_KEY || 'https://backend-fu3h.onrender.com/api';
 
 const userApi = axios.create({
   baseURL: API_BASE_URL,
@@ -38,7 +38,7 @@ export const updateUser = async (id, data) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Lỗi cập nhật:', error);
+    
     return {
       success: false,
       message: error.response?.data?.message || 'Lỗi kết nối server',
@@ -83,7 +83,7 @@ export const changePassword = async (data) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Lỗi API đổi mật khẩu:', error.response?.data || error.message);
+    
     return (
       error.response?.data || {
         success: false,
@@ -115,7 +115,7 @@ export const getCurrentUser = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi lấy thông tin người dùng:', error);
+    
     return {
       success: false,
       message: error.response?.data?.message || 'Lỗi khi lấy thông tin người dùng',
@@ -138,7 +138,7 @@ export const saveVoucher = async (voucherCode) => {
     );
     return { success: true, data: response.data };
   } catch (error) {
-    console.error('Lỗi khi lưu voucher:', error);
+    
     return {
       success: false,
       message: error.response?.data?.message || 'Lỗi khi lưu voucher',
@@ -157,7 +157,7 @@ export const removeSavedVoucher = async (voucherId) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    console.error('Lỗi khi xóa voucher:', error);
+    
     return {
       success: false,
       message: error.response?.data?.message || 'Lỗi khi xóa voucher',
@@ -176,7 +176,7 @@ export const getSavedVouchers = async () => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách voucher:', error);
+    
     return {
       success: false,
       message: error.response?.data?.message || 'Lỗi khi lấy danh sách voucher',

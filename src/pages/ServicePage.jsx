@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import OneService from '../components/OneService';
 import { getAllServices } from '../APIs/ServiceAPI';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Spin } from 'antd';
 import Header from '../components/Header';
-
+import Footer from '../components/Footer';
 const ServicePage = () => {
   const [filter, setFilter] = useState('Tất cả dịch vụ');
   const [data, setData] = useState([]);
@@ -22,7 +21,6 @@ const ServicePage = () => {
         const uniqueCategories = [...new Set(response.data.map(service => service.category))];
         setCategories(uniqueCategories.map((name, index) => ({ _id: index, name })));
       } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu:', error);
       } finally {
         setIsLoading(false);
       }
@@ -42,6 +40,11 @@ const ServicePage = () => {
     <>
       <Header className="!bg-white !text-black !shadow-md" />
       <div className="mt-[100px] px-6 py-4">
+         <nav className="text-sm text-gray-500">
+                          <Link to="/" className="hover:underline">Trang chủ</Link> &gt;{' '}
+                          <Link to="/servicepage" className="hover:underline">Dịch vụ</Link> &gt;{' '}
+                          
+                      </nav>
         <h2 className="text-3xl font-bold text-maincolor text-center mb-6">Our Services</h2>
 
         {isLoading ? (
@@ -107,6 +110,7 @@ const ServicePage = () => {
           </div>
         )}
       </div>
+      <Footer/>
     </>
   );
 };

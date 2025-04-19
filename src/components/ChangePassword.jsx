@@ -54,7 +54,7 @@ function ChangePasswordTab() { // Renamed component for clarity if needed
                 }
             }
         } catch (error) {
-            console.error('Lỗi khi đổi mật khẩu:', error);
+            
             // Use translated specific error or generic frontend message
             if (error.response && error.response.data && (error.response.data.message === "Mật khẩu cũ không chính xác" || error.response.data.message === "Incorrect old password")) {
                 toast.error(t('changePassword.errors.oldPasswordIncorrect'));

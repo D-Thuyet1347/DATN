@@ -109,7 +109,6 @@ const VoucherManagement = () => {
       closeDrawer();
       fetchVouchers();
     } catch (error) {
-      console.error('Submit error:', error);
     } finally {
       setLoading(false);
     }

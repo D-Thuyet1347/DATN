@@ -7,6 +7,7 @@ import {
   updateBranch,
 } from "../../APIs/brand";
 import { Button, Drawer, Modal, Table, message, Form, Input, Popconfirm } from "antd";
+import { errorToast, toastContainer } from "../../utils/toast";
 
 export const BrandManagement = () => {
   const [dataBrand, setDataBrand] = useState([]);
@@ -25,7 +26,7 @@ export const BrandManagement = () => {
         setDataBrand([]);
       }
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách chi nhánh:", error);
+    
       setDataBrand([]);
     }
   };
@@ -61,8 +62,8 @@ export const BrandManagement = () => {
       setIsDrawerOpen(false);
       setIsModalOpen(false);
     } catch (error) {
-      console.error("Lỗi khi cập nhật chi nhánh:", error);
-      message.error("Có lỗi xảy ra, vui lòng thử lại.");
+      
+      errorToast("Có lỗi xảy ra, vui lòng thử lại.");
     }
   };
 
@@ -72,8 +73,8 @@ export const BrandManagement = () => {
       message.success("Xóa chi nhánh thành công!");
       fetchBrand();
     } catch (error) {
-      console.error("Lỗi khi xóa chi nhánh:", error);
-      message.error("Có lỗi xảy ra khi xóa chi nhánh.");
+    
+      errorToast("Có lỗi xảy ra khi xóa chi nhánh.");
     }
   };
 
@@ -115,6 +116,7 @@ export const BrandManagement = () => {
 
   return (
     <div className="mt-3">
+    {toastContainer()}
       <h2>Quản lý Brand</h2>
       <Button className="mt-5 bg-blue-500" onClick={() => openEditDrawer()}>
         Thêm Brand

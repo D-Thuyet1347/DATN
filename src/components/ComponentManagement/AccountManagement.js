@@ -47,7 +47,6 @@ const AccountManagement = () => {
         setFilteredData([]);
       }
     } catch (error) {
-      console.error('Lỗi khi tải danh sách user:', error);
       setData([]);
       setFilteredData([]);
     }
@@ -61,13 +60,11 @@ const AccountManagement = () => {
 
   const handleUpdateAccount = async () => {
     try {
-      const values = await form.validateFields();
-      await updateUserRole(selectedUser._id, values);
+      await updateUserRole(selectedUser._id);
       successToast('Cập nhật thành công!');
       setIsEditOpen(false);
       fetchAccount();
     } catch (error) {
-      console.error('Lỗi khi cập nhật role:', error);
       errorToast('Có lỗi xảy ra, vui lòng thử lại.');
     }
   };
@@ -80,8 +77,8 @@ const AccountManagement = () => {
         fetchAccount();
       }
     } catch (error) {
-      console.error(error);
-      message.error('Có lỗi xảy ra khi xóa tài khoản.');
+      
+      errorToast('Có lỗi xảy ra khi xóa tài khoản.');
     }
   };
 
@@ -141,23 +138,23 @@ const AccountManagement = () => {
           <Form.Item
             name="firstName"
             label="Tên"
-            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}
+            // rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}
           >
             <Input  disabled />
           </Form.Item>
           <Form.Item
             name="lastName"
             label="Họ"
-            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}>
+            >
             <Input disabled />
           </Form.Item>
           <Form.Item
             name="email"
             label="Email"
-            rules={[
-              { required: true, message: 'Vui lòng nhập email' },
-              { type: 'email', message: 'Email không hợp lệ' },
-            ]}
+            // rules={[
+            //   { required: true, message: 'Vui lòng nhập email' },
+            //   { type: 'email', message: 'Email không hợp lệ' },
+            // ]}
           >
             <Input disabled />
           </Form.Item>

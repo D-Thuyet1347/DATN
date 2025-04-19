@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Tag, Typography, message } from 'antd';
 import { getOrders } from '../APIs/orderApi';
+import { errorToast, toastContainer } from '../utils/toast';
 
 const { Text } = Typography;
 
@@ -14,7 +15,7 @@ const MyOrdersTab = () => {
     const fetchOrders = async () => {
       try {
         if (!token || !userId) {
-          message.error('Vui lòng đăng nhập để xem đơn hàng');
+          errorToast('Vui lòng đăng nhập để xem đơn hàng');
           return;
         }
         const rawOrders = await getOrders(token);
@@ -44,8 +45,8 @@ const MyOrdersTab = () => {
           message.info('Bạn chưa có đơn hàng nào.');
         }
       } catch (error) {
-        console.error('Error fetching orders in MyOrdersTab:', error);
-        message.error(error.message || 'Lỗi khi tải đơn hàng');
+        
+        errorToast(error.message || 'Lỗi khi tải đơn hàng');
       }
     };
 
@@ -140,6 +141,7 @@ const MyOrdersTab = () => {
 
   return (
     <div className="my-order-tab">
+    {toastContainer()}
       <Table
         columns={columns}
         dataSource={orders}

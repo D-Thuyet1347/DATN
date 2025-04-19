@@ -4,6 +4,7 @@ import { Button, Drawer, Form, Table, Select, Spin, message,Popconfirm } from 'a
 import { createEmployee, listEmployee, removeEmployee, updateEmployee } from '../../APIs/employee';
 import { listBranch } from '../../APIs/brand';
 import { listUser } from '../../APIs/userApi';
+import { errorToast, toastContainer } from '../../utils/toast';
 
 const { Option } = Select;
 
@@ -26,16 +27,16 @@ export const EmployeeManagement = () => {
                 listEmployee(),
                 listUser()
             ]);
-
             if (brandRes?.data) setDataBrand(brandRes.data.map(item => ({ ...item, key: item._id })));
             if (employeeRes?.data) setDataEmployee(employeeRes.data.map(item => ({ ...item, key: item._id })));
             if (userRes?.data) {
                 const employees = userRes.data.filter(user => user.role === 'employee');
                 setDataUser(employees.map(item => ({ ...item, key: item._id })));
             }
+            console.log("Brand Data:", brandRes.data);
+            console.log("Employee Data:", employeeRes.data);
         } catch (error) {
-            console.error("Error fetching data:", error);
-            message.error("Lỗi khi tải dữ liệu!");
+            errorToast("Lỗi khi tải dữ liệu!");
         } finally {
             setIsTableLoading(false);
         }
@@ -76,8 +77,8 @@ export const EmployeeManagement = () => {
             fetchData();
             setIsDrawerOpen(false);
         } catch (error) {
-            console.error("Error saving employee:", error);
-            message.error(error.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại.");
+        
+            errorToast(error.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại.");
         } finally {
             setLoading(false);
         }
@@ -90,13 +91,13 @@ export const EmployeeManagement = () => {
     
             if (response.message === "Nhân viên đã được xóa thành công") {
                 message.success("Xóa nhân viên thành công!");
-                fetchData(); // Reload the table data
+                fetchData();
             } else {
-                message.error(response.message); // Show error if the employee cannot be deleted
+                errorToast(response.message); // Show error if the employee cannot be deleted
             }
         } catch (error) {
-            console.error("Error deleting employee:", error);
-            message.error("Có lỗi xảy ra khi xóa nhân viên.");
+          
+            errorToast("Có lỗi xảy ra khi xóa nhân viên.");
         } finally {
             setDeleting(prev => ({ ...prev, [id]: false })); // Reset loading state
         }
@@ -127,6 +128,15 @@ export const EmployeeManagement = () => {
             title: 'Vị trí',
             dataIndex: 'Position',
             key: 'Position',
+        },
+        {
+            title: 'Số điện thoại',
+            dataIndex: 'UserID',
+            key: 'UserID',
+            render: (text, record) => {
+                const user = dataUser.find(u => u._id === record.UserID);
+                return user ? `${user.phoneNumber}` : 'Chưa có số điện thoại'; 
+            },
         },
         {
             title: 'Trạng thái',
@@ -163,6 +173,7 @@ export const EmployeeManagement = () => {
 
     return (
         <div className="mt-3">
+        {toastContainer()}
             <h2>Quản lý nhân viên</h2>
             <div className="flex justify-between items-center mb-4">
                 <Button 

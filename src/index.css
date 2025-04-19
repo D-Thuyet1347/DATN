@@ -13,6 +13,37 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+input.no-spinner::-webkit-inner-spin-button,
+input.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input.no-spinner {
+  -moz-appearance: textfield;
+}
+/* Style cho nút giờ/phút trong TimePicker */
+.ant-picker-ok{
+  color: black;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.ant-picker-dropdown {
+  pointer-events: auto;
+}
+
+.ant-picker-dropdown .ant-picker-panel {
+  overscroll-behavior: none;
+}
+.ant-btn{
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  border: none;
+  color: black;
+  cursor: pointer;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

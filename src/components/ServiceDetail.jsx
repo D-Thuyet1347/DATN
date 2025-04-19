@@ -18,7 +18,7 @@ const ServiceDetail = () => {
         }
         setLoading(false);
       } catch (error) {
-        console.error('Lỗi khi lấy dịch vụ:', error);
+        ('Lỗi khi lấy dịch vụ:', error);
         setLoading(false);
       }
     };

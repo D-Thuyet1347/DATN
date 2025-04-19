@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { FaStar } from 'react-icons/fa';
-import { Link, useParams } from 'react-router-dom';
-import { getProductById } from '../APIs/ProductsApi';
-import { listReviewSP } from '../APIs/ReviewSPAPI';
-import { RightOutlined } from '@ant-design/icons';
-import { addToCart, decreaseToCart } from '../APIs/cartApi';
-import { errorToast, successToast, toastContainer } from '../utils/toast';
+import React, { useState, useEffect } from "react";
+import { FaStar } from "react-icons/fa";
+import { Link, useParams } from "react-router-dom";
+import { getProductById } from "../APIs/ProductsApi";
+import { listReviewSP } from "../APIs/ReviewSPAPI";
+import { RightOutlined } from "@ant-design/icons";
+import { addToCart, decreaseToCart } from "../APIs/cartApi";
+import { errorToast, successToast, toastContainer } from "../utils/toast";
 
 const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
@@ -26,13 +26,18 @@ const ProductDetail = () => {
           const reviews = await listReviewSP(productData.data._id);
           if (reviews && Array.isArray(reviews)) {
             setReviewCount(reviews.length);
-            const totalStars = reviews.reduce((sum, r) => sum + (r.Rating || r.rating || 0), 0);
-            setAverageRating(reviews.length > 0 ? totalStars / reviews.length : 0);
+            const totalStars = reviews.reduce(
+              (sum, r) => sum + (r.Rating || r.rating || 0),
+              0
+            );
+            setAverageRating(
+              reviews.length > 0 ? totalStars / reviews.length : 0
+            );
           }
         }
         setLoading(false);
       } catch (error) {
-        console.error('Lỗi khi lấy sản phẩm hoặc đánh giá:', error);
+        errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng");
         setLoading(false);
       }
     };
@@ -47,8 +52,18 @@ const ProductDetail = () => {
         successToast("Sản phẩm đã được thêm vào giỏ hàng!");
       }
     } catch (error) {
-      errorToast("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
+      errorToast("Vui lòng đăng nhập để thêm vào giỏ hàng");
     }
+  };
+  const handleQuantityChange = (e) => {
+    let value = parseInt(e.target.value);
+    if (isNaN(value)) value = 1;
+    if (value < 1) value = 1;
+    if (value > product.StockQuantity) {
+      errorToast("Vượt quá số lượng sản phẩm hiện có");
+      value = product.StockQuantity;
+    }
+    setQuantity(value);
   };
 
   const handleDecrease = async (productId) => {
@@ -57,7 +72,7 @@ const ProductDetail = () => {
       try {
         await decreaseToCart(productId);
       } catch (error) {
-        console.error("Lỗi khi gọi API giảm số lượng:", error);
+        
       }
     }
   };
@@ -93,14 +108,20 @@ const ProductDetail = () => {
           </div>
           <div className="w-full md:w-1/2">
             <nav className="text-sm text-gray-500 mb-4">
-              <Link to="/" className="hover:underline">Trang chủ</Link>{' '}
-              <RightOutlined />{' '}
-              <Link to="/product" className="hover:underline">Sản phẩm</Link>{' '}
-              <RightOutlined />{' '}
+              <Link to="/" className="hover:underline">
+                Trang chủ
+              </Link>{" "}
+              <RightOutlined />{" "}
+              <Link to="/product" className="hover:underline">
+                Sản phẩm
+              </Link>{" "}
+              <RightOutlined />{" "}
               <span className="text-gray-700">{product.ProductName}</span>
             </nav>
 
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.ProductName}</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              {product.ProductName}
+            </h1>
 
             {/* Hiển thị đánh giá */}
             <div className="flex items-center mb-4">
@@ -108,17 +129,29 @@ const ProductDetail = () => {
                 {[...Array(5)].map((_, i) => (
                   <FaStar
                     key={i}
-                    className={i < Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'}
+                    className={
+                      i < Math.round(averageRating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }
                   />
                 ))}
               </div>
-              <span className="ml-2 text-gray-600">({reviewCount} đánh giá)</span>
+              <span className="ml-2 text-gray-600">
+                ({reviewCount} đánh giá)
+              </span>
             </div>
 
-            <p className="text-2xl font-semibold text-gray-800 mb-4">{product.PricePD} đ</p>
+            <p className="text-2xl font-semibold text-gray-800 mb-4">
+              {product.PricePD} đ
+            </p>
             <p className="text-gray-600 mb-4">
               <span className="flex items-center">
-                <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-4 h-4 mr-2 text-green-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-1-9h2v4H9V7zm0 6h2v2H9v-2z" />
                 </svg>
                 Giao hàng miễn phí cho đơn hàng trên 500.000đ
@@ -135,7 +168,15 @@ const ProductDetail = () => {
                   >
                     -
                   </button>
-                  <span className="px-4 py-1">{quantity}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={product.StockQuantity}
+                    value={quantity}
+                    onChange={(e) => handleQuantityChange(e)}
+                    className="w-16 text-center border-l border-r outline-none no-spinner"
+                  />
+
                   <button
                     onClick={handleIncrease}
                     className="px-3 py-1 text-gray-600 hover:bg-gray-100"
@@ -143,7 +184,9 @@ const ProductDetail = () => {
                     +
                   </button>
                 </div>
-                <div className="ml-4 text-gray-600">{product.StockQuantity - quantity} sản phẩm có sẵn</div>
+                <div className="ml-4 text-gray-600">
+                  {product.StockQuantity - quantity} sản phẩm có sẵn
+                </div>
               </div>
             </div>
 

@@ -22,6 +22,7 @@ import { getProducts, addProduct, updateProduct } from '../../APIs/ProductsApi';
 import axios from 'axios';
 import TextArea from 'antd/es/input/TextArea';
 import { getBase64 } from '../../utils/ultils';
+import { errorToast, toastContainer } from '../../utils/toast';
 
 const { Option } = Select;
 
@@ -52,7 +53,7 @@ const ProductManagement = () => {
         setProducts([]);
       }
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+  
       setProducts([]);
     } finally {
       setIsTableLoading(false);
@@ -109,8 +110,8 @@ const ProductManagement = () => {
       setIsDrawerOpen(false);
       form.resetFields();
     } catch (error) {
-      console.error('Lỗi khi lưu sản phẩm:', error);
-      message.error('Có lỗi xảy ra, vui lòng thử lại.');
+      
+      errorToast('Có lỗi xảy ra, vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -118,14 +119,14 @@ const ProductManagement = () => {
 
   const handleDeleteProduct = async (id) => {
     try {
-      const response = await axios.post('http://localhost:4000/api/product/remove', { id });
+      const response = await axios.post('https://backend-fu3h.onrender.com/api/product/remove', { id });
       if (response.data.success) {
         message.success('Xóa sản phẩm thành công!');
         fetchProducts();
       }
     } catch (error) {
-      console.error('Lỗi khi xóa sản phẩm:', error);
-      message.error('Xóa sản phẩm thất bại!');
+  
+      errorToast('Xóa sản phẩm thất bại!');
     }
   };
 
@@ -204,6 +205,7 @@ const ProductManagement = () => {
 
   return (
     <div className="pt-3">
+    {toastContainer()}
       <h2>Quản Lý Sản Phẩm</h2>
       <Button className="bg-blue-500 mt-5" onClick={() => openEditDrawer()}>
         Thêm Sản Phẩm

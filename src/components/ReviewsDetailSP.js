@@ -29,7 +29,7 @@ const ReviewsDetailSP = () => {
         if (userData.success) {
           setUserFullName(`${userData.data.firstName} ${userData.data.lastName}`);
         } else {
-          console.error("Không thể lấy thông tin người dùng.");
+          
         }
       }
       const data = await listReviewSP(id);
@@ -55,7 +55,7 @@ const ReviewsDetailSP = () => {
       );
       setUserFullName((prev) => ({ ...prev, ...userInfoMap }));
     } catch (error) {
-      console.error("Lỗi khi lấy đánh giá:", error);
+      
     }
     setLoading(false);
   };

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://backend-fu3h.onrender.com';
 
 export const getOrders = async (token) => {
       const response = await axios.get(
@@ -14,32 +14,20 @@ export const getOrders = async (token) => {
           return response.data.data;
 };
 export const listOrder = async () => {
-    try {
+   
         const response = await axios.get(`${API_URL}/api/order/list`);
         return response.data;
-    } catch (error) {
-        console.error('Error in listOrder:', error);
-        throw error;
-    }
+   
 };
 export const getOrderDetail = async (orderId, token) => {
-    try {
         const response = await axios.get(`${API_URL}/api/order/${orderId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-
-        console.log('API response from /api/order/:orderId:', response.data);
         return response.data;
-    } catch (error) {
-        console.error('Error in getOrderDetail:', error);
-        if (error.response?.status === 401) {
-            throw new Error('Phiên đăng nhập hết hạn');
-        }
-        throw new Error(error.response?.data?.message || 'Lỗi khi lấy chi tiết đơn hàng');
-    }
+  
 };
 export const placeOrder = async (orderData, token) => {
       const response = await axios.post(
@@ -58,21 +46,16 @@ export const placeOrder = async (orderData, token) => {
 
 
 export const updateOrderStatus = async (orderId, statusData) => {
-    try {
         const response = await axios.put(
             `${API_URL}/api/order/status`, 
             { orderId, ...statusData }
         );
         console.log('Update Status Response:', response.data); // Debug log
         return response.data;
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        throw error;
-    }
+  
 };
 export const deleteOrder = async (data) => {
-      const response = await axios.delete(`${API_URL}/api/order/delete-order`, data
-      );
+      const response = await axios.delete(`${API_URL}/api/order/delete-order`, data);
       return response.data;
   };
 

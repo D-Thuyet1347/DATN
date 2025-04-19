@@ -37,7 +37,6 @@ const ServiceDetailPage = () => {
                 }
                 setLoading(false);
             } catch (error) {
-                console.error('Lỗi khi tải dữ liệu dịch vụ hoặc đánh giá:', error);
                 setError(error.message || 'Có lỗi xảy ra khi tải dữ liệu');
                 setLoading(false);
             }
@@ -49,8 +48,8 @@ const ServiceDetailPage = () => {
     const handleBookNow = () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            alert('Vui lòng đăng nhập để đặt lịch!');
-            navigate('/login');
+            errorToast('Vui lòng đăng nhập để đặt lịch!');
+            navigate('/sign-in');
         } else {
             navigate(`/book-service/${id}`, { state: { service } });
         }
@@ -87,26 +86,18 @@ const ServiceDetailPage = () => {
                         </h1>
                     </div>
                 </div>
-
-                {/* Main Content */}
                 <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
-                    {/* Left Section */}
                     <div className="md:w-2/3">
-                        {/* Thông tin dịch vụ */}
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <h2 className="text-2xl font-bold text-gray-800 mb-4">Thông tin dịch vụ</h2>
                             <p className="text-gray-600 mb-4">
                                 {service.description || 'Thư giãn và phục hồi cơ thể với liệu pháp massage truyền thống của chúng tôi.'}
                             </p>
                         </div>
-
-                        {/* Đánh giá dịch vụ */}
                         <div className="mt-8">
                             <ReviewsDeTailDV />
                         </div>
                     </div>
-
-                    {/* Right Section */}
                     <div className="md:w-1/3 lg:col-span-1">
                         <div className="bg-white p-6 rounded-lg shadow-md sticky top-24">
                             <h2 className="text-2xl font-bold text-gray-800 mb-4">Chi tiết dịch vụ</h2>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_KEY || "http://localhost:4000/api";
+const API_BASE_URL = process.env.REACT_APP_API_KEY || "https://backend-fu3h.onrender.com/api";
 
 const review = axios.create({
   baseURL: API_BASE_URL,
@@ -28,7 +28,7 @@ export const removeReviewSP = async (reviewId) => {
       });
       return response.data;
     } catch (err) {
-      console.error("Lỗi khi xoá đánh giá:", err.response?.data || err.message);
+      
       return { success: false, message: err.response?.data?.message || "Xoá không thành công" };
     }
   };

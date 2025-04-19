@@ -73,7 +73,6 @@ const OrderConfirmation = () => {
                 },
             });
         } catch (error) {
-            console.error('Error:', error);
             navigate('/profile', {
                 state: {
                     activeTab: 'myorders',
