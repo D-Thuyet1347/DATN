@@ -23,11 +23,10 @@ import axios from "axios";
 import { Tag } from "lucide-react";
 import { redeemVoucher } from "../APIs/VoucherAPI";
 import Header from "../components/Header";
-import dayjs from "dayjs";
 const { Option } = Select;
 const { Text } = Typography;
 // const API_BASE_URL = "https://backend-fu3h.onrender.com/api/";
-const API_BASE_URL = "http://localhost:4000/api/"; // Thay thế bằng URL của bạn
+const API_BASE_URL = "http://localhost:4000/api/";
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {

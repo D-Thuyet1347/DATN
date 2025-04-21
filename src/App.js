@@ -72,7 +72,7 @@ function App() {
           <Route path="/manager" element={<PrivateRoute element={<Manager />} requiredRole={"manager"} />} />
           <Route path="/schedule" element={<PrivateRoute element={<Schedule />} requiredRole={"employee"} />} />
           {/* Router riêng dành cho employee */}
-        </Routes>
+        </Routes>    
       </AuthProvider>
     </>
   );

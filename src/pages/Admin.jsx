@@ -20,6 +20,7 @@ import AccountManagement from '../components/ComponentManagement/AccountManageme
 import Dashboard from '../components/ComponentManagement/Dashboard';
 import { IoHomeOutline } from 'react-icons/io5';
 import BookingManagement from '../components/ComponentManagement/BookingManagement';
+import ReportForm from '../components/ComponentManagement/ReportForm';
 
 const items = [
   { key: 'dashboard', label: 'Dashboard', icon: <TbLayoutDashboard style={{fontSize:'24px'}} /> },
@@ -52,6 +53,7 @@ const items = [
       { key: 'banner', label: 'Banner trang chủ' },
       { key: 'account', label: 'Quản lý tài khoản' },
       { key: 'brand', label: 'Quản lý chi nhánh' },
+      { key: 'report', label: 'Báo cáo' },
     ],
   },
 ];
@@ -92,6 +94,8 @@ const Admin = () => {
         return <VoucherManagement />;
       case 'booking':
         return <BookingManagement />;
+      case 'report':
+        return <ReportForm />;
       default:
         return <Dashboard />;
     }

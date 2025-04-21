@@ -38,7 +38,6 @@ const BookingManagement = () => {
           bookings: processedBookings,
           loading: { ...prev.loading, table: false },
         }));
-        successToast(`Đã tải ${processedBookings.length} lịch hẹn`);
       } else {
         throw new Error("Dữ liệu không hợp lệ");
       }

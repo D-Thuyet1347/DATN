@@ -8,7 +8,6 @@ import {
 } from '../utils/cloudinaryConfig';
 const DEFAULT_AVATAR = 'https://placehold.co/150?text=No+Image';
 
-// helper upload file lên Cloudinary
 const uploadToCloudinary = async (file) => {
   const form = new FormData();
   form.append('file', file);

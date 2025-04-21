@@ -73,7 +73,6 @@ const OrderManagement = () => {
           loading: { ...prev.loading, table: false }
         }));
 
-        successToast(`Đã tải ${processedOrders.length} đơn hàng`);
       } else {
         throw new Error("Dữ liệu không hợp lệ");
       }

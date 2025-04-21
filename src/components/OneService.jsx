@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -16,8 +17,11 @@ const OneService = ({ name, title, price, duration, description, image,id }) => 
           <span className="text-gray-500">{duration} phút</span>
         </div>
          <Link to={`/service/${id}`} className="text-maincolor mt-4 flex items-center">
-                View Details <span className="ml-2 material-icons">arrow_forward</span>
+                Xem chi tiết <span className="ml-2 material-icons">arrow_forward</span>
          </Link>
+         <Link to={`/book-service/${id}`} className="mt-4 bg-maincolor text-white hover:bg-maincolor" type="primary">
+          Đặt ngay
+          </Link>
       </div>
     </div>
   );
