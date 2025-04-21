@@ -91,7 +91,7 @@ const Products = () => {
           className="text-2xl text-[40px] font-bold mb-6 text-center"
           style={{ fontFamily: "Dancing Script, serif" }}
         >
-          Our Products
+          Những sản phẩm nổi bật
         </h2>
 
         {cartMessage && (

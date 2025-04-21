@@ -28,9 +28,14 @@ const SignUpPage = () => {
       return;
     }
     try {
-      await registerUser({ email, password });
-      successToast("Đăng ký thành công! Chúng tôi đã gửi xác nhận vào Email.");
-      navigate("/sign-in");
+      const res =await registerUser({ email, password });
+      if(res.success === true){
+        successToast("Đăng ký thành công! Chúng tôi đã gửi xác nhận vào Email.");
+        navigate("/sign-in");
+      }
+      else if(res.success === false){
+        errorToast("Email đã tồn tại!");
+      }
     } catch (error) {
       successToast("Đăng ký thất bại!");
     }

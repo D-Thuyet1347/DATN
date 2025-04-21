@@ -45,7 +45,9 @@ const ServicePage = () => {
                           <Link to="/servicepage" className="hover:underline">Dịch vụ</Link> &gt;{' '}
                           
                       </nav>
-        <h2 className="text-3xl font-bold text-maincolor text-center mb-6">Our Services</h2>
+        <h2 className="text-3xl font-bold text-maincolor text-center mb-6">
+          Danh sách dịch vụ
+        </h2>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">

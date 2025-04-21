@@ -24,8 +24,8 @@ import { errorToast, successToast, toastContainer } from "../utils/toast";
 import axios from "axios";
 import Header from "../components/Header";
 
-// const API_BASE_URL = "https://backend-fu3h.onrender.com/api/";
-const API_BASE_URL = "http://localhost:4000/api"; // Replace with your local URL
+const API_BASE_URL = "https://backend-fu3h.onrender.com/api/";
+// const API_BASE_URL = "http://localhost:4000/api"; // Replace with your local URL
 
 const api = axios.create({
   baseURL: API_BASE_URL,

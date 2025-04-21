@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const API_URL = 'https://backend-fu3h.onrender.com/api'; 
-const API_URL = 'http://localhost:4000/api'; // Thay thế bằng URL của bạn
+const API_URL = 'https://backend-fu3h.onrender.com/api'; 
+// const API_URL = 'http://localhost:4000/api'; // Thay thế bằng URL của bạn
 
 export const getCart = async () => {
     const token = localStorage.getItem("token");

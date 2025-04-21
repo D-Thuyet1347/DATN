@@ -9,6 +9,9 @@ import { IoBagHandleOutline } from "react-icons/io5";
 import { getUser } from "../APIs/userApi";
 import { jwtDecode } from "jwt-decode";
 import { useTranslation } from "react-i18next";
+import Mess from "./Mess";
+import BackToTop from "./BackToTop";
+
 const DEFAULT_AVATAR = user;
 
 const Header = ({className=''}) => {
@@ -68,6 +71,7 @@ const Header = ({className=''}) => {
     navigate("/sign-in");
   };
 
+
   const handleAvatar = () => {
     navigate("/sign-in");
     setIsMenu(false);
@@ -92,7 +96,10 @@ const Header = ({className=''}) => {
     className={`fixed z-30 top-0 left-0 h-[65px] w-full shadow-sm transition-all 
       ${isScrolled ? "bg-white text-black shadow-lg p-3" : "bg-transparent text-white p-3"}
       ${className}`}
-      > 
+    > 
+    <Mess />
+    <BackToTop/>
+
       <div className="container relative mx-auto flex justify-between items-center px-6">
         <div className="text-2xl font-bold text-maincolor">
           <Link className="flex" to="/">
@@ -113,91 +120,49 @@ const Header = ({className=''}) => {
           </Link>
         </div>
         <nav className="space-x-6 hidden md:flex">
-            <>
-              <Link
-                to="/"
-                className="mt-[-7px] text-[20px] hover:text-maincolor"
-              >
-                {t("header.home")}
-              </Link>
-              <Link
-                to="/servicepage"
-                className="text-[20px] mt-[-7px] hover:text-maincolor"
-              >
-                {t("header.services")}
-              </Link>
-              <Link
-                to="/productpage"
-                className="text-[20px] mt-[-7px] hover:text-maincolor"
-              >
-                {t("header.products")}
-              </Link>
-              <Link
-                to="/blogpage"
-                className="mt-[-7px] text-[20px] hover:text-maincolor"
-              >
-                {t("header.blogger")}
-              </Link>
-              <Link
-                to="/spvc"
-                className="mt-[-7px]  text-[20px] hover:text-maincolor"
-              >
-                {t("header.voucher")}
-              </Link>
-              <Link
-                to="/about"
-                className="mt-[-7px] text-[20px] hover:text-maincolor"
-              >
-                {t("header.about")}
-              </Link>
-              <Link
-                to="/contact"
-                className=" mt-[-7px] text-[20px] hover:text-maincolor"
-              >
-                {t("header.contact")}
-              </Link>
-            </>
+            <Link to="/" className="mt-[-7px] text-[20px] hover:text-maincolor">
+              {t("header.home")}
+            </Link>
+            <Link to="/servicepage" className="text-[20px] mt-[-7px] hover:text-maincolor">
+              {t("header.services")}
+            </Link>
+            <Link to="/productpage" className="text-[20px] mt-[-7px] hover:text-maincolor">
+              {t("header.products")}
+            </Link>
+            <Link to="/blogpage" className="mt-[-7px] text-[20px] hover:text-maincolor">
+              {t("header.blogger")}
+            </Link>
+            <Link to="/spvc" className="mt-[-7px]  text-[20px] hover:text-maincolor">
+              {t("header.voucher")}
+            </Link>
+            <Link to="/about" className="mt-[-7px] text-[20px] hover:text-maincolor">
+              {t("header.about")}
+            </Link>
+            <Link to="/contact" className=" mt-[-7px] text-[20px] hover:text-maincolor">
+              {t("header.owner")}
+            </Link>
           {userRole === "admin" && (
-            <Link
-              to="/admin"
-              className="flex justify-center mt-[-5px] items-center hover:text-maincolor"
-            >
+            <Link to="/admin" className="flex justify-center mt-[-5px] items-center hover:text-maincolor">
               {t("header.admin")} <IoIosReturnRight className="text-[26px]" />
             </Link>
           )}
           {userRole === "manager" && (
-            <Link
-              to="/manager"
-              className="flex justify-center mt-[-5px] items-center hover:text-maincolor"
-            >
+            <Link to="/manager" className="flex justify-center mt-[-5px] items-center hover:text-maincolor">
               {t("header.admin")} <IoIosReturnRight className="text-[26px]" />
             </Link>
           )}
         </nav>
         <div className="flex items-center space-x-4">
-          <div
-            className="cursor-pointer hover:text-maincolor transition"
-            onClick={handleSearchClick}
-          >
+          <div className="cursor-pointer hover:text-maincolor transition" onClick={handleSearchClick}>
             <IoMdSearch size={24} />
           </div>
           <div className="relative cursor-pointer hover:text-maincolor transition">
             <Link to="/cart">
               <IoBagHandleOutline size={24} />
             </Link>
-            {/* <span className="absolute -top-2 -right-2 bg-maincolor text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              4
-            </span> */}
           </div>
-          <div
-            className="cursor-pointer hover:text-maincolor transition"
-            onClick={handleLanguageChange}
-          >
-            <img
-              src={i18n.language === "vi" ? vi : en}
-              alt="language"
-              className="w-6 h-6 object-cover"
-            />
+          <div className="cursor-pointer hover:text-maincolor transition" onClick={handleLanguageChange}>
+            <img src={i18n.language === "vi" ? vi : en} alt="language" className="w-6 h-6 object-cover" />
           </div>
           <div className="relative">
             {userAvatar ? (

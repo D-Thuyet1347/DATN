@@ -76,7 +76,7 @@ const Service = () => {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2 }}
         >
-          Our Services
+          Những dịch vụ nổi bật
         </motion.h2>
 
         <motion.div

@@ -101,7 +101,7 @@ export const ForgotPassword = () => {
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-11 text-gray-500 cursor-pointer"
+                className="absolute right-4 top-12 text-gray-500 cursor-pointer"
               >
                 {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
               </span>

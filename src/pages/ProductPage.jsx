@@ -87,9 +87,8 @@ const ProductsPage = () => {
             &gt;{" "}
           </nav>
           <h2 className="text-3xl font-bold text-maincolor text-center mb-6">
-            Our ProductsPage
+            Danh sách sản phẩm
           </h2>
-
           {cartMessage && (
             <div className="text-center text-red-500 mb-4">{cartMessage}</div>
           )}
