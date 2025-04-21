@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = "https://backend-fu3h.onrender.com/api/slide";
+// const API_URL = "https://backend-fu3h.onrender.com/api/slide";
+const API_URL = "http://localhost:4000/api/slide";
+
 
 export const getAllSlides = async () => {
     const res = await axios.get(API_URL);

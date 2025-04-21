@@ -75,7 +75,7 @@ const OrderManagement = () => {
 
         successToast(`Đã tải ${processedOrders.length} đơn hàng`);
       } else {
-        throw new Error(response.message || "Dữ liệu không hợp lệ");
+        throw new Error("Dữ liệu không hợp lệ");
       }
     } catch (error) {
       
@@ -117,8 +117,6 @@ const OrderManagement = () => {
       setState(prev => ({ ...prev, loading: { ...prev.loading, status: false } }));
     }
   };
-
-  // ===== Handle View Details =====
   const handleViewDetails = async (order) => {
     setState(prev => ({
       ...prev,

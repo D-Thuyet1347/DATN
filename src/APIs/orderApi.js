@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://backend-fu3h.onrender.com';
+// const API_URL = process.env.REACT_APP_API_URL || 'https://backend-fu3h.onrender.com';
+const API_URL = 'http://localhost:4000'; // Replace with your local URL
 
 export const getOrders = async (token) => {
       const response = await axios.get(

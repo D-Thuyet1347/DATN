@@ -1,22 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  Table,
-  Button,
-  Drawer,
-  Spin,
-  Select,
-  Descriptions,
-  Badge,
-  message,
-  Space,
-  Empty,
-} from "antd";
+import {Table,Button,Drawer,Spin,Select,Descriptions,Badge,message,Space,Empty} from "antd";
 import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { getAllBookings } from "../../APIs/booking";
 import { updateBookingStatus } from "../../APIs/booking";
 import moment from "moment";
-import { errorToast, successToast } from "../../utils/toast";
-
+import { errorToast, successToast, toastContainer } from "../../utils/toast";
 const BookingManagement = () => {
   const [state, setState] = useState({
     bookings: [],
@@ -205,6 +193,7 @@ const BookingManagement = () => {
 
   return (
     <div className="mt-3">
+    {toastContainer()}
       <div
         style={{
           display: "flex",

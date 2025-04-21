@@ -59,7 +59,6 @@ const ProductManagement = () => {
       setIsTableLoading(false);
     }
   };
-
   const openEditDrawer = (product = null) => {
     if (product) {
       setSelectProduct({ ...product });
@@ -87,9 +86,6 @@ const ProductManagement = () => {
     }
     setIsDrawerOpen(true);
   };
-
- 
-
   const handleUpdateProduct = async (values) => {
     setLoading(true);
     try {

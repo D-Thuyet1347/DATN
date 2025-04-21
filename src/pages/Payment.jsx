@@ -52,7 +52,7 @@ const Payment = () => {
       const response = await getUser(id);
       if (response.success && response.data) {
         const userData = response.data;
-        setUserId(userData);
+        setUserId(userData._id);
         setFormData({
           firstName: userData.firstName || "",
           lastName: userData.lastName || "",
@@ -115,20 +115,13 @@ const Payment = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   const validateForm = () => {
-    if (!formData.lastName.trim() ) {
+    const { firstName, lastName, phoneNumber, address } = formData;
+    if (![firstName, lastName, address].every((val) => val.trim())) {
       errorToast("Vui lòng nhập đầy đủ thông tin");
       return false;
     }
-    if(!formData.firstName.trim()) {
-      errorToast("Vui lòng nhập đầy đủ thông tin");
-      return false; 
-    }
-    if (!formData.phoneNumber.match(/^\d{10}$/)) {
-      errorToast("Vui lòng nhập đầy đủ thông tin");
-      return false;
-    }
-    if (!formData.address.trim()) {
-      errorToast("Vui lòng nhập đầy đủ thông tin");
+    if (!phoneNumber.match(/^\d{10}$/)) {
+      errorToast("Số điện thoại không hợp lệ");
       return false;
     }
     return true;
@@ -175,7 +168,7 @@ const Payment = () => {
       if (selectedVoucher) {
         await redeemVoucher(selectedVoucher.code);
       }
-      const resData = await updateUser(userId, token);
+      const resData = await updateUser(userId, formData, token);
       if (resData.success) {
         setFormData(resData.data);
       }
@@ -522,5 +515,4 @@ const Payment = () => {
 };
 
 export default Payment;
-
 

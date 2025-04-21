@@ -4,18 +4,11 @@ import user from "../img/user.png";
 import vi from "../img/vi.png";
 import en from "../img/en.png";
 import logo from "../img/logo.jpg";
-
 import { IoIosReturnRight, IoMdSearch } from "react-icons/io";
-import { FaRegHeart } from "react-icons/fa6";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { getUser } from "../APIs/userApi";
 import { jwtDecode } from "jwt-decode";
 import { useTranslation } from "react-i18next";
-
-const BACKEND_URL = process.env.REACT_APP_API_KEY
-  ? process.env.REACT_APP_API_KEY.replace("/api", "")
-  : "https://backend-fu3h.onrender.com/";
-
 const DEFAULT_AVATAR = user;
 
 const Header = ({className=''}) => {
@@ -25,12 +18,10 @@ const Header = ({className=''}) => {
   const [userAvatar, setUserAvatar] = useState("");
   const [userRole, setUserRole] = useState("");
   const navigate = useNavigate();
-
   const handleLanguageChange = () => {
     const newLang = i18n.language === "vi" ? "en" : "vi";
     i18n.changeLanguage(newLang);
   };
-
   const fetchUserData = async () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -40,11 +31,8 @@ const Header = ({className=''}) => {
         const userData = await getUser(userId);
         if (userData.success) {
           setUserRole(userData.data.role);
-          const imageUrl = userData.data.image
-            ? `${BACKEND_URL}/uploads/${userData.data.image}`
-            : DEFAULT_AVATAR;
-          setUserAvatar(imageUrl);
-          localStorage.setItem("userAvatar", imageUrl);
+          setUserAvatar(userData.data.image || DEFAULT_AVATAR);
+          localStorage.setItem("userAvatar", userData.data.image);
         }
       } catch (error) {
         

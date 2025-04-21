@@ -160,7 +160,7 @@ export const BrandManagement = () => {
             onClick={() => setIsModalOpen(true)}
             block
           >
-            Xác nhận cập nhật
+            Xác nhận
           </Button>
         </Form>
       </Drawer>

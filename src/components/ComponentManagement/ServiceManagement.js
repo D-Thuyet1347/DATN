@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Drawer, Table, Select, message, Input, Upload, Spin, Form, Modal } from 'antd';
+import { Button, Drawer, Table, Select, message, Input, Upload, Spin, Form, Modal, Popconfirm } from 'antd';
 import { DeleteOutlined, EditOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { getAllServices, createService, updateService, deleteService } from '../../APIs/ServiceAPI';
 import { getBase64 } from '../../utils/ultils';
@@ -118,10 +118,14 @@ const ServiceManagement = () => {
       key: 'action',
       render: (record) => (
         <div>
-          <DeleteOutlined
-            style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }}
-            onClick={() => handleDeleteService(record._id)}
-          />
+         <Popconfirm
+            title="Bạn có chắc muốn xóa?"
+            onConfirm={() => handleDeleteService(record._id)}
+            okText="Xoá"
+            cancelText="Huỷ"
+          >
+            <Button style={{color:'red', fontSize:'24px'}} icon={<DeleteOutlined />}  />
+          </Popconfirm>
           <EditOutlined
             style={{ color: 'blue', fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
             onClick={() => openEditDrawer(record)}

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_KEY || 'https://backend-fu3h.onrender.com/api';
+// const API_BASE_URL ='https://backend-fu3h.onrender.com/api';
+const API_BASE_URL = 'http://localhost:4000/api'; // Replace with your local URL
 
 const userApi = axios.create({
   baseURL: API_BASE_URL,
@@ -25,7 +26,7 @@ export const getUser = async (id) => {
 };
 
 export const updateUser = async (id, data) => {
-  try {
+
     const token = localStorage.getItem('token');
     if (!token) {
       return { success: false, message: 'Không có token, vui lòng đăng nhập lại' };
@@ -37,13 +38,7 @@ export const updateUser = async (id, data) => {
       },
     });
     return response.data;
-  } catch (error) {
-    
-    return {
-      success: false,
-      message: error.response?.data?.message || 'Lỗi kết nối server',
-    };
-  }
+
 };
 
 export const updateUserRole = async (id, data) => {

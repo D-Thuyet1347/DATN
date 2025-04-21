@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { listUser, removeUser, updateUserRole } from '../../APIs/userApi';
-import { Button, Drawer, Input, Table, message, Select, Form } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { listUser, updateUser, updateUserRole } from '../../APIs/userApi';
+import { Button, Drawer, Input, Table, Select, Form, Popconfirm } from 'antd';
+import {  EditOutlined } from '@ant-design/icons';
 import { errorToast, successToast, toastContainer } from '../../utils/toast';
-
+import { FaLock, FaUnlock } from 'react-icons/fa6';
 const { Option } = Select;
 
 const AccountManagement = () => {
@@ -34,8 +34,6 @@ const AccountManagement = () => {
       setFilteredData(data);
     }
   }, [searchQuery, data]);
-  
-
   const fetchAccount = async () => {
     try {
       const res = await listUser();
@@ -57,31 +55,25 @@ const AccountManagement = () => {
     setIsEditOpen(true);
     form.setFieldsValue(user);
   };
-
   const handleUpdateAccount = async () => {
-    try {
-      await updateUserRole(selectedUser._id);
+      const updatedRole = form.getFieldValue('role'); 
+      const updatedUser = { ...selectedUser, role: updatedRole };
+      await updateUserRole(updatedUser._id, { role: updatedRole });
       successToast('Cập nhật thành công!');
       setIsEditOpen(false);
-      fetchAccount();
-    } catch (error) {
-      errorToast('Có lỗi xảy ra, vui lòng thử lại.');
-    }
+      fetchAccount(); 
   };
-
-  const handleDeleteAccount = async (userId) => {
+  
+  const handleToggleBlockAccount = async (user) => {
     try {
-      const res = await removeUser(userId);
-      if (res.success) {
-        message.success('Xóa tài khoản thành công!');
-        fetchAccount();
-      }
-    } catch (error) {
-      
-      errorToast('Có lỗi xảy ra khi xóa tài khoản.');
+      const newStatus = !user.isEmailVerified;
+      await updateUser(user._id, { isEmailVerified: newStatus });
+      successToast(`Đã ${newStatus ? 'mở khóa' : 'chặn'} email cho tài khoản!`);
+      fetchAccount();
+    } catch {
+      errorToast('Có lỗi khi cập nhật trạng thái xác thực email.');
     }
   };
-
   const columns = [
     {
       title: 'Tên tài khoản',
@@ -91,19 +83,35 @@ const AccountManagement = () => {
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'Vai trò', dataIndex: 'role', key: 'role' },
     {
+      title: 'Email Đã xác thực',
+      dataIndex: 'isEmailVerified',
+      key: 'isEmailVerified',
+      render: v => v ? 'Đang hoạt động' : 'Đã bị chặn',
+    },
+    {
       title: 'Hành động',
       key: 'action',
+      width: 150,
       render: (_, record) => (
-        <div>
-          <DeleteOutlined
-            style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }}
-            onClick={() => handleDeleteAccount(record._id)}
-          />
+        <span>
+          <Popconfirm
+            title="Bạn có chắc chặn người dùng này không?"
+            onConfirm={() => handleToggleBlockAccount(record)}
+            okText="Xác nhận"
+            cancelText="Hủy"
+          >
+            <Button
+              style={{ color: record.isEmailVerified ? 'green' : 'red', marginLeft:'20px', fontSize: 20 }}
+
+            >
+              {record.isEmailVerified ? <FaUnlock  /> : <FaLock />}
+            </Button>
+          </Popconfirm>
           <EditOutlined
-            style={{ color: 'blue', fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
+            style={{ color: 'blue', fontSize: 20, marginLeft: 16, cursor: 'pointer' }}
             onClick={() => openEditDrawer(record)}
           />
-        </div>
+        </span>
       ),
     },
   ];
@@ -151,10 +159,6 @@ const AccountManagement = () => {
           <Form.Item
             name="email"
             label="Email"
-            // rules={[
-            //   { required: true, message: 'Vui lòng nhập email' },
-            //   { type: 'email', message: 'Email không hợp lệ' },
-            // ]}
           >
             <Input disabled />
           </Form.Item>
@@ -175,7 +179,7 @@ const AccountManagement = () => {
             type="primary"
             block
             onClick={handleUpdateAccount}
-          >
+           >
             Xác nhận cập nhật
           </Button>
         </Form>

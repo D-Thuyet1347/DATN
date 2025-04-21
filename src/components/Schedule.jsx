@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { getAllBookings } from '../APIs/booking';
-import { getUser } from '../APIs/userApi'; // Import API getUser
+import { getUser } from '../APIs/userApi';
 import moment from 'moment';
 import { errorToast } from '../utils/toast';
 import { List, Tag } from 'antd';
 import { jwtDecode } from 'jwt-decode';
 
 const hours = Array.from({ length: 10 }, (_, i) => i + 8);
-const days = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+const daysName = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
 
-const Schedule = () => {
+const Schedule = ({ employeeViewId }) => {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const [dateFilter, setDateFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState(moment().format("YYYY-MM-DD"));
   const [showSchedule, setShowSchedule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState([]);
   const [employeeId, setEmployeeId] = useState('');
   const [data, setData] = useState([]);
-  const [isEmployee, setIsEmployee] = useState(false);  // To check if user is employee
+  const [isEmployee, setIsEmployee] = useState(false);
   const [userRole, setUserRole] = useState('');
   const token = localStorage.getItem('token');
-
 
   const getStatusTag = (status) => {
     const statusMap = {
@@ -47,6 +46,12 @@ const Schedule = () => {
       : 'Liên hệ';
   };
 
+  const getNext7DaysFromDate = (dateStr) => {
+    return Array.from({ length: 7 }, (_, i) =>
+      moment(dateStr).clone().add(i, 'days').format('YYYY-MM-DD')
+    );
+  };
+
   const fetchBookingsALL = async () => {
     try {
       const res = await getAllBookings();
@@ -56,10 +61,16 @@ const Schedule = () => {
         time: booking.time || 'N/A',
         status: booking.status || 'Đang xử lý',
       }));
-      setBookings(bookingsData);
-
       const transformed = bookingsData
-      .filter(b => isEmployee ? b.employee?.UserID._id === employeeId :employeeId)
+        .filter(b => {
+          if (employeeViewId) {
+            return b.employee?.UserID?._id === employeeViewId;
+          }
+          if (isEmployee && employeeId) {
+            return b.employee?.UserID?._id === employeeId;
+          }
+          return false;
+        })
         .map(b => {
           const [hourStr] = b.time.split(':');
           return {
@@ -68,15 +79,17 @@ const Schedule = () => {
             date: `${b.date}T${hourStr.padStart(2, '0')}:00:00`,
           };
         });
+
       setData(transformed);
     } catch (error) {
-      
-      errorToast(error.message || 'Có lỗi xảy ra khi tải dữ liệu');
+      errorToast('Có lỗi xảy ra khi tải dữ liệu');
     } finally {
       setLoading(false);
     }
   };
+
   const fetchUserData = async () => {
+    if (employeeViewId) return; 
     const token = localStorage.getItem('token');
     if (token) {
       try {
@@ -93,24 +106,34 @@ const Schedule = () => {
           }
         }
       } catch (error) {
-        
+        errorToast('Lỗi khi tải thông tin người dùng');
       }
     }
   };
+
   useEffect(() => {
-    fetchUserData();
-    fetchBookingsALL(); // Fetch all bookings whenever isEmployee or employeeId changes
-  }, [employeeId, isEmployee,token]);
+    if (employeeViewId) {
+      setEmployeeId(employeeViewId);
+    } else {
+      fetchUserData();
+    }
+    fetchBookingsALL();
+  }, [employeeId, employeeViewId, token]);
+
+  const currentWeekDays = dateFilter ? getNext7DaysFromDate(dateFilter) : [];
 
   const filteredEvents = data
-    .filter(event => filter === "all" || new Date(event.date).getDay() === parseInt(filter))
-    .filter(event => event.title && event.title.toLowerCase().includes(search.toLowerCase()))
-    .filter(event => !dateFilter || event.date.startsWith(dateFilter));
+  .filter(event => {
+    const eventDate = moment(event.date).format('YYYY-MM-DD');
+    return currentWeekDays.includes(eventDate);
+  })
+  .filter(event => filter === "all" || moment(event.date).day() === parseInt(filter))
+  .filter(event => event.title && event.title.toLowerCase().includes(search.toLowerCase()));
 
-  const getEventByHourAndDay = (hour, dayIndex) => {
+  const getEventByHourAndDay = (hour, dateStr) => {
     return filteredEvents.find(event => {
-      const eventDate = new Date(event.date);
-      return eventDate.getHours() === hour && eventDate.getDay() === dayIndex;
+      const eventDate = moment(event.date);
+      return eventDate.hour() === hour && eventDate.format('YYYY-MM-DD') === dateStr;
     });
   };
 
@@ -138,13 +161,9 @@ const Schedule = () => {
           className="border border-gray-300 rounded-md p-3"
         >
           <option value="all">Tất cả</option>
-          <option value="1">Thứ 2</option>
-          <option value="2">Thứ 3</option>
-          <option value="3">Thứ 4</option>
-          <option value="4">Thứ 5</option>
-          <option value="5">Thứ 6</option>
-          <option value="6">Thứ 7</option>
-          <option value="0">Chủ nhật</option>
+          {daysName.map((d, i) => (
+            <option key={i} value={i}>{d}</option>
+          ))}
         </select>
       </div>
 
@@ -153,8 +172,10 @@ const Schedule = () => {
           <thead>
             <tr className="bg-gray-100">
               <th className="border px-4 py-2 w-[100px]">Giờ \ Ngày</th>
-              {days.map((day, index) => (
-                <th key={index} className="border px-4 py-2">{day}</th>
+              {currentWeekDays.map((dayStr, index) => (
+                <th key={index} className="border px-4 py-2">
+                  {daysName[moment(dayStr).day()]} <br /> {moment(dayStr).format("DD/MM")}
+                </th>
               ))}
             </tr>
           </thead>
@@ -162,12 +183,12 @@ const Schedule = () => {
             {hours.map(hour => (
               <tr key={hour} className="hover:bg-gray-50">
                 <td className="border px-4 py-2 font-semibold">{hour}:00</td>
-                {days.map((_, dayIndex) => {
-                  const event = getEventByHourAndDay(hour, dayIndex);
+                {currentWeekDays.map((dayStr, dayIndex) => {
+                  const event = getEventByHourAndDay(hour, dayStr);
                   return (
                     <td
                       key={dayIndex}
-                      className={`border px-4 py-2 w-[100px] h-[100px] ${event ? 'bg-green-300 cursor-pointer' : 'bg-white'}`}
+                      className={`border px-2 py-2 w-[100px] h-[100px] ${event ? 'bg-green-300 cursor-pointer' : 'bg-white'}`}
                       onClick={() => event && setShowSchedule(event)}
                     >
                       {event ? event.title : "-"}
@@ -197,19 +218,15 @@ const Schedule = () => {
               renderItem={(booking) => (
                 <List.Item className="bg-white rounded-lg shadow-sm mb-4 p-4">
                   <List.Item.Meta
-                    title={
-                      <span className="font-medium text-lg">
-                        {booking.service?.name || 'Dịch vụ không xác định'}
-                      </span>
-                    }
+                    title={<span className="font-medium text-lg">{booking.service?.name || 'Dịch vụ không xác định'}</span>}
                     description={
                       <div className="space-y-1">
-                        <div><span className="font-medium">Ngày hẹn: </span>{moment(booking.date).format('DD/MM/YYYY')} - {booking.time}</div>
-                        <div><span className="font-medium">Chi nhánh: </span>{booking.branch?.BranchName || 'Không xác định'}</div>
-                        <div><span className="font-medium">Nhân viên: </span>{booking.employee?.UserID?.firstName || 'Không xác định'}</div>
-                        <div><span className="font-medium">Trạng thái: </span>{getStatusTag(booking.status)}</div>
-                        <div><span className="font-medium">Giá: </span>{formatPrice(booking.service?.price)}</div>
-                        <div><span className="font-medium">Ngày đăng ký: </span>{moment(booking.createdAt).format('DD/MM/YYYY HH:mm')}</div>
+                        <div><strong>Ngày hẹn:</strong> {moment(booking.date).format('DD/MM/YYYY')} - {booking.time}</div>
+                        <div><strong>Chi nhánh:</strong> {booking.branch?.BranchName || 'Không xác định'}</div>
+                        <div><strong>Nhân viên:</strong> {booking.employee?.UserID?.firstName || 'Không xác định'}</div>
+                        <div><strong>Trạng thái:</strong> {getStatusTag(booking.status)}</div>
+                        <div><strong>Giá:</strong> {formatPrice(booking.service?.price)}</div>
+                        <div><strong>Ngày đăng ký:</strong> {moment(booking.createdAt).format('DD/MM/YYYY HH:mm')}</div>
                       </div>
                     }
                   />
