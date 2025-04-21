@@ -53,13 +53,10 @@ const items = [
       { key: 'banner', label: 'Banner trang chủ' },
       { key: 'account', label: 'Quản lý tài khoản' },
       { key: 'brand', label: 'Quản lý chi nhánh' },
-      { key: 'report', label: 'Báo cáo' },
+      { key: 'report', label: 'Báo cáo, thống kê' },
     ],
   },
 ];
-
-
-
 const Admin = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState('1');
@@ -158,5 +155,4 @@ const Admin = () => {
     </div>
   );
 };
-
 export default Admin;

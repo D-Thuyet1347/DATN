@@ -128,7 +128,6 @@ const ReportForm = () => {
         setLoading(false);
       }
     };
-  
     return (
       <Card title="Báo cáo theo thời gian">
         {toastContainer()}
