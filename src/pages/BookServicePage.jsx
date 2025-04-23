@@ -49,6 +49,7 @@ const BookServicePage = () => {
   const [vouchers, setVouchers] = useState([]);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [isVoucherModalVisible, setIsVoucherModalVisible] = useState(false);
+  const now = new Date();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -222,7 +223,6 @@ const BookServicePage = () => {
       e.preventDefault();
     }
   };
-
   const handleOpenChange = (open) => {
     if (open) {
       window.addEventListener("wheel", handleWheel, { passive: false });
@@ -231,7 +231,6 @@ const BookServicePage = () => {
     }
   };
 
-  // Thời gian
   const handleDateChange = (date) => {
     const employeeId = form.getFieldValue("employee");
     if (employeeId && date) {
@@ -239,13 +238,13 @@ const BookServicePage = () => {
     }
   };
   const disabledTime = () => {
-    const allowedHours = Array.from({ length: 11 }, (_, i) => i + 6); 
+    const allowedHours = Array.from({ length: 11 }, (_, i) => i + 8); 
     const allHours = Array.from({ length: 24 }, (_, i) => i);
     const disabledHours = allHours.filter((h) => !allowedHours.includes(h));
     return {
       disabledHours: () => disabledHours,
       disabledMinutes: (hour) => {
-        return hour >= 8 && hour <= 17 ? [] : [0, 30];
+        return hour >= 8 && hour <= 18 ? [] : [0, 30];
       },
     };
   };
@@ -338,6 +337,10 @@ const BookServicePage = () => {
     const values = await form.validateFields();
     if (!service || !service._id || !service.duration) {
       errorToast("Thiếu thông tin dịch vụ");
+      return false;
+    }
+    if (now.getHours() > values.time.hours()) {
+      errorToast("Giờ đặt lịch đã qua!");
       return false;
     }
     const { branch, employee, date, time } = values;

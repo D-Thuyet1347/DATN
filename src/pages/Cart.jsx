@@ -9,6 +9,7 @@ import {
   Typography,
   Modal,
   Input,
+  Popconfirm,
 } from "antd";
 import { Trash2, Tag } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -267,7 +268,7 @@ const Cart = () => {
         <Card className="w-full max-w-5xl mx-auto">
           <div className="p-4 flex flex-col md:flex-row">
             <div className="w-full md:w-2/3 space-y-4">
-          <p className="p-3 bg-slate-300">Giỏ hàng của bạn</p>
+              <p className="p-3 bg-slate-300">Giỏ hàng của bạn</p>
               {products.map(
                 (product) =>
                   cartItems[product._id] && (
@@ -331,20 +332,25 @@ const Cart = () => {
                             +
                           </button>
                         </div>
-                        <button
-                          onClick={() => handleRemoveFromCart(product._id)}
-                          className="px-2 py-1 text-black rounded"
+                        <Popconfirm
+                          title="Bạn có chắc muốn xóa?"
+                          onConfirm={() => handleRemoveFromCart(product._id)}
+                          okText="Xoá"
+                          cancelText="Huỷ"
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                          <button className="px-2 py-1 text-black rounded">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </Popconfirm>
                       </div>
                     </Card>
                   )
               )}
               <div className="flex items-center p-3 bg-slate-300">
-              <p className=" flex bg-slate-300">Tổng sản phẩm: {totalQuantity}
-              </p>
-              
+                <p className=" flex bg-slate-300">
+                  Tổng sản phẩm: {totalQuantity}
+                </p>
+
                 <Button
                   type="link"
                   className="text-blue-500 hover:text-blue-700"

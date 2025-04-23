@@ -19,7 +19,7 @@ const Mess = () => {
     window.open('tel:123456789', '_blank')
   }
   return (
-    <div className="fixed bottom-[70px] right-3 z-30 pointer-events-none">
+    <div className="fixed bottom-[70px] right-1 z-30 pointer-events-none">
       <div
         className={`rounded-lg p-4 flex flex-col items-center pointer-events-auto space-y-4 ${
           isVisible ? 'mess-animation' : 'opacity-0'

@@ -5,9 +5,11 @@ import { motion } from "framer-motion";
 import { Button, Pagination } from "antd";
 import { useNavigate } from "react-router-dom";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const Service = () => {
-  const [filter, setFilter] = useState("Tất cả dịch vụ");
+  const { t } = useTranslation();
+  const [filter, setFilter] = useState(t("scheduleTab.filters.allServices"));
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [categories, setCategories] = useState([]);
@@ -27,14 +29,18 @@ const Service = () => {
         setCategories(
           uniqueCategories.map((name, index) => ({ _id: index, name }))
         );
-      } catch (error) {
-      }
+      } catch (error) {}
     };
     fetchData();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+    setFilter(t("scheduleTab.filters.allServices")); // Reset filter khi ngôn ngữ thay đổi
+  }, [t]);
+
   const filteredProducts =
-    filter === "Tất cả dịch vụ"
+    filter === t("scheduleTab.filters.allServices")
       ? data
       : data.filter((product) => product.category === filter);
 
@@ -76,7 +82,7 @@ const Service = () => {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2 }}
         >
-          Những dịch vụ nổi bật
+          {t("header.featured Services")}
         </motion.h2>
 
         <motion.div
@@ -103,9 +109,9 @@ const Service = () => {
             <motion.div
               whileTap={{ scale: 0.9 }}
               key="all"
-              onClick={() => setFilter("Tất cả dịch vụ")}
+              onClick={() => setFilter(t("scheduleTab.filters.allServices"))}
               className={`px-4 py-2 rounded-lg cursor-pointer ${
-                filter === "Tất cả dịch vụ"
+                filter === t("scheduleTab.filters.allServices")
                   ? "bg-maincolor text-white"
                   : "bg-gray-200 text-gray-700"
               }`}
@@ -113,7 +119,7 @@ const Service = () => {
                 display: categoryScrollIndex === 0 ? "block" : "none",
               }}
             >
-              Tất cả dịch vụ
+              {t("scheduleTab.filters.allServices")} {/* Tất cả dịch vụ */}
             </motion.div>
             {categories
               .slice(
@@ -131,7 +137,7 @@ const Service = () => {
                       : "bg-gray-200 text-gray-700"
                   }`}
                 >
-                  {item.name}
+                  {t(`scheduleTab.filters.${item.name.toLowerCase()}`, item.name)} {/* Dịch danh mục */}
                 </motion.div>
               ))}
           </motion.div>
@@ -171,7 +177,7 @@ const Service = () => {
             ))
           ) : (
             <p className="text-center text-gray-600 col-span-3">
-              Không có dịch vụ nào trong danh mục này.
+              {t("services.noServices")} {/* Không có dịch vụ */}
             </p>
           )}
         </div>

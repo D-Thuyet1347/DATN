@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getAllServices } from '../APIs/ServiceAPI';
+
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { getAllServices } from "../APIs/ServiceAPI";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -10,12 +13,10 @@ const Footer = () => {
       try {
         const response = await getAllServices();
         const uniqueCategories = [
-          ...new Set(response.data.map(service => service.category))
+          ...new Set(response.data.map((service) => service.category)),
         ];
         setCategories(uniqueCategories);
-      } catch (error) {
-        
-      }
+      } catch (error) {}
     };
 
     fetchServices();
@@ -24,23 +25,14 @@ const Footer = () => {
   return (
     <footer className="bg-footcolor text-white p-10">
       <div className="text-center">
-        <h2 className="text-3xl font-bold">Đánh Thức Giác Quan – Khơi Dậy Năng Lượng</h2>
-        <p className="mt-4">
-          Hãy để WinnerSpaBeauty chăm sóc bạn từ trong ra ngoài. Từ những liệu trình thư giãn đỉnh cao đến dịch vụ cá nhân hoá, chúng tôi cam kết mang đến cho bạn trải nghiệm xứng đáng nhất.
-        </p>
-        <Link to="/booknow">
-          <button className="bg-white text-maincolor px-6 py-3 rounded-md hover:bg-gray-200 mt-6 flex items-center mx-auto">
-            Đặt Lịch Ngay <span className="ml-2 material-icons">arrow_forward</span>
-          </button>
-        </Link>
+        <h2 className="text-3xl font-bold">{t("header.tagline")}</h2>
+        <p className="mt-4">{t("header.description")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
         <div>
-          <h3 className="text-xl font-bold">Về WinnerSpaBeauty</h3>
-          <p className="mt-2">
-            Hơn cả một spa – chúng tôi là điểm đến của sự cân bằng, chữa lành và tái tạo. Hành trình chăm sóc bản thân bắt đầu tại đây.
-          </p>
+          <h3 className="text-xl font-bold">{t("header.aboutTitle")}</h3>
+          <p className="mt-2">{t("header.aboutDescription")}</p>
           <div className="flex space-x-4 mt-4">
             <span className="material-icons">instagram</span>
             <span className="material-icons">facebook</span>
@@ -49,44 +41,66 @@ const Footer = () => {
         </div>
 
         <div>
-          <h3 className="text-xl font-bold">Khám Phá</h3>
+          <h3 className="text-xl font-bold">{t("header.exploreTitle")}</h3>
           <ul className="mt-2 space-y-2">
-            <li><Link to="/" className="hover:underline">Trang Chủ</Link></li>
-            <li><Link to="/about" className="hover:underline">Về Chúng Tôi</Link></li>
-            <li><Link to="/services" className="hover:underline">Dịch Vụ</Link></li>
-            <li><Link to="/booknow" className="hover:underline">Đặt Lịch</Link></li>
-            <li><Link to="/consult-ai" className="hover:underline">Tư Vấn Làm Đẹp AI</Link></li>
+            <li>
+              <Link to="/" className="hover:underline">
+                {t("header.home")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" className="hover:underline">
+                {t("header.about")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/services" className="hover:underline">
+                {t("header.services")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/booknow" className="hover:underline">
+                {t("header.bookNow")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/consult-ai" className="hover:underline">
+                {t("header.consultAI")}
+              </Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h3 className="text-xl font-bold">Dịch Vụ Ưu Việt</h3>
+          <h3 className="text-xl font-bold">{t("header.servicesTitle")}</h3>
           <ul className="mt-2 space-y-2">
             {categories.length > 0 ? (
               categories.slice(0, 6).map((cat, index) => (
                 <li key={index}>
-                  <Link to="/services" className="hover:underline">{cat}</Link>
+                  <Link to="/services" className="hover:underline">
+                    {t(`scheduleTab.filters.${cat.toLowerCase()}`, cat)}
+                  </Link>
                 </li>
               ))
             ) : (
-              <li>Đang tải...</li>
+              <li>{t("header.loading")}</li>
             )}
           </ul>
         </div>
 
         <div>
-          <h3 className="text-xl font-bold">Kết Nối Với Chúng Tôi</h3>
+          <h3 className="text-xl font-bold">{t("header.connectTitle")}</h3>
           <ul className="mt-2 space-y-2">
-            <li>Đâu đó tại Đà Nẵng chăng</li>
-            <li>+84 (555) 123-4567</li>
-            <li>contact@WinnerSpaBeauty.com</li>
-            <li>Giờ mở cửa: 9:00 - 20:00 hàng ngày</li>
+            <li>{t("header.address")}</li>
+            <li>{t("header.phone")}</li>
+            <li>{t("header.email")}</li>
+            <li>{t("header.hours")}</li>
           </ul>
         </div>
       </div>
 
-      <p className="text-center mt-10 italic">"Bạn xứng đáng được chăm sóc và yêu thương."</p>
-      <p className="text-center mt-2">© 2025 WinnerSpaBeauty. Tất cả các quyền được bảo lưu.</p>
+      <p className="text-center mt-10 italic">{t("header.quote")}</p>
+      <p className="text-center mt-2">{t("header.copyright")}</p>
     </footer>
   );
 };

@@ -67,8 +67,14 @@ export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!rating || !comment.trim()) {
-      return errorToast("Vui lòng nhập đầy đủ đánh giá.");
+    if (!rating) {
+      return errorToast("Vui lòng đánh giá rating.");
+    }
+    if (!comment.trim()) {
+      return errorToast("Vui lòng nhập bình luận.");
+    }
+    if(!rating || !comment.trim()) {
+      return errorToast("Vui lòng nhập đầy đủ thông tin.");
     }
     if (!service) {
       return errorToast("Thiếu thông tin dịch vụ.");

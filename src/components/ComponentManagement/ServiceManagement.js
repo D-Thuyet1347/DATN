@@ -103,7 +103,7 @@ const ServiceManagement = () => {
   };
   const columns = [
     { title: 'Tên', dataIndex: 'name', key: 'name' },
-    { title: 'Mô tả', dataIndex: 'description', key: 'description' },
+    { title: 'Mô tả', dataIndex: 'description', key: 'description'},
     { title: 'Giá', dataIndex: 'price', key: 'price' },
     { title: 'Thời gian (phút)', dataIndex: 'duration', key: 'duration' },
     {
@@ -116,6 +116,7 @@ const ServiceManagement = () => {
     {
       title: 'Hành động',
       key: 'action',
+      width: 120,
       render: (record) => (
         <div>
          <Popconfirm

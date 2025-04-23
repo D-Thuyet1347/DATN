@@ -4,13 +4,16 @@ import { Button, message, Pagination } from "antd";
 import { motion } from "framer-motion";
 import { errorToast, toastContainer } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const BlogViewer = () => {
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState([]);
   const [publishedBlogs, setPublishedBlogs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 3;
   const navigate = useNavigate();
+
   useEffect(() => {
     fetchBlogs();
   }, []);
@@ -27,10 +30,10 @@ const BlogViewer = () => {
         const filteredBlogs = allBlogs.filter((blog) => blog.isPublished);
         setPublishedBlogs(filteredBlogs);
       } else {
-        errorToast("Không lấy được dữ liệu blog!");
+        errorToast(t("blog.noData")); // Dịch thông báo không lấy được dữ liệu
       }
     } catch (error) {
-      errorToast("Lỗi tải danh sách bài viết!");
+      errorToast(t("blog.fetchError")); // Dịch thông báo lỗi tải
     }
   };
 
@@ -42,14 +45,15 @@ const BlogViewer = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
   const handleBlog = () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      errorToast("Vui lòng đăng nhập để xem bài viết!");
+      errorToast(t("blog.pleaseLogin")); // Dịch thông báo yêu cầu đăng nhập
       return;
     }
     navigate("/blogpage");
-  }
+  };
 
   return (
     <motion.div
@@ -59,14 +63,14 @@ const BlogViewer = () => {
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 1.2 }}
     >
-    {toastContainer()}
+      {toastContainer()}
       <h1
         className="text-2xl text-[40px] font-bold mb-6 text-center"
         style={{ fontFamily: "Dancing Script, serif" }}
       >
-        Bài viết nổi bật
+        {t("blog.featuredBlog")} {/* Bài viết nổi bật */}
       </h1>
-      <div  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center px-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center px-10">
         {paginatedBlogs.map((blog, index) => (
           <motion.div
             key={blog._id}
@@ -76,7 +80,7 @@ const BlogViewer = () => {
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
           >
-            <div  className="flex items-center mb-4">
+            <div className="flex items-center mb-4">
               <img
                 src="https://randomuser.me/api/portraits/men/1.jpg"
                 alt="User Profile"
@@ -93,11 +97,12 @@ const BlogViewer = () => {
                 {blog.content}
               </p>
               {blog.image && (
-                <img 
-                onClick={handleBlog}
+                <img
+                  onClick={handleBlog}
                   src={blog.image}
                   alt="Post"
                   className="w-full h-[192px] object-cover rounded-lg mt-4"
+                  style={{ cursor: "pointer" }}
                 />
               )}
             </div>

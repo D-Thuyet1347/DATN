@@ -41,7 +41,7 @@ const BackToTop = () => {
       style={{
         position: "fixed",
         bottom: "200px",
-        right: "25px",
+        right: "20px",
         zIndex: 1000,
         transition: "bottom 0.3s ease-in-out",
       }}

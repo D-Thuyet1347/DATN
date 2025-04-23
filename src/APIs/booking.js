@@ -58,7 +58,6 @@ export const updateBooking = async (id, bookingData) => {
 
 };
 
-// Hàm xóa booking
 export const deleteBooking = async (id) => {
     const response = await axios.delete(`${API_URL}/delete/${id}`, {
       headers: {

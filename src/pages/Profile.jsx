@@ -3,7 +3,6 @@ import { Menu } from 'antd';
 import { useLocation } from 'react-router-dom';
 import {
     EditOutlined,
-    HomeOutlined,
     LockOutlined,
     ShoppingCartOutlined,
     ClockCircleOutlined,
@@ -26,7 +25,7 @@ function Profile() {
 
     const items = [
         { key: 'profile', icon: <EditOutlined />, label: 'Hồ sơ' },
-        { key: 'myorders', icon: <HomeOutlined />, label: 'Đơn hàng' },
+        { key: 'myorders', icon: <ShoppingCartOutlined />, label: 'Đơn hàng'},
         { key: 'changepassword', icon: <LockOutlined />, label: 'Đổi mật khẩu' },
         { key: 'schedule', icon: <ClockCircleOutlined />, label: 'Lịch hẹn' },
     ];
@@ -52,23 +51,60 @@ function Profile() {
 
     return (
         <>
-        <Header className="!bg-white !text-black !shadow-md" />
-        <div className=" mt-[100px]  flex items-center justify-center p-4">
-            <div className="flex w-[1500px] bg-white rounded-3xl shadow-xl overflow-hidden">
-                <div className="w-64 flex-shrink-0 bg-gradient-to-b from-pink-200 to-purple-300 rounded-l-3xl">
-                    <Menu
-                        mode="inline"
-                        selectedKeys={[activeTab]}
-                        onClick={handleMenuClick}
-                        items={items}
-                        className="!border-e-0 h-full bg-transparent p-4 text-gray-700"
-                    />
-                </div>
-                <div className="flex-1 p-8  bg-gray-50 rounded-r-3xl overflow-y-auto">
-                    {renderContent()}
+         <Header className="!bg-white !text-black !shadow-md" />
+            <div className="flex justify-center mt-[70px] items-center min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 ">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl w-full">
+                    <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        <div className="mb-2 text-center">
+                            <p className="text-2xl font-semibold text-pink-600">Quản lý thông tin</p>
+                        </div>
+                        <Menu
+                            mode="inline"
+                            selectedKeys={[activeTab]}
+                            onClick={handleMenuClick}
+                            items={items}
+                            className="custom-menu border-0"
+                        />
+                    </div>
+                    <div className="md:col-span-3 bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+                        {renderContent()}
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <style>
+                {`
+                    .custom-menu .ant-menu-item {
+                        border-radius: 0.75rem;
+                        margin-bottom: 0.5rem;
+                        padding: 14px 16px;
+                        display: flex;
+                        align-items: center;
+                        transition: all 0.3s ease;
+                        font-size: 16px;
+                        font-weight: 500;
+                    }
+
+                    .custom-menu .ant-menu-item:hover {
+                        background: linear-gradient(135deg, #f9a8d4, #f3e8ff) !important;
+                        color: #ec4899 !important;
+                        transform: scale(1.02);
+                        box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2);
+                    }
+
+                    .custom-menu .ant-menu-item-selected {
+                        background: linear-gradient(135deg, #f9a8d4, #f3e8ff) !important;
+                        color: #ec4899 !important;
+                        font-weight: 600;
+                        box-shadow: 0 2px 8px rgba(236, 72, 153, 0.15);
+                    }
+
+                    .custom-menu .ant-menu-item .anticon {
+                        font-size: 18px;
+                        margin-right: 12px;
+                    }
+                `}
+            </style>
         </>
     );
 }

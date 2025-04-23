@@ -187,7 +187,6 @@ const ReviewsDeTailDV = () => {
                 </div>
                 <p className="text-gray-600 mt-2">{review.comment}</p>
 
-                {/* Dropdown menu */}
                 <div className="relative dropdown-review">
                   <div
                     className="flex justify-end mt-2 cursor-pointer"

@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Tag, Typography, message, Button, Modal, Select, Spin } from 'antd';
-import moment from 'moment';
-import { getBookingUser, deleteBooking, updateBooking } from '../APIs/booking';
+import React, { useState, useEffect } from 'react';
+import { Table, Tag, message, Button, Modal, Spin } from 'antd';
+import moment from 'moment'; 
+import 'moment/locale/vi'; 
+import { deleteBooking, getBookingUser, updateBooking } from '../APIs/booking';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { errorToast, toastContainer } from '../utils/toast';
+import { errorToast,successToast,toastContainer } from '../utils/toast';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-const { Text } = Typography;
-const { Option } = Select;
+moment.locale('vi');
 
 const ScheduleTab = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentBooking, setCurrentBooking] = useState(null);
-  const [editStatus, setEditStatus] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false); 
+  const [currentBooking, setCurrentBooking] = useState(null); 
+  const [editStatus, setEditStatus] = useState(''); 
   const token = localStorage.getItem('token');
-  const userId = localStorage.getItem('userId');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -24,207 +24,265 @@ const ScheduleTab = () => {
     { value: 'Đã xác nhận', label: 'Đã xác nhận', color: 'blue' },
     { value: 'Đã hoàn thành', label: 'Đã hoàn thành', color: 'green' },
     { value: 'Đã hủy', label: 'Đã hủy', color: 'red' },
+    { value: 'Không đến', label: 'Không đến', color: 'purple' }, 
   ];
-
-  useEffect(() => {
-    fetchBookings();
-  }, []);
-
-  useEffect(() => {
-    if (location.state?.newBookingId) {
-      fetchBookings();
-    }
-  }, [location.state]);
-
   const fetchBookings = async () => {
+    setLoading(true);
     try {
-      if (!token || !userId) {
-        errorToast('Vui lòng đăng nhập để xem lịch hẹn');
+      if (!token) {
+        errorToast('Vui lòng đăng nhập để xem lịch hẹn.');
+        setLoading(false);
         return;
       }
 
-      const res = await getBookingUser(token);
-      const formatted = res.map((b) => ({
+      const res = await getBookingUser(token); // API uses token to identify user
+
+      if (!Array.isArray(res)) {
+        console.error("Expected an array of bookings, received:", res);
+        throw new Error("Dữ liệu lịch hẹn không hợp lệ.");
+      }
+
+      const sortedBookings = res.sort((a, b) => moment(b.date).diff(moment(a.date)));
+
+      const formatted = sortedBookings.map((b) => ({
         ...b,
-        key: b._id,
-        dateFormatted: moment(b.date).format('DD/MM/YYYY'),
-        createdAtFormatted: moment(b.createdAt).format('DD/MM/YYYY HH:mm'),
+        key: b._id, 
+        dateFormatted: b.date ? moment(b.date).format('DD/MM/YYYY') : 'N/A',
+        timeFormatted: b.time || 'N/A', // Assuming time is already a string like "09:00"
+        createdAtFormatted: b.createdAt ? moment(b.createdAt).format('DD/MM/YYYY HH:mm') : 'N/A',
+        serviceName: b.service?.name || 'Không xác định',
+        branchName: b.branch?.BranchName || 'Không xác định',
+        employeeName: b.employee?.UserID?.firstName ? `${b.employee.UserID.firstName} ${b.employee.UserID.lastName || ''}`.trim() : (b.employee?.name || 'Không xác định'),
+        statusNormalized: b.status ? b.status.trim() : 'Đang xử lý', 
+        totalAmountFormatted: formatPrice(b.totalAmount),
       }));
       setBookings(formatted);
+      if (formatted.length === 0 && !loading) { 
+           // message.info('Bạn chưa có lịch hẹn nào.'); // Maybe not needed if "empty" state is shown
+      }
+
     } catch (err) {
-      
-      errorToast(err.message || 'Lỗi khi tải lịch hẹn');
+      console.error("Fetch bookings error:", err);
+      errorToast(err.message || 'Lỗi khi tải danh sách lịch hẹn.');
     } finally {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    fetchBookings();
+  }, [location.state?.newBookingId]);
   const getStatusTag = (status) => {
-    const match = bookingStatusOptions.find((s) => s.value === status);
-    return <Tag color={match?.color || 'gray'}>{match?.label || status}</Tag>;
+    const match = bookingStatusOptions.find((s) => s.value.toLowerCase() === status?.toLowerCase());
+    return (
+      <Tag color={match?.color || 'default'} className="text-xs font-medium whitespace-nowrap">
+        {match?.label || status || 'N/A'}
+      </Tag>
+    );
+  };
+  const formatPrice = (totalAmount) => {
+    if (totalAmount === null || totalAmount === undefined || totalAmount === '') return <span className="text-gray-500 italic text-xs">Chưa cập nhật</span>;
+
+    const numericPrice = typeof totalAmount === 'string'
+        ? parseFloat(totalAmount.replace(/[^0-9,-]+/g,"").replace(',', '.')) 
+        : totalAmount;
+
+    if (isNaN(numericPrice)) return <span className="text-gray-500 italic text-xs">Giá không hợp lệ</span>;
+
+    return numericPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
 
-  const handleCancelBooking = (id) => {
+  const handleCancelBooking = (bookingId, currentStatus) => {
     Modal.confirm({
       title: 'Xác nhận hủy lịch hẹn',
-      content: 'Bạn có chắc chắn muốn hủy lịch hẹn này?',
+      icon: <ExclamationCircleOutlined className="text-red-600" />,
+      content: 'Bạn có chắc chắn muốn hủy lịch hẹn này không? Hành động này không thể hoàn tác.',
       okText: 'Xác nhận',
+      okButtonProps: {
+        danger: true,
+        className: 'bg-red-600 hover:bg-red-700 border-red-600 hover:border-red-700',
+      },
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await deleteBooking(id);
-          message.success('Hủy lịch hẹn thành công');
-          fetchBookings();
+          message.loading({ content: 'Đang hủy lịch hẹn...', key: 'deleteBooking' });
+          const response = await deleteBooking(bookingId);
+          if (response.success) {
+            successToast('Hủy lịch hẹn thành công!');
+            fetchBookings();
+          } else {
+            throw new Error(response.message || 'Xóa lịch hẹn thất bại.');
+          }
         } catch (err) {
-          
-          errorToast(err.message || 'Lỗi khi hủy lịch hẹn');
+          console.error("Delete booking error:", err);
+          message.error({ content: err.message || 'Lỗi khi xóa lịch hẹn.', key: 'deleteBooking', duration: 3 });
         }
       },
     });
   };
-
-  const handleUpdateBooking = async () => {
-    try {
-      await updateBooking(currentBooking._id, { status: editStatus });
-      message.success('Cập nhật trạng thái thành công');
-      setIsModalVisible(false);
-      fetchBookings();
-    } catch (err) {
-      
-      errorToast(err.message || 'Lỗi khi cập nhật trạng thái');
-    }
-  };
-
-  const formatPrice = (totalAmount) => {
-    if (!totalAmount && totalAmount !== 0) return 'Chưa xác định';
-
-    const numericPrice =
-      typeof totalAmount === 'string'
-        ? parseFloat(totalAmount.replace(/\./g, '').replace(',', '.'))
-        : totalAmount;
-
-    return numericPrice.toLocaleString('vi-VN') + 'đ';
+  
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setCurrentBooking(null);
+    setEditStatus('');
   };
 
   const columns = [
     {
-      title: 'Dịch vụ',
-      dataIndex: ['service', 'name'],
+      title: <span className="font-semibold text-gray-700">Dịch vụ</span>,
+      dataIndex: 'serviceName',
       key: 'service',
-      render: (text) => text || 'Không xác định',
+      render: (text) => <span className="text-sm font-medium text-gray-800">{text}</span>,
     },
     {
-      title: 'Ngày & Giờ',
+      title: <span className="font-semibold text-gray-700">Ngày & Giờ</span>,
       key: 'datetime',
-      className: 'w-[150px]',
-      render: (b) => `${b.dateFormatted} - ${b.time}`,
+      render: (_, record) => ( 
+        <div className="flex flex-col">
+          <span className="text-sm text-gray-700">{record.dateFormatted}</span>
+          <span className="text-xs text-gray-500">{record.timeFormatted}</span>
+        </div>
+      ),
     },
     {
-      title: 'Chi nhánh',
-      dataIndex: ['branch', 'BranchName'],
+      title: <span className="font-semibold text-gray-700">Chi nhánh</span>,
+      dataIndex: 'branchName',
       key: 'branch',
-      render: (text) => text || 'Không xác định',
+      render: (text) => <span className="text-sm text-gray-600">{text}</span>,
     },
     {
-      title: 'Nhân viên',
-      dataIndex: ['employee', 'UserID'],
-      key: 'employee',
-      render: (emp) => emp?.firstName || emp?.name || 'Không xác định',
+      title: <span className="font-semibold text-gray-700">Giá</span>,
+      dataIndex: 'totalAmountFormatted',
+      key: 'totalAmount',
+      render: (text) => <span className="text-sm font-semibold text-pink-700">{text}</span>,
     },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
+      title: <span className="font-semibold text-gray-700">Trạng thái</span>,
+      dataIndex: 'statusNormalized',
       key: 'status',
       render: (status) => getStatusTag(status),
     },
+
     {
-      title: 'Giá',
-      key: 'totalAmount',
-      render: (booking) => (
-        <div>
-          {formatPrice(booking.totalAmount)}
-        </div>
-      ),
-    },
-    {
-      title: 'Ghi chú',
-      dataIndex: 'notes',
-      key: 'notes',
-      render: (text) => text || '-',
-    },
-    {
-      title: 'Hành động',
+      title: <span className="font-semibold text-gray-700">Hành động</span>,
       key: 'actions',
-      render: (booking) => (
-        <div className="space-x-2">
-          <Button
-            size="small"
-            danger
-            onClick={() => handleCancelBooking(booking._id)}
-            disabled={booking.status === 'Đã hủy'}
-          >
-            Hủy
-          </Button>
-        </div>
-      ),
+      fixed: 'right',
+      width: 120,
+      render: (_, record) => {
+          const canCancel = record.statusNormalized !== 'Đã hủy' && record.statusNormalized !== 'Đã hoàn thành' && record.statusNormalized !== 'Đã xác nhận'; ;
+          return (
+             <div className="flex items-center justify-center">
+                <Button
+                    type="link"
+                    danger 
+                    size="small"
+                    onClick={() => handleCancelBooking(record._id, record.statusNormalized)}
+                    disabled={!canCancel}
+                    className={`p-0 h-auto font-medium ${!canCancel ? 'text-gray-400 cursor-not-allowed' : 'text-red-600 hover:text-red-800'}`}
+                    title={!canCancel ? `Không thể hủy lịch hẹn đã ${record.statusNormalized?.toLowerCase()}` : "Hủy lịch hẹn này"}
+                >
+                    Hủy
+                </Button>
+             </div>
+          );
+      },
     },
   ];
 
   return (
-    <div className="my-bookings-tab">
-    {toastContainer()}
-      <h2 className="text-2xl font-semibold mb-4">Lịch Hẹn Của Tôi</h2>
-      {loading ? (
-        <div className="text-center"><Spin size="large" /></div>
-      ) : bookings.length === 0 ? (
-        <p className="text-center text-gray-500">
-          Bạn chưa có lịch hẹn nào.{' '}
-          <Button type="link" onClick={() => navigate('/servicepage')} className="p-0">
-            Đặt lịch ngay
+    <div className="space-y-2">
+      {toastContainer()}
+      <div className="flex justify-between items-center mb-6">
+         <h2 className="text-2xl font-semibold text-pink-800">Lịch Hẹn Của Tôi</h2>
+         <Button
+            type="primary"
+            onClick={() => navigate('/servicepage')} 
+            className="bg-pink-600 hover:bg-pink-700 border-pink-600 hover:border-pink-700 focus:ring-pink-500 text-white font-semibold rounded-md shadow-sm transition duration-150"
+         >
+            Đặt lịch hẹn mới
           </Button>
-        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <Spin size="large" />
+          <span className="ml-4 text-gray-500">Đang tải lịch hẹn...</span>
+        </div>
+      ) : bookings.length === 0 ? (
+        <div className="text-center py-10 px-6 bg-white rounded-lg shadow-sm border border-pink-100">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <h3 className="mt-2 text-lg font-medium text-gray-900">Chưa có lịch hẹn nào</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            Bạn chưa đặt lịch hẹn nào tại spa.
+          </p>
+          <div className="mt-6">
+            <Button
+              type="primary"
+              onClick={() => navigate('/servicepage')} 
+              className="bg-pink-600 hover:bg-pink-700 border-pink-600 hover:border-pink-700 focus:ring-pink-500 text-white font-semibold rounded-md shadow-sm transition duration-150"
+            >
+              Đặt lịch ngay
+            </Button>
+          </div>
+        </div>
       ) : (
-        <Table
-          columns={columns}
-          dataSource={bookings}
-          pagination={{ pageSize: 5 }}
-          scroll={{ x: true }}
-        />
+         <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-pink-100">
+            <Table
+                columns={columns}
+                dataSource={bookings}
+                pagination={{
+                    pageSize: 5,
+                    showSizeChanger: false,
+                    className: "p-4",
+                }}
+                rowClassName="hover:bg-rose-50/50 transition-colors duration-150"
+                scroll={{ x: 'max-content' }} 
+                locale={{ emptyText: <span className="text-gray-500 italic">Không có dữ liệu.</span> }}
+             />
+         </div>
       )}
 
       <Modal
-        title="Chỉnh sửa lịch hẹn"
+        title={<span className="font-semibold text-lg text-pink-800">Chi tiết lịch hẹn</span>} 
         open={isModalVisible}
-        onOk={handleUpdateBooking}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={handleModalCancel} 
+        okText="Lưu thay đổi"
+        cancelText="Đóng"
+        okButtonProps={{ disabled: !editStatus || !currentBooking, className:"bg-pink-600 hover:bg-pink-700 border-pink-600 hover:border-pink-700"}} // Disable OK if no status selected
+        cancelButtonProps={{ className:"hover:border-gray-400"}}
+        destroyOnClose 
       >
         {currentBooking && (
-          <div className="space-y-3">
-            <p><strong>Dịch vụ:</strong> {currentBooking.service?.name}</p>
-            <p><strong>Ngày:</strong> {moment(currentBooking.date).format('DD/MM/YYYY')}</p>
-            <p><strong>Giờ:</strong> {currentBooking.time}</p>
-            <p><strong>Chi nhánh:</strong> {currentBooking.branch?.BranchName}</p>
-            <p><strong>Nhân viên:</strong> {currentBooking.employee?.UserID?.firstName || 'Không xác định'}</p>
-            <p><strong>Tổng tiền:</strong> {formatPrice(currentBooking.totalAmount)}</p>
-
-            <Select
-              style={{ width: '100%' }}
-              value={editStatus}
-              onChange={setEditStatus}
-            >
-              {bookingStatusOptions.map((opt) => (
-                <Option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </Option>
-              ))}
-            </Select>
-
-            {currentBooking.notes && (
-              <>
-                <p><strong>Ghi chú:</strong></p>
-                <p>{currentBooking.notes}</p>
-              </>
-            )}
+          <div className="space-y-4">
+            <div className="space-y-2 text-sm">
+                <div className="grid grid-cols-3 gap-2">
+                    <p className="text-gray-500 font-medium col-span-1">Dịch vụ:</p>
+                    <p className="text-gray-800 col-span-2">{currentBooking.serviceName}</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                    <p className="text-gray-500 font-medium col-span-1">Ngày:</p>
+                    <p className="text-gray-800 col-span-2">{currentBooking.dateFormatted}</p>
+                </div>
+                 <div className="grid grid-cols-3 gap-2">
+                    <p className="text-gray-500 font-medium col-span-1">Giờ:</p>
+                    <p className="text-gray-800 col-span-2">{currentBooking.timeFormatted}</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                    <p className="text-gray-500 font-medium col-span-1">Chi nhánh:</p>
+                    <p className="text-gray-800 col-span-2">{currentBooking.branchName}</p>
+                </div>
+                 <div className="grid grid-cols-3 gap-2">
+                    <p className="text-gray-500 font-medium col-span-1">Giá:</p>
+                    <p className="col-span-2 font-semibold text-pink-700">{currentBooking.totalAmountFormatted}</p>
+                </div>
+                 {currentBooking.notes && (
+                    <div className="grid grid-cols-3 gap-2 pt-1">
+                        <p className="text-gray-500 font-medium col-span-1">Ghi chú:</p>
+                        <p className="text-gray-700 col-span-2 italic">{currentBooking.notes}</p>
+                    </div>
+                 )}
+            </div>
           </div>
         )}
       </Modal>

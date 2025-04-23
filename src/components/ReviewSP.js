@@ -24,8 +24,7 @@ export const ReviewSP = ({ onAddReview }) => {
         if (productData.success) {
           setProduct(productData.data);
         }
-      } catch (error) {
-        
+      } catch (error) {  
       }
     };
     fetchProduct();
@@ -68,12 +67,18 @@ export const ReviewSP = ({ onAddReview }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!rating || !comment.trim()) {
-      return alert("Vui lòng nhập đầy đủ đánh giá.");
-    }
-
+ e.preventDefault();
+     if (!rating) {
+       return errorToast("Vui lòng đánh giá rating.");
+     }
+     if (!comment.trim()) {
+       return errorToast("Vui lòng nhập bình luận.");
+     }
+     if(!rating || !comment.trim()) {
+       return errorToast("Vui lòng nhập đầy đủ thông tin.");
+     }
     if (!userId || !product) {
-      return alert("Thiếu thông tin user hoặc sản phẩm.");
+      return errorToast("Thiếu thông tin user hoặc sản phẩm.");
     }
 
     const reviewData = {
@@ -88,7 +93,7 @@ export const ReviewSP = ({ onAddReview }) => {
       const res = await addReviewSP(reviewData);
       if (res.success) {
         successToast("Đánh giá thành công!");
-        onAddReview(); // Gọi lại hàm fetch lại đánh giá
+        onAddReview();
         setRating(0);
         setComment('');
       } else {
