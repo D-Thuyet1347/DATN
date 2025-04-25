@@ -1,15 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Row, Col, Card, Statistic, message, List, Avatar } from "antd";
+import { Row, Col, Card, Statistic, message, List, Avatar, DatePicker, Select } from "antd";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Tooltip,
-  Legend,
-  LineChart,
-  Line,
   ResponsiveContainer,
   PieChart,
   Pie,
@@ -19,7 +11,8 @@ import { listOrder } from "../../APIs/orderApi";
 import { listUser } from "../../APIs/userApi";
 import { getAllBookings } from "../../APIs/booking";
 import anhSpa from "../../img/anhspa.png";
-import { errorToast, toastContainer } from "../../utils/toast";
+import dayjs from "dayjs";
+
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -41,12 +34,14 @@ const Dashboard = () => {
 
   const [topProducts, setTopProducts] = useState([]);
   const [topServices, setTopServices] = useState([]);
+  const [dateRange, setDateRange] = useState(null);
+  const [filterType, setFilterType] = useState('all'); // 'all', 'orders', 'bookings'
 
   const groupOrdersByDate = (orders) => {
     const grouped = {};
     orders.forEach((order) => {
       const date = new Date(order.orderDate);
-      const formattedDate = new Intl.DateTimeFormat("vi-VN").format(date); // Định dạng theo "Ngày/Tháng/Năm"
+      const formattedDate = new Intl.DateTimeFormat("vi-VN").format(date);
       if (!grouped[formattedDate]) {
         grouped[formattedDate] = {
           date: formattedDate,
@@ -58,6 +53,16 @@ const Dashboard = () => {
       grouped[formattedDate].revenue += order.totalAmount;
     });
     return Object.values(grouped);
+  };
+
+  const filterByDateRange = (data, dateField) => {
+    if (!dateRange) return data;
+    
+    const [start, end] = dateRange;
+    return data.filter(item => {
+      const itemDate = dayjs(item[dateField]);
+      return itemDate.isAfter(start) && itemDate.isBefore(end.add(1, 'day'));
+    });
   };
 
   const getTopSellingProducts = (orders) => {
@@ -124,9 +129,11 @@ const Dashboard = () => {
       let totalRevenue = 0;
       let orderRevenue = 0;
       let bookingRevenue = 0;
+      let filteredOrders = [];
+      let filteredBookings = [];
 
       if (orderRes.success && Array.isArray(orderRes.data)) {
-        const orders = orderRes.data.map((item) => ({
+        filteredOrders = orderRes.data.map((item) => ({
           ...item,
           key: item._id,
           orderDate: item.orderDate
@@ -134,15 +141,23 @@ const Dashboard = () => {
             : "Không rõ",
         }));
 
-        const totalOrders = orders.length;
-        orderRevenue = orders.reduce(
+        // Áp dụng bộ lọc ngày nếu có
+        if (dateRange && filterType !== 'bookings') {
+          filteredOrders = filterByDateRange(filteredOrders, 'orderDate');
+        }
+
+        const totalOrders = filteredOrders.length;
+        orderRevenue = filteredOrders.reduce(
           (sum, order) => sum + (order.totalAmount || 0),
           0
         );
-        totalRevenue += orderRevenue;
+        
+        if (filterType !== 'bookings') {
+          totalRevenue += orderRevenue;
+        }
 
-        const groupedData = groupOrdersByDate(orders);
-        const topSelling = getTopSellingProducts(orders);
+        const groupedData = groupOrdersByDate(filteredOrders);
+        const topSelling = getTopSellingProducts(filteredOrders);
 
         setStats((prev) => ({ ...prev, totalOrders }));
 
@@ -162,42 +177,46 @@ const Dashboard = () => {
         });
 
         setTopProducts(topSelling);
-      } else {
-        throw new Error(orderRes.message || "Không thể tải đơn hàng");
-      }
-
+      } 
+      
       if (userRes.success && Array.isArray(userRes.data)) {
         const totalUsers = userRes.data.filter(
           (user) => user.role === "user"
         ).length;
         setStats((prev) => ({ ...prev, totalUsers }));
-      } else {
-        throw new Error(
-          userRes.message || "Không thể tải danh sách người dùng"
-        );
-      }
-
+      } 
+      
       if (Array.isArray(bookingRes)) {
-        bookingRevenue = bookingRes.reduce(
+        filteredBookings = bookingRes.map(item => ({
+          ...item,
+          bookingDate: item.bookingDate || item.createdAt
+        }));
+
+        if (dateRange && filterType !== 'orders') {
+          filteredBookings = filterByDateRange(filteredBookings, 'bookingDate');
+        }
+
+        bookingRevenue = filteredBookings.reduce(
           (sum, booking) => sum + (booking.totalAmount || 0),
           0
         );
-        totalRevenue += bookingRevenue;
+        
+        if (filterType !== 'orders') {
+          totalRevenue += bookingRevenue;
+        }
 
         setStats((prev) => ({
           ...prev,
-          totalBookings: bookingRes.length,
+          totalBookings: filteredBookings.length,
           totalRevenue,
           orderRevenue,
           bookingRevenue,
         }));
 
-        const topUsed = getTopUsedServices(bookingRes);
+        const topUsed = getTopUsedServices(filteredBookings);
         setTopServices(topUsed);
-      } else {
-        throw new Error("Không thể tải danh sách dịch vụ");
-      }
-
+      } 
+      
       setStats((prev) => ({ ...prev, loading: false }));
     } catch (error) {
       setStats((prev) => ({
@@ -205,27 +224,27 @@ const Dashboard = () => {
         error: error.response?.data?.message || error.message,
         loading: false,
       }));
-      errorToast(error.response?.data?.message || "Không thể tải thống kê");
+      message.error(error.response?.data?.message || "Không thể tải thống kê");
     }
-  }, []);
+  }, [dateRange, filterType]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
-  const COLORSORDER = ['#D65DB1', '#FFC75F', '#FF6F91', '#FFBB28', '#845EC2', '#F9F871', '#00C49F', '#FF8042', '#0088FE', '#FF9671'];
-
-  const COLORSBOOKING = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#845EC2', '#D65DB1', '#FF6F91', '#FF9671', '#FFC75F', '#F9F871'];
+  const COLORSORDER = [ '#FF6F91'];
+  const COLORSBOOKING = ['#FF8042'];
+  
   const orderPieData = [
     { name: "Doanh thu đơn hàng", value: stats.orderRevenue },
   ];
+  
   const bookingPieData = [
     { name: "Doanh thu đặt lịch", value: stats.bookingRevenue },
   ];
   return (
     <div>
       <h2>Dashboard</h2>
-      {toastContainer()}
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col span={6}>
           <Card>
@@ -252,6 +271,7 @@ const Dashboard = () => {
           </Card>
         </Col>
       </Row>
+      
       <Row gutter={[16, 16]} style={{ marginTop: "30px" }}>
         <Col span={12}>
           <Card title="Biểu đồ tròn: Doanh thu từ đơn hàng">
@@ -275,24 +295,7 @@ const Dashboard = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  content={({ payload }) => {
-                    if (payload && payload.length > 0) {
-                      const { name, value } = payload[0];
-                      // Thêm thời gian vào tooltip (ví dụ sử dụng ngày tháng hiện tại)
-                      const currentDate = new Date().toLocaleDateString(
-                        "vi-VN"
-                      );
-                      return (
-                        <div>
-                          <strong>{name}</strong>
-                          <div>{value.toLocaleString()} ₫</div>
-                          <div>Thời gian: {currentDate}</div>{" "}
-                          {/* Thêm thời gian */}
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
+                  formatter={(value) => [`${value.toLocaleString()} ₫`, 'Doanh thu']}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -320,25 +323,11 @@ const Dashboard = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  content={({ payload }) => {
-                    if (payload && payload.length > 0) {
-                      const { name, value } = payload[0];
-                      const currentDate = new Date().toLocaleDateString(
-                        "vi-VN"
-                      );
-                      return (
-                        <div>
-                          <strong>{name}</strong>
-                          <div>{value.toLocaleString()} ₫</div>
-                          <div>Thời gian: {currentDate}</div>{" "}
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
+                  formatter={(value) => [`${value.toLocaleString()} ₫`, 'Doanh thu']}
                 />
               </PieChart>
             </ResponsiveContainer>
+         
           </Card>
         </Col>
       </Row>

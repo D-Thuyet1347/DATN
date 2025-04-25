@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Drawer, Table, Select, message, Input, Upload, Spin, Form, Modal, Popconfirm } from 'antd';
+import { Button, Drawer, Table, Select, message, Input, Upload, Spin, Form, Popconfirm } from 'antd';
 import { DeleteOutlined, EditOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { getAllServices, createService, updateService, deleteService } from '../../APIs/ServiceAPI';
 import { getBase64 } from '../../utils/ultils';
-import { errorToast, toastContainer } from '../../utils/toast';
 
 const { Option } = Select;
 
@@ -66,7 +65,7 @@ const ServiceManagement = () => {
       fetchServices();
     } catch (error) {
   
-      errorToast('Xóa dịch vụ thất bại!');
+      message.error('Xóa dịch vụ thất bại!');
     }
   };
 
@@ -98,7 +97,7 @@ const ServiceManagement = () => {
       setIsDrawerOpen(false);
     } catch (error) {
     
-      errorToast('Có lỗi xảy ra, vui lòng thử lại.');
+      message.error('Có lỗi xảy ra, vui lòng thử lại.');
     }
   };
   const columns = [
@@ -137,7 +136,6 @@ const ServiceManagement = () => {
   ];
   return (
     <div className="pt-4 p-4">
-    {toastContainer()}
       <h2>Quản Lý Dịch Vụ</h2>
       <Button className="bg-blue-600 mt-5" onClick={() => openEditDrawer()}>
         Thêm Dịch Vụ

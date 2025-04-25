@@ -4,7 +4,6 @@ import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { getAllBookings } from "../../APIs/booking";
 import { updateBookingStatus } from "../../APIs/booking";
 import moment from "moment";
-import { errorToast, successToast, toastContainer } from "../../utils/toast";
 const BookingManagement = () => {
   const [state, setState] = useState({
     bookings: [],
@@ -27,12 +26,15 @@ const BookingManagement = () => {
     try {
       const response = await getAllBookings();
       if (Array.isArray(response)) {
-        const processedBookings = response.map((item) => ({
+        const processedBookings = response
+        .filter((item) => item.branch?._id !== "680b4f376e58bda8dfa176e2")
+        .map((item) => ({
           ...item,
           key: item._id,
           dateFormatted: moment(item.date).format("DD/MM/YYYY"),
           createdAtFormatted: moment(item.updatedAt).format("DD/MM/YYYY"),
         }));
+      
         setState((prev) => ({
           ...prev,
           bookings: processedBookings,
@@ -48,7 +50,7 @@ const BookingManagement = () => {
         error: error.response?.data?.message || error.message,
         loading: { ...prev.loading, table: false },
       }));
-      errorToast(error.response?.data?.message || "Không thể tải lịch hẹn");
+      message.error(error.response?.data?.message || "Không thể tải lịch hẹn");
     }
   }, []);
 
@@ -95,7 +97,7 @@ const BookingManagement = () => {
         throw new Error(response.message || "Không thể cập nhật");
       }
     } catch (error) {
-      errorToast(error?.response?.data?.message || "Cập nhật thất bại");
+      message.error(error?.response?.data?.message || "Cập nhật thất bại");
       setState((prev) => ({
         ...prev,
         loading: { ...prev.loading, status: false },
@@ -192,7 +194,6 @@ const BookingManagement = () => {
 
   return (
     <div className="mt-3">
-    {toastContainer()}
       <div
         style={{
           display: "flex",

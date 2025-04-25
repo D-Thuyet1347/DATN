@@ -20,18 +20,7 @@
     "featured blog": "Bài viết nổi bật",
     "featured Services": "Dịch vụ nổi bật",
     "featured Products": "Sản phẩm nổi bật",
-    "all": "Tất cả"
-  },
-  "products": {
-    "addToCartSuccess": "Sản phẩm đã được thêm vào giỏ hàng!",
-    "pleaseLogin": "Vui lòng đăng nhập để thêm vào giỏ hàng!",
-    "outOfStock": "Sản phẩm đã hết hàng!",
-    "noProducts": "Không có sản phẩm nào trong danh mục này."
-  },
-  "services": {
-    "noServices": "Không có dịch vụ nào trong danh mục này."
-  },
-  "footer": {
+    "all": "Tất cả",
     "tagline": "Đánh Thức Giác Quan – Khơi Dậy Năng Lượng",
     "description": "Hãy để WinnerSpaBeauty chăm sóc bạn từ trong ra ngoài. Từ những liệu trình thư giãn đỉnh cao đến dịch vụ cá nhân hoá, chúng tôi cam kết mang đến cho bạn trải nghiệm xứng đáng nhất.",
     "aboutTitle": "Về WinnerSpaBeauty",
@@ -47,6 +36,15 @@
     "hours": "Giờ mở cửa: 9:00 - 20:00 hàng ngày",
     "quote": "\"Bạn xứng đáng được chăm sóc và yêu thương.\"",
     "copyright": "© 2025 WinnerSpaBeauty. Tất cả các quyền được bảo lưu."
+  },
+  "products": {
+    "addToCartSuccess": "Sản phẩm đã được thêm vào giỏ hàng!",
+    "pleaseLogin": "Vui lòng đăng nhập để thêm vào giỏ hàng!",
+    "outOfStock": "Sản phẩm đã hết hàng!",
+    "noProducts": "Không có sản phẩm nào trong danh mục này."
+  },
+  "services": {
+    "noServices": "Không có dịch vụ nào trong danh mục này."
   },
   "blog": {
     "featuredBlog": "Bài viết nổi bật",

@@ -23,7 +23,6 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { getBase64 } from "../../utils/ultils";
-import { errorToast, toastContainer } from "../../utils/toast";
 
 const SlideBannerManagement = () => {
   const [slides, setSlides] = useState([]);
@@ -43,11 +42,11 @@ const SlideBannerManagement = () => {
       if (res.success) {
         setSlides(res.data.map((s) => ({ ...s, key: s._id })));
       } else {
-        errorToast("Không thể tải danh sách slide!");
+        message.error("Không thể tải danh sách slide!");
       }
     } catch (err) {
       
-      errorToast("Lỗi khi tải slide!");
+      message.error("Lỗi khi tải slide!");
     }
   };
 
@@ -109,7 +108,7 @@ const SlideBannerManagement = () => {
       fetchSlides();
     } catch (error) {
       
-      errorToast("Lỗi khi thêm/cập nhật slide!");
+      message.error("Lỗi khi thêm/cập nhật slide!");
     }
   };
 
@@ -120,7 +119,7 @@ const SlideBannerManagement = () => {
       fetchSlides();
     } catch (error) {
       
-      errorToast("Lỗi khi xóa slide!");
+      message.error("Lỗi khi xóa slide!");
     }
   };
 
@@ -138,7 +137,7 @@ const SlideBannerManagement = () => {
         file.preview = await getBase64(file.originFileObj);
       } catch (error) {
         
-        errorToast("Không thể đọc file ảnh!");
+        message.error("Không thể đọc file ảnh!");
       }
     }
 
@@ -197,7 +196,6 @@ const SlideBannerManagement = () => {
 
   return (
     <div className="mt-3">
-    {toastContainer()}
       <h2>Quản lý Slide Banner</h2>
       <Button
         className="bg-blue-500 mt-5"

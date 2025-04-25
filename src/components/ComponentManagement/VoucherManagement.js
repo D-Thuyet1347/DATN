@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   Button, Drawer, Table, Select, Input, Spin,
   Form, InputNumber, DatePicker, Popconfirm,
+  message,
 } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
   addVoucher, getVouchers, updateVoucher, deleteVoucher,
 } from '../../APIs/VoucherAPI';
-import { errorToast, successToast, toastContainer } from '../../utils/toast';
 
 const { Option } = Select;
 
@@ -34,7 +34,7 @@ const VoucherManagement = () => {
         .filter(v => v.code.toLowerCase().includes(voucherCodeFilter.toLowerCase()));
       setVouchers(filtered);
     } catch {
-      errorToast('Không thể tải danh sách voucher.');
+      message.error('Không thể tải danh sách voucher.');
     } finally {
       setIsTableLoading(false);
     }
@@ -65,23 +65,23 @@ const VoucherManagement = () => {
     const { discount, maximumDiscount, minimumAmount, startDate, endDate, usageLimit } = values;
 
     if (discount <= 0 || discount >= 100) {
-      errorToast('Giảm giá phải lớn hơn 0% và nhỏ hơn 100%.');
+      message.error('Giảm giá phải lớn hơn 0% và nhỏ hơn 100%.');
       return false;
     }
     if (maximumDiscount <= 0) {
-      errorToast('Giảm tối đa phải lớn hơn 0.');
+      message.error('Giảm tối đa phải lớn hơn 0.');
       return false;
     }
     if (minimumAmount < 0) {
-      errorToast('Đơn tối thiểu phải lớn hơn hoặc bằng 0.');
+      message.error('Đơn tối thiểu phải lớn hơn hoặc bằng 0.');
       return false;
     }
     if (!startDate || !endDate || startDate >= endDate) {
-      errorToast('Ngày kết thúc phải sau ngày bắt đầu.');
+      message.error('Ngày kết thúc phải sau ngày bắt đầu.');
       return false;
     }
     if (usageLimit <= 0) {
-      errorToast('Giới hạn sử dụng phải lớn hơn 0.');
+      message.error('Giới hạn sử dụng phải lớn hơn 0.');
       return false;
     }
     return true;
@@ -101,10 +101,10 @@ const VoucherManagement = () => {
       setLoading(true);
       if (selectVoucher?._id) {
         await updateVoucher(selectVoucher._id, payload);
-        successToast('Cập nhật voucher thành công!');
+        message.success('Cập nhật voucher thành công!');
       } else {
         await addVoucher(payload);
-        successToast('Thêm voucher thành công!');
+        message.success('Thêm voucher thành công!');
       }
       closeDrawer();
       fetchVouchers();
@@ -117,10 +117,10 @@ const VoucherManagement = () => {
   const handleDeleteVoucher = async (id) => {
     try {
       await deleteVoucher(id);
-      successToast('Xóa voucher thành công!');
+      message.success('Xóa voucher thành công!');
       fetchVouchers();
     } catch {
-      errorToast('Xóa voucher thất bại!');
+      message.error('Xóa voucher thất bại!');
     }
   };
 
@@ -174,8 +174,6 @@ const VoucherManagement = () => {
   return (
     <div className="pt-5 p-4">
       <h2>Quản Lý Voucher</h2>
-      {toastContainer()}
-
       <div className="flex gap-4 mt-4 mb-6">
         <Button className='bg-blue-500' onClick={() => openEditDrawer()}>Thêm Voucher</Button>
         <Input

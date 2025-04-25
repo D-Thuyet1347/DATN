@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Tag, message, Button, Modal, Spin } from 'antd';
 import moment from 'moment'; 
 import 'moment/locale/vi'; 
-import { deleteBooking, getBookingUser, updateBooking } from '../APIs/booking';
+import { deleteBooking, getBookingUser } from '../APIs/booking';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { errorToast,successToast,toastContainer } from '../utils/toast';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -35,7 +35,7 @@ const ScheduleTab = () => {
         return;
       }
 
-      const res = await getBookingUser(token); // API uses token to identify user
+      const res = await getBookingUser(token); 
 
       if (!Array.isArray(res)) {
         console.error("Expected an array of bookings, received:", res);
@@ -48,7 +48,7 @@ const ScheduleTab = () => {
         ...b,
         key: b._id, 
         dateFormatted: b.date ? moment(b.date).format('DD/MM/YYYY') : 'N/A',
-        timeFormatted: b.time || 'N/A', // Assuming time is already a string like "09:00"
+        timeFormatted: b.time || 'N/A', 
         createdAtFormatted: b.createdAt ? moment(b.createdAt).format('DD/MM/YYYY HH:mm') : 'N/A',
         serviceName: b.service?.name || 'Không xác định',
         branchName: b.branch?.BranchName || 'Không xác định',

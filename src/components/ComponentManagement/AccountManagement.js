@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { listUser, updateUser, updateUserRole } from '../../APIs/userApi';
-import { Button, Drawer, Input, Table, Select, Form, Popconfirm } from 'antd';
+import { Button, Drawer, Input, Table, Select, Form, Popconfirm, message } from 'antd';
 import {  EditOutlined } from '@ant-design/icons';
-import { errorToast, successToast, toastContainer } from '../../utils/toast';
 import { FaLock, FaUnlock } from 'react-icons/fa6';
 const { Option } = Select;
 
@@ -59,7 +58,7 @@ const AccountManagement = () => {
       const updatedRole = form.getFieldValue('role'); 
       const updatedUser = { ...selectedUser, role: updatedRole };
       await updateUserRole(updatedUser._id, { role: updatedRole });
-      successToast('Cập nhật thành công!');
+      message.success('Cập nhật thành công!');
       setIsEditOpen(false);
       fetchAccount(); 
   };
@@ -68,10 +67,10 @@ const AccountManagement = () => {
     try {
       const newStatus = !user.isEmailVerified;
       await updateUser(user._id, { isEmailVerified: newStatus });
-      successToast(`Đã ${newStatus ? 'mở khóa' : 'chặn'} email cho tài khoản!`);
+      message.success(`Đã ${newStatus ? 'mở khóa' : 'chặn'} email cho tài khoản!`);
       fetchAccount();
     } catch {
-      errorToast('Có lỗi khi cập nhật trạng thái xác thực email.');
+      message.error('Có lỗi khi cập nhật trạng thái xác thực email.');
     }
   };
   const columns = [
@@ -118,9 +117,7 @@ const AccountManagement = () => {
   
   return (
     <div className="mt-3">
-      {toastContainer()}
       <h1>Quản lý tài khoản</h1>
-      
       <Input
         style={{ width: '300px', marginBottom: '16px', marginTop: '16px' , outline: 'none'}}
         placeholder="Tìm kiếm theo tên tài khoản hoặc email"

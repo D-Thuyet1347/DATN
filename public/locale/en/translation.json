@@ -20,18 +20,7 @@
     "featured blog": "Featured Blog",
     "featured Services": "Featured Services",
     "featured Products": "Featured Products",
-    "all": "All"
-  },
-  "products": {
-    "addToCartSuccess": "Product added to cart successfully!",
-    "pleaseLogin": "Please log in to add to cart!",
-    "outOfStock": "Product is out of stock!",
-    "noProducts": "No products in this category."
-  },
-  "services": {
-    "noServices": "No services in this category."
-  },
-  "footer": {
+    "all": "All",
     "tagline": "Awaken Your Senses – Ignite Your Energy",
     "description": "Let WinnerSpaBeauty pamper you inside and out. From top-tier relaxation treatments to personalized services, we promise an unparalleled experience.",
     "aboutTitle": "About WinnerSpaBeauty",
@@ -48,6 +37,16 @@
     "quote": "\"You deserve to be cared for and cherished.\"",
     "copyright": "© 2025 WinnerSpaBeauty. All rights reserved."
   },
+  "products": {
+    "addToCartSuccess": "Product added to cart successfully!",
+    "pleaseLogin": "Please log in to add to cart!",
+    "outOfStock": "Product is out of stock!",
+    "noProducts": "No products in this category."
+  },
+  "services": {
+    "noServices": "No services in this category."
+  },
+
   "blog": {
     "featuredBlog": "Featured Blog",
     "fetchError": "Error loading blog list!",

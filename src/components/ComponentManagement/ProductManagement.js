@@ -10,7 +10,6 @@ import {
   Spin,
   Form,
   Popconfirm,
-  Modal,
 } from 'antd';
 import {
   DeleteOutlined,
@@ -22,7 +21,6 @@ import { getProducts, addProduct, updateProduct } from '../../APIs/ProductsApi';
 import axios from 'axios';
 import TextArea from 'antd/es/input/TextArea';
 import { getBase64 } from '../../utils/ultils';
-import { errorToast, toastContainer } from '../../utils/toast';
 
 const { Option } = Select;
 
@@ -107,7 +105,7 @@ const ProductManagement = () => {
       form.resetFields();
     } catch (error) {
       
-      errorToast('Có lỗi xảy ra, vui lòng thử lại.');
+      message.error('Có lỗi xảy ra, vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -122,7 +120,7 @@ const ProductManagement = () => {
       }
     } catch (error) {
   
-      errorToast('Xóa sản phẩm thất bại!');
+      message.error('Xóa sản phẩm thất bại!');
     }
   };
 
@@ -201,7 +199,6 @@ const ProductManagement = () => {
 
   return (
     <div className="pt-3">
-    {toastContainer()}
       <h2>Quản Lý Sản Phẩm</h2>
       <Button className="bg-blue-500 mt-5" onClick={() => openEditDrawer()}>
         Thêm Sản Phẩm

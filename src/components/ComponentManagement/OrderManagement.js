@@ -6,7 +6,6 @@ import {
 import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { listOrder, updateOrderStatus } from "../../APIs/orderApi";
 import { getUser } from "../../APIs/userApi";
-import { errorToast, successToast, toastContainer } from "../../utils/toast";
 
 const OrderManagement = () => {
   // ===== State =====
@@ -83,7 +82,7 @@ const OrderManagement = () => {
         error: error.response?.data?.message || error.message,
         loading: { ...prev.loading, table: false }
       }));
-      errorToast(error.response?.data?.message || "Không thể tải đơn hàng");
+      message.error(error.response?.data?.message || "Không thể tải đơn hàng");
     }
   }, []);
 
@@ -110,7 +109,7 @@ const OrderManagement = () => {
       }
     } catch (error) {
      
-      errorToast(error.response?.data?.message || "Không thể cập nhật trạng thái");
+      message.error(error.response?.data?.message || "Không thể cập nhật trạng thái");
       fetchOrders();
     } finally {
       setState(prev => ({ ...prev, loading: { ...prev.loading, status: false } }));
@@ -216,7 +215,6 @@ const OrderManagement = () => {
 
   return (
     <div className="mt-3">
-    {toastContainer()}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Quản lý đơn hàng</h1>
         <Button icon={<ReloadOutlined />} onClick={fetchOrders} loading={state.loading.table}>

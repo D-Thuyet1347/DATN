@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Menu} from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
   MenuFoldOutlined,
@@ -7,51 +7,46 @@ import {
 } from '@ant-design/icons';
 import { TbLayoutDashboard } from 'react-icons/tb';
 import { GrUserManager } from 'react-icons/gr';
-import { RiAdminLine } from 'react-icons/ri';
-import { BrandManagement } from '../components/ComponentManagement/BrandManagement';
-import { EmployeeManagement } from '../components/ComponentManagement/EmployeeManagement';
 import ServiceManagement from '../components/ComponentManagement/ServiceManagement';
 import ProductManagement from '../components/ComponentManagement/ProductManagement';
 import BlogManagement from '../components/ComponentManagement/BlogManagement';
-import SlideBannerManagement from '../components/ComponentManagement/SlideBannerManagement';
 import OrderManagement from '../components/ComponentManagement/OrderManagement';
 import VoucherManagement from '../components/ComponentManagement/VoucherManagement';
-import AccountManagement from '../components/ComponentManagement/AccountManagement';
 import Dashboard from '../components/ComponentManagement/Dashboard';
 import { IoHomeOutline } from 'react-icons/io5';
-import BookingManagement from '../components/ComponentManagement/BookingManagement';
-
-const items = [
-  { key: 'dashboard', label: 'Dashboard', icon: <TbLayoutDashboard style={{fontSize:'24px'}} /> },
-  {
-    key: 'home',
-    label: 'Trang người dùng',
-    icon: <IoHomeOutline style={{fontSize:'24px'}} />,
-
-  },
-  {
-    key: 'manager',
-    label: 'Manager',
-    icon: <GrUserManager style={{fontSize:'24px'}} />,
-    children: [
-      { key: 'blog', label: 'Quản lý BLog' },
-      { key: 'employee', label: 'Quản lý nhân viên' },
-      { key: 'service', label: 'Quản lý dịch vụ' },
-      { key: 'product', label: 'Quản lý sản phẩm' },
-      { key: 'order', label: 'Quản lý đơn hàng' },
-      { key: 'booking', label: 'Quản lý đặt lịch' },
-      { key: 'voucher', label: 'Quản lý voucher' },
-    ],
-  },
-];
-
-
+import { listmanager } from '../APIs/manager';
+import EmployeeBrand from '../components/ComponentManagement/EmployeeBrand';
+import BookingBrand from '../components/ComponentManagement/BookingBrand';
 
 const Manager = () => {
   const navigate = useNavigate();
-  const [current, setCurrent] = useState('1');
+  const [current, setCurrent] = useState('dashboard');
   const [collapsed, setCollapsed] = useState(false);
   const [stateOpenKeys, setStateOpenKeys] = useState('dashboard');
+  const [position, setPosition] = useState(null);
+
+  useEffect(() => {
+    const fetchManager = async () => {
+      try {
+        const data = await listmanager(); 
+        const currentUserId = localStorage.getItem("userId"); 
+  
+        if (data.success === true) {
+          const currentManager = data.data.find(m => m.UserID === currentUserId || m.UserID?._id === currentUserId);
+          if (currentManager) {
+            setPosition(currentManager.Position);
+          } else {
+            console.warn("Không tìm thấy manager tương ứng với userId");
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching manager info:', error);
+      }
+    };
+  
+    fetchManager();
+  }, []);
+  
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
@@ -64,7 +59,7 @@ const Manager = () => {
       case 'blog':
         return <BlogManagement />;
       case 'employee':
-        return <EmployeeManagement />;
+        return <EmployeeBrand />;
       case 'service':
         return <ServiceManagement />;
       case 'product':
@@ -74,7 +69,7 @@ const Manager = () => {
       case 'voucher':
         return <VoucherManagement />;
       case 'booking':
-        return <BookingManagement />;
+        return <BookingBrand />;
       default:
         return <Dashboard />;
     }
@@ -83,6 +78,40 @@ const Manager = () => {
   const handleOnClick = ({ key }) => {
     setStateOpenKeys(key);
     setCurrent(key);
+  };
+
+  const generateMenuItems = () => {
+    const commonItems = [
+      { key: 'dashboard', label: 'Dashboard', icon: <TbLayoutDashboard style={{ fontSize: '24px' }} /> },
+      { key: 'home', label: 'Trang người dùng', icon: <IoHomeOutline style={{ fontSize: '24px' }} /> },
+    ];
+
+    if (position === 'Quản lý chi nhánh') {
+      commonItems.push({
+        key: 'manager',
+        label: 'Manager',
+        icon: <GrUserManager style={{ fontSize: '24px' }} />,
+        children: [
+          { key: 'employee', label: 'Quản lý nhân viên' },
+          { key: 'booking', label: 'Quản lý đặt lịch' },
+        ],
+      });
+    } else if (position === 'Quản lý dịch vụ') {
+      commonItems.push({
+        key: 'manager',
+        label: 'Manager',
+        icon: <GrUserManager style={{ fontSize: '24px' }} />,
+        children: [
+          { key: 'blog', label: 'Quản lý BLog' },
+          { key: 'service', label: 'Quản lý dịch vụ' },
+          { key: 'product', label: 'Quản lý sản phẩm' },
+          { key: 'order', label: 'Quản lý đơn hàng' },
+          { key: 'voucher', label: 'Quản lý voucher' },
+        ],
+      });
+    }
+
+    return commonItems;
   };
 
   return (
@@ -114,12 +143,12 @@ const Manager = () => {
         </Button>
         <Menu
           onClick={handleOnClick}
-          style={{ width: '100%', flex: 1, marginTop: 30, marginRight:15 }}
+          style={{ width: '100%', flex: 1, marginTop: 30, marginRight: 15 }}
           defaultSelectedKeys={['dashboard']}
           selectedKeys={[current]}
           mode="inline"
           inlineCollapsed={collapsed}
-          items={[items[0], items[1], items[2], items[3]]}
+          items={position ? generateMenuItems() : []}
         />
       </div>
       <div

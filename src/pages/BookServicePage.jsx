@@ -533,7 +533,9 @@ const BookServicePage = () => {
                     onSelect={handleBranchChange}
                     loading={loading}
                   >
-                    {branches.map((branch) => (
+                    {branches
+                    .filter((branch) => branch._id !== "680b4f376e58bda8dfa176e2")
+                    .map((branch) => (
                       <Option key={branch._id} value={branch._id}>
                         {branch.BranchName} - {branch.Address}
                       </Option>

@@ -6,8 +6,7 @@ import {
   removeBrand,
   updateBranch,
 } from "../../APIs/brand";
-import { Button, Drawer, Modal, Table, message, Form, Input, Popconfirm } from "antd";
-import { errorToast, toastContainer } from "../../utils/toast";
+import { Button, Drawer, Table, message, Form, Input, Popconfirm } from "antd";
 
 export const BrandManagement = () => {
   const [dataBrand, setDataBrand] = useState([]);
@@ -63,7 +62,7 @@ export const BrandManagement = () => {
       setIsModalOpen(false);
     } catch (error) {
       
-      errorToast("Có lỗi xảy ra, vui lòng thử lại.");
+      // errorToast("Vui lòng nhập đủ thông tin.");
     }
   };
 
@@ -74,7 +73,7 @@ export const BrandManagement = () => {
       fetchBrand();
     } catch (error) {
     
-      errorToast("Có lỗi xảy ra khi xóa chi nhánh.");
+      message.error("Có lỗi xảy ra khi xóa chi nhánh.");
     }
   };
 
@@ -116,7 +115,6 @@ export const BrandManagement = () => {
 
   return (
     <div className="mt-3">
-    {toastContainer()}
       <h2>Quản lý Brand</h2>
       <Button className="mt-5 bg-blue-500" onClick={() => openEditDrawer()}>
         Thêm Brand
@@ -157,22 +155,13 @@ export const BrandManagement = () => {
           <Button
             className="mt-4 bg-blue-500"
             type="primary"
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleUpdateBrand}
             block
           >
             Xác nhận
           </Button>
         </Form>
       </Drawer>
-
-      <Modal
-        title="Xác nhận cập nhật"
-        open={isModalOpen}
-        onOk={handleUpdateBrand}
-        onCancel={() => setIsModalOpen(false)}
-      >
-        <p>Bạn có chắc chắn muốn cập nhật Brand với thông tin mới không?</p>
-      </Modal>
 
       <Table
         style={{ marginTop: 20 }}

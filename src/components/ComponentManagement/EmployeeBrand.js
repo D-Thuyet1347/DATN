@@ -19,10 +19,11 @@ import {
 import { listBranch } from "../../APIs/brand";
 import { listUser } from "../../APIs/userApi";
 import Schedule from "../Schedule";
+import { listmanager } from "../../APIs/manager";
 
 const { Option } = Select;
 
-export const EmployeeManagement = () => {
+export const EmployeeBrand = () => {
   const [dataEmployee, setDataEmployee] = useState([]);
   const [dataBrand, setDataBrand] = useState([]);
   const [dataUser, setDataUser] = useState([]);
@@ -32,10 +33,55 @@ export const EmployeeManagement = () => {
   const [deleting, setDeleting] = useState({});
   const [form] = Form.useForm();
   const [editingEmployee, setEditingEmployee] = useState(null);
-  const [viewScheduleFor, setViewScheduleFor] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [viewScheduleFor, setViewScheduleFor] = useState(null);
+  const [managerBranchId, setManagerBranchId] = useState(null);
+  const [managerBranchInfo, setManagerBranchInfo] = useState(null); // 👈
+
+  useEffect(() => {
+    const fetchManagerBranch = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+  
+        const [managerRes, branchRes] = await Promise.all([
+          listmanager(),
+          listBranch(),
+        ]);
+  
+        const managerList = managerRes?.data || [];
+        const branchList = branchRes?.data || [];
+  
+        const currentManager = managerList.find((m) => {
+          return (
+            m.UserID === userId ||
+            (typeof m.UserID === "object" && m.UserID?._id === userId)
+          );
+        });
+  
+        if (currentManager) {
+          setManagerBranchId(currentManager.BranchID);
+  
+          const branchInfo = branchList.find(
+            (b) => b._id === currentManager.BranchID
+          );
+          setManagerBranchInfo(branchInfo);
+        } else {
+          message.error("Không tìm thấy thông tin quản lý.");
+        }
+      } catch (err) {
+        message.error("Không thể lấy thông tin chi nhánh.");
+        console.error(err);
+      }
+    };
+  
+    fetchManagerBranch();
+  }, []);
+  
 
   const fetchData = async () => {
+    if (!managerBranchId) return;
+
     setIsTableLoading(true);
     try {
       const [brandRes, employeeRes, userRes] = await Promise.all([
@@ -43,12 +89,19 @@ export const EmployeeManagement = () => {
         listEmployee(),
         listUser(),
       ]);
+
       if (brandRes?.data)
         setDataBrand(brandRes.data.map((item) => ({ ...item, key: item._id })));
-      if (employeeRes?.data)
-        setDataEmployee(
-          employeeRes.data.map((item) => ({ ...item, key: item._id }))
+
+      if (employeeRes?.data) {
+        const employeesInBranch = employeeRes.data.filter(
+          (emp) => emp.BranchID === managerBranchId
         );
+        setDataEmployee(
+          employeesInBranch.map((item) => ({ ...item, key: item._id }))
+        );
+      }
+
       if (userRes?.data) {
         const employees = userRes.data.filter(
           (user) => user.role === "employee"
@@ -63,8 +116,10 @@ export const EmployeeManagement = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (managerBranchId) {
+      fetchData();
+    }
+  }, [managerBranchId]);
 
   const openEditDrawer = (employee = null) => {
     setEditingEmployee(employee);
@@ -185,39 +240,57 @@ export const EmployeeManagement = () => {
     },
   ];
 
+  const filteredUsers = selectedBranch
+    ? dataEmployee
+        .filter((emp) => emp.BranchID === selectedBranch)
+        .map((emp) => emp.UserID)
+    : [];
+
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Quản lý nhân viên</h2>
+        <h2 className="text-xl font-semibold">
+          Quản lý nhân viên
+          {managerBranchInfo ? ` - ${managerBranchInfo.BranchName}` : ""}
+        </h2>
         <Button className="bg-blue-400" onClick={() => openEditDrawer()}>
           Thêm nhân viên
         </Button>
       </div>
 
       <div className="flex items-center gap-4 mb-4">
-        <Select
-          placeholder="Chọn nhân viên để xem lịch"
-          style={{ width: 250 }}
-          onChange={(value) => setSelectedUserId(value)}
-          value={selectedUserId}
-          allowClear
-        >
-          {dataUser.map((user) => (
-            <Option key={user._id} value={user._id}>
-              {user.firstName}
-            </Option>
-          ))}
-        </Select>
+  <Select
+    placeholder="Chọn nhân viên để xem lịch"
+    style={{ width: 250 }}
+    onChange={(value) => setSelectedUserId(value)}
+    value={selectedUserId}
+    allowClear
+  >
+    {dataUser
+      .filter((user) =>
+        dataEmployee.some(
+          (emp) =>
+            emp.UserID === user._id || emp.UserID?._id === user._id
+        )
+      )
+      .map((user) => (
+        <Option key={user._id} value={user._id}>
+          {user.firstName}
+        </Option>
+      ))}
+  </Select>
 
-        <Button
-          type="default"
-          icon={<EyeFilled />}
-          disabled={!selectedUserId}
-          onClick={() => setViewScheduleFor(selectedUserId)}
-        >
-          Xem lịch làm việc
-        </Button>
-      </div>
+  <Button
+    type="default"
+    icon={<EyeFilled />}
+    disabled={!selectedUserId}
+    onClick={() => setViewScheduleFor(selectedUserId)}
+  >
+    Xem lịch làm việc
+  </Button>
+</div>
+
 
       <Table
         columns={columns}
@@ -237,16 +310,18 @@ export const EmployeeManagement = () => {
           <Form.Item
             name="BranchID"
             label="Chi nhánh"
+            initialValue={managerBranchId}
             rules={[{ required: true, message: "Vui lòng chọn chi nhánh" }]}
           >
-            <Select placeholder="Chọn chi nhánh">
-              {dataBrand
-                .filter((branch) => branch._id !== "680b4f376e58bda8dfa176e2")
-                .map((branch) => (
-                  <Option key={branch._id} value={branch._id}>
-                    {branch.BranchName}
-                  </Option>
-                ))}
+            <Select placeholder="Chọn chi nhánh" disabled>
+              {managerBranchInfo && (
+                <Option
+                  key={managerBranchInfo._id}
+                  value={managerBranchInfo._id}
+                >
+                  {managerBranchInfo.BranchName}
+                </Option>
+              )}
             </Select>
           </Form.Item>
 
@@ -311,9 +386,8 @@ export const EmployeeManagement = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };
 
-export default EmployeeManagement;
+export default EmployeeBrand;
