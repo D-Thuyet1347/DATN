@@ -46,7 +46,7 @@ npm run server
 ├── 📄 package.json
 └── 📘 README.md
 
-
+```
 ## 🚀 Frontend (ReactJS + Tailwind CSS).
 ```bash
 # 📦 Cài đặt các thư viện phụ thuộc (dùng nếu gặp xung đột phiên bản)
