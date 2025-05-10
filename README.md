@@ -2,8 +2,22 @@
 
 Ứng dụng quản lý & đặt lịch dịch vụ làm đẹp, bao gồm hệ thống Backend (Node.js + MongoDB) và Frontend (ReactJS + Tailwind CSS).
 
+Dự án: Xây dựng hệ thống quản lý chuỗi beauty spa tích hợp AI tư vấn trực tuyến & đặt lịch hẹn trải nghiệm dịch vụ - Dự án của nhóm sinh viên Đỗ Cao Thắng
+
+## 👥 Với các thành viên:
+```
+| STT | Họ và Tên         | Mã Số Sinh Viên   | Vai Trò Trong Dự Án              |
+|-----|-------------------|-------------------|----------------------------------|
+| 1   | Đỗ Cao Thắng      | 123456789         | Trưởng nhóm, Backend, tài liệu   |
+| 2   | Huỳnh Hồng Sơn    | 987654321         | Frontend, tài liệu               |
+| 3   | Lê Ngọc Thanh Nam | 112233445         | Frontend, tài liệu               |
+| 4   | Võ Duy Thuyết     | 556677889         | Frontend, tài liệu               |
+| 5   | Trần Văn Tín      | 998877665         | Backend, tài liệu                |
+
+
+```
 ```bash
-🖥️ Backend (Node.js + Express + MongoDB)
+# 🖥️ Backend (Node.js + Express + MongoDB)
 # Cài đặt thư viện
 npm install
 # Khởi chạy server
@@ -31,8 +45,9 @@ npm run server
 ├── 🚀 server.js            # Điểm khởi động chính
 ├── 📄 package.json
 └── 📘 README.md
-## 🚀 Cài đặt & Chạy ứng dụng
 
+
+## 🚀 Frontend (ReactJS + Tailwind CSS).
 ```bash
 # 📦 Cài đặt các thư viện phụ thuộc (dùng nếu gặp xung đột phiên bản)
 npm install --legacy-peer-deps
