@@ -7,7 +7,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { listOrder } from "../../APIs/orderApi";
+import {  listOrder } from "../../APIs/orderApi";
 import { listUser } from "../../APIs/userApi";
 import { getAllBookings } from "../../APIs/booking";
 import anhSpa from "../../img/anhspa.png";

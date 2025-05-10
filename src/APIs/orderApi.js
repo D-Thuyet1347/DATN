@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://backend-fu3h.onrender.com';
-// const API_URL = 'http://localhost:4000'; // Replace with your local URL
-
+const API_URL = 'http://localhost:4000'; 
 export const getOrders = async (token) => {
       const response = await axios.get(
           `${API_URL}/api/order/userorders`,
@@ -51,7 +49,7 @@ export const updateOrderStatus = async (orderId, statusData) => {
             `${API_URL}/api/order/status`, 
             { orderId, ...statusData }
         );
-        console.log('Update Status Response:', response.data); // Debug log
+        console.log('Update Status Response:', response.data); 
         return response.data;
   
 };

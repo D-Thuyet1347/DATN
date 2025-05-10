@@ -125,7 +125,7 @@ const ProfileTab = () => {
   if (!user)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-400"></div>
       </div>
     );
 
@@ -150,7 +150,7 @@ const ProfileTab = () => {
                   onError={() => setPreviewImage(DEFAULT_AVATAR)}
                 />
                 {isEditing && (
-                  <label className="absolute bottom-2 right-2 bg-pink-500 text-white rounded-full p-2 cursor-pointer hover:bg-pink-600 transition shadow-md">
+                  <label className="absolute bottom-2 right-2 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-pink-600 transition shadow-md">
                     <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
@@ -218,7 +218,7 @@ const ProfileTab = () => {
                     <button
                       onClick={handleUpdate}
                       disabled={isLoading}
-                      className={`px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className={`px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                       {isLoading ? (
                         <span className="flex items-center justify-center">
@@ -261,7 +261,7 @@ const ProfileTab = () => {
                   <div className="flex justify-center pt-6">
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="px-8 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition font-medium text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                      className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     >
                       Chỉnh sửa thông tin
                     </button>

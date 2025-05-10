@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Footer from "../components/Footer";
 import OneProduct from "../components/OneProduct";
 import { getProducts } from "../APIs/ProductsApi";
@@ -9,6 +9,7 @@ import { errorToast, successToast, toastContainer } from "../utils/toast";
 import { Button, Pagination } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const Products = () => {
   const { t } = useTranslation();
@@ -22,7 +23,7 @@ const Products = () => {
   const [categoryScrollIndex, setCategoryScrollIndex] = useState(0);
   const visibleCategories = 6;
   const pageSize = 8;
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       const res = await getProducts();
@@ -42,7 +43,7 @@ const Products = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-    setFilter(t("header.all")); // Cập nhật filter khi ngôn ngữ thay đổi
+    setFilter(t("header.all")); 
   }, [t]);
 
   const filteredProducts =
@@ -64,6 +65,9 @@ const Products = () => {
     } catch (error) {
       if (error?.response?.status === 401) {
         errorToast(t("products.pleaseLogin"));
+        setTimeout(() => {
+          navigate("/sign-in");
+        }, 2000);
       } else {
         errorToast(t("products.outOfStock"));
       }

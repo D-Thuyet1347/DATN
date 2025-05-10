@@ -196,7 +196,7 @@ const ScheduleTab = () => {
          <Button
             type="primary"
             onClick={() => navigate('/servicepage')} 
-            className="bg-pink-600 hover:bg-pink-700 border-pink-600 hover:border-pink-700 focus:ring-pink-500 text-white font-semibold rounded-md shadow-sm transition duration-150"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-sm transition duration-150"
          >
             Đặt lịch hẹn mới
           </Button>

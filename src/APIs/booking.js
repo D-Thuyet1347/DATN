@@ -3,8 +3,8 @@ import moment from 'moment';  // Add this line at the top of the file
 
 
 // Đặt base URL của API
-const API_URL = 'https://backend-fu3h.onrender.com/api/booking';
-// const API_URL = 'http://localhost:4000/api/booking'; // Thay thế bằng URL của bạn
+// const API_URL = 'https://backend-fu3h.onrender.com/api/booking';
+const API_URL = 'http://localhost:4000/api/booking'; 
 
 export const bookService = async (bookingData) => {
     const token = localStorage.getItem('token');
