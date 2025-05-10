@@ -2,7 +2,7 @@
 
 Ứng dụng quản lý & đặt lịch dịch vụ làm đẹp, bao gồm hệ thống Backend (Node.js + MongoDB) và Frontend (ReactJS + Tailwind CSS).
 
----
+```bash
 🖥️ Backend (Node.js + Express + MongoDB)
 # Cài đặt thư viện
 npm install
