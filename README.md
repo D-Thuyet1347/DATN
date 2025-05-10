@@ -1,4 +1,4 @@
-# 🌟 Frontend Beauty Spa App (React)
+# 🌟 Beauty Spa App (React)
 
 Ứng dụng quản lý & đặt lịch dịch vụ làm đẹp, bao gồm hệ thống Backend (Node.js + MongoDB) và Frontend (ReactJS + Tailwind CSS).
 
