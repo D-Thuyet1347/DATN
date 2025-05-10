@@ -15,9 +15,10 @@ Dự án: Xây dựng hệ thống quản lý chuỗi beauty spa tích hợp AI 
 | 5   | Trần Văn Tín      | 998877665         | Backend, tài liệu                |
 
 
+
 ```
-```bash
 # 🖥️ Backend (Node.js + Express + MongoDB)
+```bash
 # Cài đặt thư viện
 npm install
 # Khởi chạy server
