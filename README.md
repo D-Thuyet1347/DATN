@@ -1,8 +1,40 @@
 # 🌟 Frontend Beauty Spa App (React)
 
-Đây là ứng dụng frontend cho hệ thống quản lý và đặt lịch dịch vụ làm đẹp (Beauty Spa), xây dựng bằng **ReactJS** và sử dụng **Tailwind CSS** cho giao diện.
+Ứng dụng quản lý & đặt lịch dịch vụ làm đẹp, bao gồm hệ thống Backend (Node.js + MongoDB) và Frontend (ReactJS + Tailwind CSS).
 
 ---
+🖥️ Backend (Node.js + Express + MongoDB)
+# Cài đặt thư viện
+npm install
+# Khởi chạy server
+npm run server
+📁 Cấu trúc backend
+backend-project/
+├── ⚙️ config/              # Cấu hình hệ thống
+│   └── 🗄️ db.js            # Kết nối MongoDB
+
+├── 📂 controllers/         # Xử lý logic nghiệp vụ
+│   ├── 📦 productController.js
+│   ├── 👤 userController.js
+│   └── 🛒 cartController.js
+
+├── 📂 models/              # Định nghĩa mô hình MongoDB
+│   ├── 📦 product.js
+│   ├── 👤 user.js
+│   └── 🛒 cart.js
+
+├── 📂 routes/              # Định nghĩa các route
+│   ├── 📦 productRoutes.js
+│   ├── 👤 userRoutes.js
+│   └── 🛒 cartRoutes.js
+
+├── 🛡️ middleware/          # Middleware (Xác thực, lỗi,...)
+├── 🛠️ utils/               # Hàm tiện ích
+├── 📤 uploads/             # Thư mục chứa file upload (nếu có)
+├── 🧪 .env                 # Biến môi trường
+├── 🚀 server.js           # Điểm khởi chạy chính
+├── 📄 package.json
+└── 📘 README.md
 
 ## 🚀 Cài đặt & Chạy ứng dụng
 
