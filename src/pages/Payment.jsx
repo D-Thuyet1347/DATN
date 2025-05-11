@@ -114,18 +114,34 @@ const Payment = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const validateForm = () => {
-    const { firstName, lastName, phoneNumber, address } = formData;
-    if (![firstName, lastName, address].every((val) => val.trim())) {
-      errorToast("Vui lòng nhập đầy đủ thông tin");
-      return false;
-    }
-    if (!phoneNumber.match(/^\d{10}$/)) {
-      errorToast("Số điện thoại không hợp lệ");
-      return false;
-    }
-    return true;
-  };
+const validateForm = () => {
+  const { firstName, lastName, phoneNumber, address } = formData;
+  
+  // Kiểm tra các trường bắt buộc không được trống
+  if (![firstName, lastName, address].every((val) => val.trim())) {
+    errorToast("Vui lòng nhập đầy đủ thông tin");
+    return false;
+  }
+
+  // Kiểm tra họ và tên chỉ chứa chữ cái (có dấu hoặc không dấu) và khoảng trắng
+  const nameRegex = /^[\p{L}\s]+$/u;
+  if (!nameRegex.test(firstName.trim())) {
+    errorToast("Họ chỉ được chứa chữ cái và khoảng trắng");
+    return false;
+  }
+  if (!nameRegex.test(lastName.trim())) {
+    errorToast("Tên chỉ được chứa chữ cái và khoảng trắng");
+    return false;
+  }
+
+  // Kiểm tra số điện thoại hợp lệ (10 chữ số)
+  if (!phoneNumber.match(/^\d{10}$/)) {
+    errorToast("Số điện thoại không hợp lệ");
+    return false;
+  }
+
+  return true;
+};
   
 
   const handleSubmit = async (e) => {
@@ -410,7 +426,7 @@ const Payment = () => {
           <div className="lg:w-1/3">
             <div className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-4">
               <div className="p-6 border-b">
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-xl font-semibold text-#2c3e50">
                   Đơn hàng của bạn
                 </h2>
               </div>
@@ -515,3 +531,4 @@ const Payment = () => {
 };
 
 export default Payment;
+

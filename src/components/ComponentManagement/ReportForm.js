@@ -18,7 +18,7 @@ const ReportForm = () => {
   const [revenuePieData, setRevenuePieData] = useState([]);
   const [staffPerformance, setStaffPerformance] = useState([]);
   const [staffBookingCounts, setStaffBookingCounts] = useState([]);
-  const [timeRangeType, setTimeRangeType] = useState("custom"); // 'custom', 'month', 'quarter', 'year'
+  const [timeRangeType, setTimeRangeType] = useState("custom"); 
 
   const getTopSellingProducts = (orders) => {
     const productMap = {};
@@ -518,6 +518,7 @@ const ReportForm = () => {
         </div>
       ) : (
         <>
+        
           {form.getFieldValue("type") === "order" &&
             revenuePieData.length > 0 && (
               <Card
@@ -544,7 +545,7 @@ const ReportForm = () => {
                       stroke="#8884d8"
                       strokeWidth={2}
                       dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
+                      activeDot={{ r:10 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>

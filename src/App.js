@@ -30,10 +30,12 @@ import ServicePage from './pages/ServicePage';
 import ProductsPage from './pages/ProductPage';
 import BlogPage from './pages/BlogPage';
 import Manager from './pages/Manager';
+import { CartProvider } from './context/CartContext';
 
 function App() {
   return (
     <>
+      <CartProvider>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -70,6 +72,8 @@ function App() {
           {/* Router riêng dành cho employee */}
         </Routes>    
       </AuthProvider>
+     </CartProvider>
+
     </>
   );
 }
