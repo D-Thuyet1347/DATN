@@ -5,7 +5,7 @@ import { getProductById } from '../APIs/ProductsApi';
 import { addReviewSP } from "../APIs/ReviewSPAPI";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { jwtDecode } from 'jwt-decode';
-import { errorToast, successToast, toastContainer } from '../utils/toast';
+import { errorToast, successToast,  } from '../utils/toast';
 
 export const ReviewSP = ({ onAddReview }) => {
   const [rating, setRating] = useState(0);
@@ -107,7 +107,7 @@ export const ReviewSP = ({ onAddReview }) => {
 
   return (
     <div className="max-w-md mx-auto p-4 shadow-md rounded border mt-4">
-      {toastContainer()}
+      
       <h1 className="text-2xl font-bold mb-4">Đánh giá sản phẩm</h1>
 
       {userFullName && (

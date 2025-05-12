@@ -180,29 +180,29 @@ const VoucherManagement = () => {
   const columns = [
     { title: 'Mã', dataIndex: 'code' },
     {
-      title: 'Giảm giá (%)',
-      dataIndex: 'discount',
-      filters: [...new Set(vouchers.map(v => v.discount))].map(discount => ({
-        text: `${discount}%`,
-        value: discount,
-      })),
-      onFilter: (value, record) => record.discount === value,
+  title: 'Giảm giá (%)',
+  dataIndex: 'discount',
+  filters: [
+    {
+      text: '1% - 49%',
+      value: '1-49',
     },
+    {
+      text: '50% - 99%',
+      value: '50-99',
+    },
+  ],
+  onFilter: (value, record) => {
+    const discount = record.discount;
+    if (value === '1-49') return discount >= 1 && discount <= 49;
+    if (value === '50-99') return discount >= 50 && discount <= 99;
+    return false;
+  },
+},
+
     
-    { title: 'Giảm tối đa', dataIndex: 'maximumDiscount',
-      filters: [...new Set(vouchers.map(v => v.maximumDiscount))].map(maximumDiscount => ({
-        text: `${maximumDiscount}`,
-        value: maximumDiscount,
-      })),
-      onFilter: (value, record) => record.maximumDiscount === value,
-     },
-    { title: 'Đơn tối thiểu', dataIndex: 'minimumAmount',
-      filters: [...new Set(vouchers.map(v => v.minimumAmount))].map(minimumAmount => ({
-        text: `${minimumAmount}`,
-        value: minimumAmount,
-      })),
-      onFilter: (value, record) => record.minimumAmount === value,
-     },
+    { title: 'Giảm tối đa', dataIndex: 'maximumDiscount',},
+    { title: 'Đơn tối thiểu', dataIndex: 'minimumAmount'},
     {
       title: 'Ngày bắt đầu',
       dataIndex: 'startDate',
@@ -213,13 +213,12 @@ const VoucherManagement = () => {
       dataIndex: 'endDate',
       render: (date) => new Date(date).toLocaleDateString(),
     },
-    { title: 'Giới hạn sử dụng', dataIndex: 'usageLimit' ,
-      filters: [...new Set(vouchers.map(v => v.usageLimit))].map(usageLimit => ({
-        text: `${usageLimit}`,
-        value: usageLimit,
-      })),
-      onFilter: (value, record) => record.usageLimit === value,
+    {
+      title: 'Giới hạn sử dụng',
+      dataIndex: 'usageLimit',
+      render: (v) => v ?? 0,
     },
+
     {
       title: 'Số lượt dùng',
       dataIndex: 'usageLeft',

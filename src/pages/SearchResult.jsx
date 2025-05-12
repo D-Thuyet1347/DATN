@@ -53,14 +53,11 @@ const SearchPage = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     window.history.pushState({}, '', `/search?q=${encodeURIComponent(query)}`);
-    // Kích hoạt tìm kiếm lại bằng cách cập nhật query
   };
 
   return (
     <div className=" ">
-      <Header className="!bg-white !text-black !shadow-md" />
-      <div className="container mt-[40px] mx-auto px-4 py-8">
-        {/* Thanh tìm kiếm */}
+      <div className=" container mt-[-10px] mx-auto px-4 py-2">
         <form onSubmit={handleSearch} className="mb-8">
           <div className="flex items-center max-w-2xl mx-auto">
             <input
@@ -68,30 +65,28 @@ const SearchPage = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Tìm kiếm sản phẩm hoặc dịch vụ..."
-              className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-maincolor"
+              className="flex-1 p-3 border text-black border-black-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-maincolor"
             />
             <button
               type="submit"
-              className="bg-maincolor text-white px-6 py-3 rounded-r-lg hover:bg-maincolorhover"
+              className="bg-blue-600 text-white px-6 py-3 rounded-r-lg hover:bg-maincolorhover"
             >
               Tìm kiếm
             </button>
           </div>
         </form>
 
-        {/* Trạng thái tải */}
         {loading && <p className="text-center text-gray-600">Đang tải...</p>}
 
-        {/* Lỗi */}
         {error && <p className="text-center text-red-500">{error}</p>}
 
-        {/* Kết quả tìm kiếm */}
-        <div>
-          {/* Dịch vụ */}
+        <div className='w-full max-w-4xl mx-auto'>
+         <div className="max-h-[300px] overflow-y-auto pr-2">
           {services.length > 0 && (
-            <div className="mb-12">
+            <div className="mb-8" >
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Dịch vụ</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="max-h-[300px] overflow-y-auto pr-2">
+              <div className="grid grid-cols-5 gap-6">
                 {services.map((service) => (
                   <Link
                     key={service._id}
@@ -101,7 +96,9 @@ const SearchPage = () => {
                     <img
                       src={service.image || 'https://via.placeholder.com/150'}
                       alt={service.name}
-                      className="w-full h-40 object-cover rounded-lg mb-3"
+                      width={150}
+                      height={150}
+                      className="w-full h-40 object-cover rounded-lg mb-0"
                     />
                     <h3 className="text-lg font-semibold text-gray-800">{service.name}</h3>
                     <p className="text-gray-600">{service.price} đ</p>
@@ -109,14 +106,14 @@ const SearchPage = () => {
                   </Link>
                 ))}
               </div>
+              </div>
             </div>
           )}
-
-          {/* Sản phẩm */}
           {products.length > 0 && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Sản phẩm</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-0">Sản phẩm</h2>
+              <div className="max-h-[300px] overflow-y-auto pr-2">
+              <div className="grid grid-cols-5 gap-6">
                 {products.map((product) => (
                   <Link
                     key={product._id}
@@ -135,11 +132,15 @@ const SearchPage = () => {
                 ))}
               </div>
             </div>
+            </div>
+              
           )}
           {query && !loading && services.length === 0 && products.length === 0 && (
             <p className="text-center text-gray-600">Không tìm thấy kết quả cho "{query}"</p>
           )}
         </div>
+        </div>
+
       </div>
     </div>
   );

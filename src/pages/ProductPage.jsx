@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import OneProduct from "../components/OneProduct";
 import { getProducts } from "../APIs/ProductsApi";
 import { addToCart } from "../APIs/cartApi";
-import { errorToast, successToast, toastContainer } from "../utils/toast";
+import { errorToast, successToast,  } from "../utils/toast";
 import { motion } from "framer-motion";
 import { Button, Spin } from "antd";
 import { Link } from "react-router-dom";
@@ -73,7 +73,7 @@ const ProductsPage = () => {
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 1.2 }}
       >
-        {toastContainer()}
+        
 
         <section className="px-10 py-6">
           <nav className="text-sm text-gray-500 mt-4">

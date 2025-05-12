@@ -5,7 +5,7 @@ import { addReviewDV } from "../APIs/ReviewDVAPI";
 import { MdOutlineStarPurple500 } from "react-icons/md";
 import { jwtDecode } from 'jwt-decode';
 import { getServiceById } from '../APIs/ServiceAPI';
-import { errorToast, successToast, toastContainer } from '../utils/toast';
+import { errorToast, successToast,  } from '../utils/toast';
 
 export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
   const [rating, setRating] = useState(0);
@@ -109,7 +109,7 @@ export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
 
   return (
     <div className="max-w-md mx-auto p-4 shadow-md rounded border mt-4">
-      {toastContainer()}
+      
       <h1 className="text-2xl font-bold mb-4">Đánh giá sản phẩm</h1>
 
       {userFullName && (

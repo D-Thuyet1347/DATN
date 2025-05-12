@@ -129,6 +129,12 @@ export const EmployeeManagement = () => {
         const branch = dataBrand.find((b) => b._id === record.BranchID);
         return branch?.BranchName || "Chưa có chi nhánh";
       },
+      filters: dataBrand
+        .filter(branch => branch._id !== "680b4f376e58bda8dfa176e2")
+       .map((branch) => ({ text: branch.BranchName,
+        value: branch._id,
+      })),
+      onFilter: (value, record) => record.BranchID === value,
     },
     {
       title: "Tên nhân viên",
@@ -136,13 +142,19 @@ export const EmployeeManagement = () => {
       key: "UserID",
       render: (text, record) => {
         const user = dataUser.find((u) => u._id === record.UserID);
-        return user ? `${user.firstName}` : "Chưa có nhân viên";
+        return user ? `${user.firstName} ${user.lastName}`  : "Chưa có nhân viên";
       },
     },
     {
       title: "Vị trí",
       dataIndex: "Position",
       key: "Position",
+      filters: [
+        { text: "Nhân viên chăm sóc", value: "Nhân viên chăm sóc" },
+        { text: "Nhân viên dịch vụ", value: "Nhân viên dịch vụ" },
+        { text: "Nhân viên lễ tân", value: "Nhân viên lễ tân" },
+      ],
+      onFilter: (value, record) => record.Position === value,
     },
     {
       title: "Số điện thoại",
@@ -256,11 +268,19 @@ export const EmployeeManagement = () => {
             rules={[{ required: true, message: "Vui lòng chọn nhân viên" }]}
           >
             <Select placeholder="Chọn nhân viên">
-              {dataUser.map((user) => (
-                <Option key={user._id} value={user._id}>
-                  {user.firstName}
-                </Option>
-              ))}
+              {dataUser
+                .filter((user) => {
+                  if (editingEmployee) return true;
+                  const alreadyAssigned = dataEmployee.some(
+                    (emp) => emp.UserID === user._id
+                  );
+                  return !alreadyAssigned;
+                })
+                .map((user) => (
+                  <Option key={user._id} value={user._id}>
+                    {user.firstName}{" " + user.lastName}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
 
@@ -292,6 +312,7 @@ export const EmployeeManagement = () => {
             htmlType="submit"
             block
             onClick={handleEmployeeSubmit}
+            loading={loading}
           >
             Xác nhận
           </Button>
@@ -311,7 +332,6 @@ export const EmployeeManagement = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

@@ -103,6 +103,10 @@ const fetchCategories = async () => {
   const handleUpdateProduct = async (values) => {
     setLoading(true);
     try {
+      if(!image) {
+        message.error('Vui lòng tải lên hình ảnh sản phẩm!');
+        return;
+      }
       if (values.PricePD < 0 || values.StockQuantity < 0) {
         message.error('Giá và số lượng phải lớn hơn 0!');
         return;

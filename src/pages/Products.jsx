@@ -4,7 +4,7 @@ import OneProduct from "../components/OneProduct";
 import { getProducts } from "../APIs/ProductsApi";
 import { motion } from "framer-motion";
 import { addToCart } from "../APIs/cartApi";
-import { errorToast, successToast, toastContainer } from "../utils/toast";
+import { errorToast, successToast,  } from "../utils/toast";
 import { Button, Pagination } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -43,7 +43,7 @@ const Products = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-    setFilter(t("header.all")); // Cập nhật filter khi ngôn ngữ thay đổi
+    setFilter(t("header.all")); 
   }, [t]);
 
   const filteredProducts =
@@ -57,20 +57,29 @@ const Products = () => {
   );
 
   const handleAddToCart = async (productId, quantity) => {
-    try {
-      const res = await addToCart(productId, quantity);
-      if (res?.success) {
-        successToast(t("products.addToCartSuccess"));
-        fetchCartCount(); // Cập nhật cartCount sau khi thêm sản phẩm
-      }
-    } catch (error) {
-      if (error?.response?.status === 401) {
-        errorToast(t("products.pleaseLogin"));
-      } else {
-        errorToast(t("products.outOfStock"));
-      }
+  try {
+        const role = localStorage.getItem("role"); 
+    if (role !== "user") {
+      errorToast(t("products.onlyUsersCanOrder"));
+      return;
     }
-  };
+
+
+
+    const res = await addToCart(productId, quantity);
+    if (res?.success) {
+      successToast(t("products.addToCartSuccess"));
+      fetchCartCount();
+    }
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      errorToast(t("products.pleaseLogin"));
+    } else {
+      errorToast(t("products.outOfStock"));
+    }
+  }
+};
+
 
   const handleScrollLeft = () => {
     if (categoryScrollIndex > 0) {
@@ -92,13 +101,13 @@ const Products = () => {
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 1.2 }}
     >
-      {toastContainer()}
+      
       <section className="p-10">
         <h2
           className="text-2xl text-[40px] font-bold mb-6 text-center"
           style={{ fontFamily: "Dancing Script, serif" }}
         >
-          {t("header.featured Products")} {/* Sản phẩm nổi bật */}
+          {t("header.featured Products")} 
         </h2>
 
         {cartMessage && (
@@ -179,7 +188,7 @@ const Products = () => {
             ))
           ) : (
             <p className="text-center text-gray-600 col-span-4">
-              {t("products.noProducts")} {/* Không có sản phẩm */}
+              {t("products.noProducts")} 
             </p>
           )}
         </div>

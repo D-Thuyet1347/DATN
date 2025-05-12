@@ -118,6 +118,10 @@ const ServiceManagement = () => {
 
   const handleFormFinish = async values => {
     try {
+       if(!image) {
+              message.error('Vui lòng tải lên hình ảnh dịch vụ!');
+              return;
+            }
       if (values.price < 0 || values.duration < 0) {
         message.error("Giá và thời gian không được âm!");
         return;

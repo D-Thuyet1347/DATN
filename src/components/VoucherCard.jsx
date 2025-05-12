@@ -1,6 +1,6 @@
 import React from 'react';
 
-const VoucherCard = ({ voucher, onSaveVoucher }) => {
+const VoucherCard = ({ voucher, onSaveVoucher, showSaveButton = true  }) => {
   const isExpired = voucher.tags.includes('Hết hạn');
 
   return (
@@ -30,11 +30,10 @@ const VoucherCard = ({ voucher, onSaveVoucher }) => {
         </div>
         <p className="text-sm text-gray-500">{voucher.expiry}</p>
         <div className="flex justify-between mt-4">
-          {/* <button className="text-gray-600 border border-gray-300 px-3 py-1 rounded-full absolute bottom-5 left-5">
-            Chi tiết
-          </button> */}
+
+          {showSaveButton && (
           <button
-            onClick={() => !isExpired && onSaveVoucher(voucher)} // Chỉ gọi onSaveVoucher nếu chưa hết hạn
+            onClick={() => !isExpired && onSaveVoucher(voucher)}
             disabled={isExpired}
             className={`px-3 py-1 rounded-full absolute bottom-5 right-5 border ${
               isExpired
@@ -44,6 +43,7 @@ const VoucherCard = ({ voucher, onSaveVoucher }) => {
           >
             Lưu voucher
           </button>
+        )}
         </div>
       </div>
     </div>
