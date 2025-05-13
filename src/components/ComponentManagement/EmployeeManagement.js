@@ -130,10 +130,8 @@ export const EmployeeManagement = () => {
         return branch?.BranchName || "Chưa có chi nhánh";
       },
       filters: dataBrand
-        .filter(branch => branch._id !== "680b4f376e58bda8dfa176e2")
-       .map((branch) => ({ text: branch.BranchName,
-        value: branch._id,
-      })),
+        .filter((branch) => branch._id !== "680b4f376e58bda8dfa176e2")
+        .map((branch) => ({ text: branch.BranchName, value: branch._id })),
       onFilter: (value, record) => record.BranchID === value,
     },
     {
@@ -142,7 +140,9 @@ export const EmployeeManagement = () => {
       key: "UserID",
       render: (text, record) => {
         const user = dataUser.find((u) => u._id === record.UserID);
-        return user ? `${user.firstName} ${user.lastName}`  : "Chưa có nhân viên";
+        return user
+          ? `${user.firstName} ${user.lastName}`
+          : "Chưa có nhân viên";
       },
     },
     {
@@ -214,11 +214,19 @@ export const EmployeeManagement = () => {
           value={selectedUserId}
           allowClear
         >
-          {dataUser.map((user) => (
-            <Option key={user._id} value={user._id}>
-              {user.firstName}
-            </Option>
-          ))}
+          {dataUser
+            .filter((user) =>
+              dataEmployee.some(
+                (emp) =>
+                  (emp.UserID === user._id || emp.UserID?._id === user._id) &&
+                  emp.Position === "Nhân viên dịch vụ"
+              )
+            )
+            .map((user) => (
+              <Option key={user._id} value={user._id}>
+                {user.firstName} {user.lastName}
+              </Option>
+            ))}
         </Select>
 
         <Button
@@ -278,7 +286,8 @@ export const EmployeeManagement = () => {
                 })
                 .map((user) => (
                   <Option key={user._id} value={user._id}>
-                    {user.firstName}{" " + user.lastName}
+                    {user.firstName}
+                    {" " + user.lastName}
                   </Option>
                 ))}
             </Select>

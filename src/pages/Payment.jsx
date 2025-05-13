@@ -9,6 +9,7 @@ import { placeOrder } from "../APIs/orderApi";
 import { jwtDecode } from "jwt-decode";
 import { getUser, updateUser } from "../APIs/userApi";
 import { redeemVoucher } from "../APIs/VoucherAPI";
+import vnpay from '../img/images.png'
 import axios from 'axios'; // Import axios để gọi API VNPAY
 
 const PaymentMethod = ({ id, name, icon, selected, onSelect }) => {
@@ -399,22 +400,22 @@ const Payment = () => {
                   {/* Stripe (Card) */}
                   <PaymentMethod
                     id="card"
-                    name="Thanh toán bằng Thẻ ngân hàng (Stripe)" // Đổi tên cho rõ ràng
-                    icon={<CreditCard size={20} />} // Dùng icon Lucide
+                    name="Thanh toán bằng Thẻ ngân hàng (Stripe)" 
+                    icon={<CreditCard size={20} />}
                     selected={selectedPayment}
                     onSelect={setSelectedPayment}
                   />
                   <PaymentMethod
                     id="cod"
                     name="Thanh toán khi nhận hàng (COD)"
-                    icon={<Truck size={20} />} // Dùng icon Lucide
+                    icon={<Truck size={20} />} 
                     selected={selectedPayment}
                     onSelect={setSelectedPayment}
                   />
                   <PaymentMethod
                     id="vnpay"
                     name="Thanh toán qua VNPAY"
-                    icon={<img src="/images/vnpay_logo.png" alt="VNPAY" className="h-6 w-auto object-contain" />}
+                    icon={<img src={vnpay} alt="VNPAY" className="h-6 w-auto object-contain" />}
                     selected={selectedPayment}
                     onSelect={setSelectedPayment}
                   />
@@ -422,15 +423,12 @@ const Payment = () => {
               </div>
             </div>
           </div>
-
-          {/* Cột phải: Order Summary (Giữ nguyên) */}
           <div className="lg:w-1/3">
             <div className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-20"> {/* Điều chỉnh top nếu header fixed */}
               <div className="p-6 border-b">
                 <h2 className="text-xl font-semibold text-gray-800">Đơn hàng của bạn</h2>
               </div>
               <div className="p-6">
-                {/* Items */}
                 <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2">
                   {products
                     .filter((p) => cartItems[p._id])
@@ -438,7 +436,7 @@ const Payment = () => {
                       <div key={product._id} className="flex items-start gap-4">
                         <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border border-gray-200">
                           <Image
-                            src={product.ImagePD ? `${process.env.REACT_APP_API_URL || 'http://localhost:4000'}/images/${product.ImagePD}` : '/placeholder.png'}
+                            src={product.ImagePD }
                             alt={product.ProductName}
                             className="w-full h-full object-cover"
                             preview={false}
@@ -455,7 +453,6 @@ const Payment = () => {
                       </div>
                     ))}
                 </div>
-                {/* Totals */}
                 <div className="space-y-3 border-t pt-4">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Tạm tính</span>
@@ -477,10 +474,9 @@ const Payment = () => {
                     <span className="text-xl font-bold text-blue-600">{total.toLocaleString("vi-VN")}₫</span>
                   </div>
                 </div>
-                {/* Buttons */}
                 <div className="mt-6 space-y-3">
                   <button
-                    type="button" // Quan trọng: để không submit form nếu dùng thẻ <form>
+                    type="button" 
                     onClick={handleSubmit}
                     disabled={isSubmitting || total <= 0 || Object.keys(cartItems).length === 0}
                     className={`w-full px-4 py-3 rounded-lg font-semibold text-white transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isSubmitting || total <= 0 || Object.keys(cartItems).length === 0

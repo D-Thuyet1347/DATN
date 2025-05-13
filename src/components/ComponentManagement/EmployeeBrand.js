@@ -195,7 +195,7 @@ export const EmployeeBrand = () => {
       filters: dataUser.map((user) => ({
         text: `${user.firstName} ${user.lastName}`,
         value: user._id,
-      })),  
+      })),
       onFilter: (value, record) => {
         const user = dataUser.find((u) => u._id === record.UserID);
         return user ? user._id === value : false;
@@ -247,12 +247,6 @@ export const EmployeeBrand = () => {
     },
   ];
 
-  const filteredUsers = selectedBranch
-    ? dataEmployee
-        .filter((emp) => emp.BranchID === selectedBranch)
-        .map((emp) => emp.UserID)
-    : [];
-
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
@@ -276,7 +270,9 @@ export const EmployeeBrand = () => {
           {dataUser
             .filter((user) =>
               dataEmployee.some(
-                (emp) => emp.UserID === user._id || emp.UserID?._id === user._id
+                (emp) =>
+                  (emp.UserID === user._id || emp.UserID?._id === user._id) &&
+                  emp.Position === "Nhân viên dịch vụ"
               )
             )
             .map((user) => (
