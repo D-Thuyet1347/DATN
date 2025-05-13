@@ -195,7 +195,7 @@ export const EmployeeBrand = () => {
       filters: dataUser.map((user) => ({
         text: `${user.firstName} ${user.lastName}`,
         value: user._id,
-      })),
+      })),  
       onFilter: (value, record) => {
         const user = dataUser.find((u) => u._id === record.UserID);
         return user ? user._id === value : false;
@@ -219,6 +219,11 @@ export const EmployeeBrand = () => {
       title: "Trạng thái",
       dataIndex: "Status",
       key: "Status",
+      filters: [
+        { text: "Đang làm việc", value: "Đang làm việc" },
+        { text: "Tạm nghỉ", value: "Tạm nghỉ" },
+      ],
+      onFilter: (value, record) => record.Status.indexOf(value) === 0,
     },
     {
       title: "Hành động",
@@ -270,9 +275,7 @@ export const EmployeeBrand = () => {
           {dataUser
             .filter((user) =>
               dataEmployee.some(
-                (emp) =>
-                  (emp.UserID === user._id || emp.UserID?._id === user._id) &&
-                  emp.Position === "Nhân viên dịch vụ"
+                (emp) => emp.UserID === user._id || emp.UserID?._id === user._id
               )
             )
             .map((user) => (

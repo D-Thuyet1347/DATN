@@ -67,6 +67,19 @@ export const ReviewDV = ({ setLoading, onReviewSubmitted }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token) {
+      errorToast("Bạn cần đăng nhập để gửi đánh giá.");
+      setTimeout(() => {
+        window.location.href = "/sign-in";
+      }, 2000);
+      return;
+    }
+    if (role !== "user") {
+      errorToast("Chỉ người dùng mới có thể gửi đánh giá.");
+      return;
+    }
     if (!rating) {
       return errorToast("Vui lòng đánh giá rating.");
     }

@@ -169,6 +169,11 @@ export const EmployeeManagement = () => {
       title: "Trạng thái",
       dataIndex: "Status",
       key: "Status",
+      filters: [
+        { text: "Đang làm việc", value: "Đang làm việc" },
+        { text: "Tạm nghỉ", value: "Tạm nghỉ" },
+      ],
+      onFilter: (value, record) => record.Status.indexOf(value) === 0,
     },
     {
       title: "Hành động",
@@ -219,6 +224,7 @@ export const EmployeeManagement = () => {
               dataEmployee.some(
                 (emp) =>
                   (emp.UserID === user._id || emp.UserID?._id === user._id) &&
+                  emp.Status === "Đang làm việc" &&
                   emp.Position === "Nhân viên dịch vụ"
               )
             )

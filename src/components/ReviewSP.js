@@ -66,8 +66,19 @@ export const ReviewSP = ({ onAddReview }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
- e.preventDefault();
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token) {
+      errorToast("Vui lòng đăng nhập để đánh giá sản phẩm.");
+      setTimeout(() => {
+        window.location.href = "/sign-in";
+      }, 2000);
+      return;
+    }
+    if (role !== "user") {
+      errorToast("Chỉ người dùng mới có thể đánh giá sản phẩm.");
+      return;
+    }
      if (!rating) {
        return errorToast("Vui lòng đánh giá rating.");
      }

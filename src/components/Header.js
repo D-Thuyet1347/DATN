@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import user from "../img/user.png";
+import user from "../img/avatar.png";
 import vi from "../img/vi.png";
 import en from "../img/en.png";
 import logo from "../img/logo.jpg";
@@ -12,7 +12,8 @@ import { useTranslation } from "react-i18next";
 import Mess from "./Mess";
 import BackToTop from "./BackToTop";
 import { CartContext } from "../context/CartContext";
-import SearchPage, { SearchResultPage } from "../pages/SearchResult";
+import SearchPage from "../pages/SearchResult";
+import { errorToast } from "../utils/toast";
 
 const DEFAULT_AVATAR = user;
 
@@ -114,6 +115,24 @@ const Header = ({ className = "" }) => {
   const handleSearchClick = () => {
     setShowSearch(!showSearch);
   };
+  const handleCartClick = () => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    
+    if (!token) {
+      errorToast("Vui lòng đăng nhập để xem giỏ hàng!");
+      setTimeout(() => {
+        navigate("/sign-in");
+      }, 2000);
+      return;
+    }
+    if (role !== "user") {
+      errorToast("Chỉ người dùng mới có thể xem giỏ hàng!");
+      return;
+    }else {
+      navigate("/cart");
+    }
+  }
 
   return (
     <header
@@ -213,7 +232,7 @@ const Header = ({ className = "" }) => {
             <IoMdSearch size={24} />
           </div>
           <div className="relative cursor-pointer hover:text-maincolor transition">
-            <Link to="/cart">
+            <div onClick={handleCartClick}>
               <div className="relative">
                 <IoBagHandleOutline size={24} />
                 {cartCount > 0 && (
@@ -222,7 +241,7 @@ const Header = ({ className = "" }) => {
                   </span>
                 )}
               </div>
-            </Link>
+            </div>
           </div>
           <div
             className="cursor-pointer hover:text-maincolor transition"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import VoucherCard from "../components/VoucherCard";
 import { getVouchers } from "../APIs/VoucherAPI";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { successToast, errorToast } from "../utils/toast";
 import Header from "../components/Header";
@@ -23,7 +23,7 @@ const SuperVouchers = () => {
   const [filterType, setFilterType] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
   const fetchVouchers = async () => {
     try {
       setLoading(true);
@@ -64,6 +64,7 @@ const SuperVouchers = () => {
             : null,
         startDate: voucher.startDate,
         endDate: voucher.endDate,
+        name: voucher.name,
         minimumAmount: voucher.minimumAmount,
         maximumDiscount: voucher.maximumDiscount,
         usageLimit: voucher.usageLimit,
@@ -83,7 +84,6 @@ const SuperVouchers = () => {
     fetchVouchers();
   }, []);
 
-  // Filter khi vouchers, filterType hoặc searchTerm thay đổi
   useEffect(() => {
     const filtered = vouchers.filter((voucher) => {
       const matchesType =
@@ -107,8 +107,19 @@ const SuperVouchers = () => {
   const handleSaveVoucher = async (voucher) => {
     try {
       const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
       if (!token) {
         errorToast("Bạn cần đăng nhập để lưu voucher!");
+        setTimeout(() => {
+          navigate("/sign-in");
+        }, 2000);
+        return;
+      }
+      if (role !== "user") {
+        errorToast("Chỉ người dùng mới có thể lưu voucher!");
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
         return;
       }
       await api.post(
@@ -121,6 +132,26 @@ const SuperVouchers = () => {
       errorToast("Voucher đã được lưu trước đó");
     }
   };
+  const handleViewVoucher = (voucher) => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token) {
+      errorToast("Bạn cần đăng nhập để xem voucher!");
+      setTimeout(() => {
+        navigate("/sign-in");
+      }, 2000);
+      return;
+    }
+      if (role !== "user") {
+      errorToast("Chỉ người dùng mới có thể xem voucher!");
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+      return;
+    }
+    navigate('/myvc')
+    
+  }
 
   return (
     <>
@@ -146,7 +177,7 @@ const SuperVouchers = () => {
                 d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
-            <Link to="/myvc">Xem vouchers của tôi</Link>
+            <div onClick={handleViewVoucher}>Xem vouchers của tôi</div>
           </button>
         </div>
 

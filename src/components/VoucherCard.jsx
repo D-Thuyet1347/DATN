@@ -13,13 +13,12 @@ const VoucherCard = ({ voucher, onSaveVoucher, showSaveButton = true  }) => {
               key={index}
               className={`text-xs px-2 py-1 rounded-full ${
                 tag === 'Hết hạn' ? 'bg-gray-200 text-gray-600' : 'bg-blue-100 text-blue-600'
-              }`}
-            >
+              }`}>
               {tag}
             </span>
           ))}
         </div>
-        <h3 className="text-lg font-semibold">{voucher.title}</h3>
+        <h3 className="text-lg font-semibold">{voucher.name}</h3>
         <p className="text-sm text-gray-600">{voucher.discount}</p>
         {voucher.minOrder && <p className="text-sm text-gray-600">{voucher.minOrder}</p>}
         <div className="flex items-center text-green-600 mt-2">

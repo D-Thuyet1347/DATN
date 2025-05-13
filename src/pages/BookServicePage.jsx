@@ -399,10 +399,9 @@ const BookServicePage = () => {
 
   const onFinish = async (values) => {
     setServerError(null);
-
     const isAvailable = await checkAvailabilityBeforeSubmit();
     if (!isAvailable) return;
-
+    
     const token = localStorage.getItem("token");
     if (!token) {
       errorToast("Vui lòng đăng nhập để đặt lịch");

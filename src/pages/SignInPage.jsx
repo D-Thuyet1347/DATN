@@ -45,7 +45,7 @@ setTimeout(() => {
     if (res.message === "Email not verified") {
       errorToast("Vui lòng xác nhận email trước khi đăng nhập.");
     } else if (res.message === "Invalid credentials") {
-      errorToast("Vui lòi kiểm tra lại mật khẩu.");
+      errorToast("Vui lòng kiểm tra lại mật khẩu.");
     } else if (res.message === "User doesn't exist") {
       errorToast("Tài khoản không tồn tại.");
     } else {

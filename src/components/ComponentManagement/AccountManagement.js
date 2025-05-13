@@ -146,8 +146,8 @@ const AccountManagement = () => {
   return (
     <div className="mt-3">
       <h1>Quản lý tài khoản</h1>
-      <Button type="primary" onClick={() => setIsAddOpen(true)} className="mb-3 mr-3">
-        Thêm tài khoản nhân viên mới
+      <Button type="primary" onClick={() => setIsAddOpen(true)} className="mt-2 mb-3 mr-3">
+        Tạo tài khoản nhân viên mới
       </Button>
       
       <Input
