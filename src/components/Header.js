@@ -307,10 +307,8 @@ const Header = ({ className = "" }) => {
 
       {showSearch && (
         <div
-          ref={searchRef}
-          className="absolute top-0 left-0 w-full bg-white opacity-100  py-5 shadow-lg z-50"
-        >
-          <SearchPage />
+          ref={searchRef}>
+          <SearchPage  onClose={() => setShowSearch(false)}  />
         </div>
       )}
     </header>

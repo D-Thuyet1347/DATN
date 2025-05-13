@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { getAllServices } from '../APIs/ServiceAPI';
 import { getProducts } from '../APIs/ProductsApi';
-import Header from '../components/Header';
 
-const SearchPage = () => {
+const SearchPage = ({onClose}) => {
   const [query, setQuery] = useState('');
   const [services, setServices] = useState([]);
   const [products, setProducts] = useState([]);
@@ -12,14 +11,12 @@ const SearchPage = () => {
   const [error, setError] = useState(null);
   const location = useLocation();
 
-  // Lấy query từ URL
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const q = searchParams.get('q') || '';
     setQuery(q);
   }, [location.search]);
 
-  // Tìm kiếm khi query thay đổi
   useEffect(() => {
     const fetchResults = async () => {
       if (!query.trim()) {
@@ -56,16 +53,22 @@ const SearchPage = () => {
   };
 
   return (
-    <div className=" ">
-      <div className=" container mt-[-10px] mx-auto px-4 py-2">
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 z-50 overflow-auto">
+      <div className="container mx-auto px-4 py-6">
+        <button
+        className="absolute top-2 right-2 text-white hover:text-red-500 text-3xl font-bold"
+        onClick={onClose}
+      >
+        &times;
+      </button>
         <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex items-center max-w-2xl mx-auto">
+          <div className="flex  items-center max-w-[45rem] mt-[-10px] mx-auto">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Tìm kiếm sản phẩm hoặc dịch vụ..."
-              className="flex-1 p-3 border text-black border-black-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-maincolor"
+              className="flex-1 p-3 border text-black border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-maincolor"
             />
             <button
               type="submit"
@@ -77,16 +80,13 @@ const SearchPage = () => {
         </form>
 
         {loading && <p className="text-center text-gray-600">Đang tải...</p>}
-
         {error && <p className="text-center text-red-500">{error}</p>}
 
-        <div className='w-full max-w-4xl mx-auto'>
-         <div className="max-h-[300px] overflow-y-auto pr-2">
+        <div className='w-full max-w-5xl mx-auto'>
           {services.length > 0 && (
-            <div className="mb-8" >
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Dịch vụ</h2>
-              <div className="max-h-[300px] overflow-y-auto pr-2">
-              <div className="grid grid-cols-5 gap-6">
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold text-white mb-4">Dịch vụ</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {services.map((service) => (
                   <Link
                     key={service._id}
@@ -96,9 +96,7 @@ const SearchPage = () => {
                     <img
                       src={service.image || 'https://via.placeholder.com/150'}
                       alt={service.name}
-                      width={150}
-                      height={150}
-                      className="w-full h-40 object-cover rounded-lg mb-0"
+                      className="w-full h-40 object-cover rounded-lg mb-2"
                     />
                     <h3 className="text-lg font-semibold text-gray-800">{service.name}</h3>
                     <p className="text-gray-600">{service.price} đ</p>
@@ -106,14 +104,13 @@ const SearchPage = () => {
                   </Link>
                 ))}
               </div>
-              </div>
             </div>
           )}
+
           {products.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-0">Sản phẩm</h2>
-              <div className="max-h-[300px] overflow-y-auto pr-2">
-              <div className="grid grid-cols-5 gap-6">
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold text-white mb-4">Sản phẩm</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {products.map((product) => (
                   <Link
                     key={product._id}
@@ -123,7 +120,7 @@ const SearchPage = () => {
                     <img
                       src={product.ImagePD || 'https://via.placeholder.com/150'}
                       alt={product.ProductName}
-                      className="w-full h-40 object-cover rounded-lg mb-3"
+                      className="w-full h-40 object-cover rounded-lg mb-2"
                     />
                     <h3 className="text-lg font-semibold text-gray-800">{product.ProductName}</h3>
                     <p className="text-gray-600">{product.PricePD} đ</p>
@@ -132,15 +129,14 @@ const SearchPage = () => {
                 ))}
               </div>
             </div>
-            </div>
-              
           )}
-          {query && !loading && services.length === 0 && products.length === 0 && (
-            <p className="text-center text-gray-600">Không tìm thấy kết quả cho "{query}"</p>
-          )}
-        </div>
-        </div>
 
+          {query && !loading && services.length === 0 && products.length === 0 && (
+            <p className="text-center text-gray-600">
+              Không tìm thấy kết quả cho "<strong>{query}</strong>"
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

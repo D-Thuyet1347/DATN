@@ -6,9 +6,8 @@ import { errorToast } from '../utils/toast';
 import { List, Tag } from 'antd';
 import { jwtDecode } from 'jwt-decode';
 import { Link } from 'react-router-dom';
-import Header from './Header';
 
-const hours = Array.from({ length: 10 }, (_, i) => i + 10);
+const hours = Array.from({ length: 12 }, (_, i) => i + 8);
 const daysName = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
 
 const Schedule = ({ employeeViewId }) => {
@@ -17,7 +16,6 @@ const Schedule = ({ employeeViewId }) => {
   const [dateFilter, setDateFilter] = useState(moment().format("YYYY-MM-DD"));
   const [showSchedule, setShowSchedule] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [bookings, setBookings] = useState([]);
   const [employeeId, setEmployeeId] = useState('');
   const [data, setData] = useState([]);
   const [isEmployee, setIsEmployee] = useState(false);

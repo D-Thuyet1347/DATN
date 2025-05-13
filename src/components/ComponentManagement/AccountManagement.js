@@ -116,6 +116,7 @@ const AccountManagement = () => {
       key: 'isEmailVerified',
       render: v => v ? 'Đang hoạt động' : 'Đã bị chặn',
     },
+    
     {
       title: 'Hành động',
       key: 'action',
