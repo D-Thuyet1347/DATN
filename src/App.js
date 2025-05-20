@@ -33,6 +33,7 @@ import Manager from './pages/Manager';
 import { CartProvider } from './context/CartContext';
 import { ToastContainerWrapper, Wrapper } from './utils/toast';
 import VnpayCheckout from './pages/VnpayCheckout';
+import ConfirmEmail from './pages/ConfirmEmail';
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
           <Route path="/book-service/:id" element={<PrivateRoute element={<BookServicePage/>} requiredRole="user" />} />  
           <Route path="/myvc" element={<PrivateRoute element={<MyVouchers />} requiredRole="user" />} />
           <Route path="/cart" element={<PrivateRoute element={<Cart />} requiredRole="user" />} />
+           <Route path="/confirm-email/:code" element={<ConfirmEmail />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} requiredRole={"admin"} />} />
