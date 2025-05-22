@@ -444,12 +444,12 @@ const VoucherManagement = () => {
         message.error('Giảm giá phải nằm trong khoảng 1-99%!');
         return;
       }
-      if (values.maximumDiscount < 1) {
-        message.error('Giảm tối đa phải lớn hơn 0!');
+      if (values.maximumDiscount < 100000) {
+        message.error('Giảm tối đa phải lớn hơn 100.000 VNĐ!');
         return;
       }
-      if (values.minimumAmount < 0) {
-        message.error('Đơn tối thiểu không được âm!');
+      if (values.minimumAmount < 200000) {
+        message.error('Đơn tối thiểu phải bằng 200.000 VNĐ!');
         return;
       }
 

@@ -107,7 +107,7 @@ const fetchCategories = async () => {
         message.error('Vui lòng tải lên hình ảnh sản phẩm!');
         return;
       }
-      if (values.PricePD < 0 || values.StockQuantity < 0) {
+      if (values.PricePD <= 0 || values.StockQuantity <= 0) {
         message.error('Giá và số lượng phải lớn hơn 0!');
         return;
       }
@@ -136,7 +136,7 @@ const fetchCategories = async () => {
 
   const handleDeleteProduct = async (id) => {
     try {
-      const response = await axios.post('https://backend-fu3h.onrender.com/api/product/remove', { id });
+      const response = await axios.post('http://localhost:4000/api/product/remove', { id });
       if (response.data.success) {
         message.success('Xóa sản phẩm thành công!');
         fetchProducts();

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { listUser, updateUser, updateUserRole, registerUser, createAccount } from '../../APIs/userApi';
+import { useEffect, useState } from 'react';
+import { listUser, updateUser, updateUserRole, registerUser } from '../../APIs/userApi';
 import { Button, Drawer, Input, Table, Select, Form, Popconfirm, message } from 'antd';
 import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
 import { FaLock, FaUnlock } from 'react-icons/fa6';

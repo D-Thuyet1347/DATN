@@ -122,8 +122,8 @@ const ServiceManagement = () => {
               message.error('Vui lòng tải lên hình ảnh dịch vụ!');
               return;
             }
-      if (values.price < 0 || values.duration < 0) {
-        message.error("Giá và thời gian không được âm!");
+      if (values.price <= 0 || values.duration <= 0) {
+        message.error("Giá và thời gian phải lớn hơn 0!");
         return;
       }
       const payload = {
@@ -289,14 +289,14 @@ const ServiceManagement = () => {
             name="price"
             rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
           >
-            <Input type="number" min={0} />
+            <Input type="number" />
           </Form.Item>
           <Form.Item
             label="Thời gian (phút)"
             name="duration"
             rules={[{ required: true, message: "Vui lòng nhập thời gian!" }]}
           >
-            <Input type="number" min={0} />
+            <Input type="number" />
           </Form.Item>
           <Form.Item
             label="Danh mục"
