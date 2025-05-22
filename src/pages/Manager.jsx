@@ -122,7 +122,7 @@ const Manager = () => {
       <div
         style={{
           width: collapsed ? 60 : 200,
-          padding: '10px',
+          paddingTop: '10px',
           transition: 'width 0.3s ease',
           display: 'flex',
           flexDirection: 'column',
