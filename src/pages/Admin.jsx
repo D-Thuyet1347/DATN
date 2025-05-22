@@ -101,7 +101,6 @@ const Admin = () => {
     //  return <Dashboard />;
     }
   };
-
   const handleOnClick = ({ key }) => {
     setStateOpenKeys(key);
     setCurrent(key);
@@ -111,8 +110,8 @@ const Admin = () => {
     <div style={{ display: 'flex', height: '100vh' }}>
       <div
         style={{
-          width: collapsed ? 60 : 200,
-          padding: '10px',
+          width: collapsed ? 50 : 200,
+          paddingTop: '10px',
           transition: 'width 0.3s ease',
           display: 'flex',
           flexDirection: 'column',

@@ -6,6 +6,7 @@ import { errorToast } from '../utils/toast';
 import { List, Tag } from 'antd';
 import { jwtDecode } from 'jwt-decode';
 import { Link } from 'react-router-dom';
+import { User } from 'lucide-react';
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 8);
 const daysName = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
@@ -233,6 +234,7 @@ const Schedule = ({ employeeViewId }) => {
                     title={<span className="font-medium text-lg">{booking.service?.name || 'Dịch vụ không xác định'}</span>}
                     description={
                       <div className="space-y-1">
+                        <div><strong>Tên khách hàng: </strong>{booking.user?.firstName }{booking.user?.lastName } </div>
                         <div><strong>Ngày hẹn:</strong> {moment(booking.date).format('DD/MM/YYYY')} - {booking.time}</div>
                         <div><strong>Chi nhánh:</strong> {booking.branch?.BranchName || 'Không xác định'}</div>
                         <div><strong>Nhân viên:</strong> {booking.employee?.UserID?.firstName || 'Không xác định'}</div>

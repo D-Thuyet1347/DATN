@@ -4,7 +4,6 @@ import axios from 'axios';
 
 const ConfirmEmail = () => {
   const { code } = useParams();
-  const navigate = useNavigate();
   const [status, setStatus] = useState('pending'); // 'pending' | 'success' | 'fail'
   const [message, setMessage] = useState('');
 

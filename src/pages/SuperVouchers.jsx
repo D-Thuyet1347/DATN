@@ -187,7 +187,7 @@ const SuperVouchers = () => {
               Trang chủ
             </Link>{" "}
             &gt;{" "}
-            <Link to="/blogpage" className="hover:underline">
+            <Link to="/spvc" className="hover:underline">
               Mã giảm giá
             </Link>{" "}
             &gt;{" "}

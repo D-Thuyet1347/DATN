@@ -15,24 +15,24 @@ import {
   Typography,
   Radio,
 } from "antd";
-// Bỏ import moment vì đã dùng dayjs nhất quán hơn
-// import moment from "moment";
-import { listBranch } from "../APIs/brand"; // Đảm bảo đường dẫn đúng
-import { listEmployee, getEmployeeBookings } from "../APIs/employee"; // Đảm bảo đường dẫn đúng
-import { bookService } from "../APIs/booking"; // Đảm bảo đường dẫn đúng
-import { errorToast, successToast } from "../utils/toast"; // Đảm bảo đường dẫn đúng
+import { listBranch } from "../APIs/brand";
+import { listEmployee, getEmployeeBookings } from "../APIs/employee";
+import { bookService } from "../APIs/booking";
+import { errorToast, successToast } from "../utils/toast";
 import axios from "axios";
-import { Tag as LucideTag } from "lucide-react"; // Đổi tên để tránh trùng với Ant Design Tag nếu có
-import { redeemVoucher } from "../APIs/VoucherAPI"; // Đảm bảo đường dẫn đúng
-import Header from "../components/Header"; // Đảm bảo đường dẫn đúng
+import { Tag as LucideTag } from "lucide-react";
+import { redeemVoucher } from "../APIs/VoucherAPI";
+import { getUser } from "../APIs/userApi"; // Thêm import API getUser
+import { jwtDecode } from 'jwt-decode'; // Thêm import jwt-decode
+import Header from "../components/Header";
 import dayjs from 'dayjs';
-import 'dayjs/locale/vi'; // Import locale tiếng Việt cho dayjs nếu cần hiển thị ngày tháng tiếng Việt
-dayjs.locale('vi'); // Set locale toàn cục cho dayjs
+import 'dayjs/locale/vi';
+dayjs.locale('vi');
 
 const { Option } = Select;
 const { Text } = Typography;
 
-const API_BASE_URL = "http://localhost:4000/api/"; // Cấu hình API base URL của bạn
+const API_BASE_URL = "http://localhost:4000/api/";
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -46,8 +46,8 @@ const BookServicePage = () => {
   const navigate = useNavigate();
   const [branches, setBranches] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading chung cho các tác vụ chính
-  const [employeeLoading, setEmployeeLoading] = useState(false); // Loading khi tải nhân viên
+  const [loading, setLoading] = useState(false);
+  const [employeeLoading, setEmployeeLoading] = useState(false);
   const [service, setService] = useState(null);
   const [serverError, setServerError] = useState(null);
   const [employeeBookings, setEmployeeBookings] = useState([]);
@@ -55,10 +55,10 @@ const BookServicePage = () => {
   const [vouchers, setVouchers] = useState([]);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [isVoucherModalVisible, setIsVoucherModalVisible] = useState(false);
-
   const [employeeSelectionMode, setEmployeeSelectionMode] = useState("manual");
   const [autoSelectedEmployeeId, setAutoSelectedEmployeeId] = useState(null);
-
+  const [isProfileComplete, setIsProfileComplete] = useState(false); // Thêm state để kiểm tra thông tin người dùng
+  const [profileLoading, setProfileLoading] = useState(true); // Thêm state để kiểm tra trạng thái tải thông tin
 
   useEffect(() => {
     if (location.state?.service) {
@@ -74,7 +74,6 @@ const BookServicePage = () => {
       setService(parsedService);
     } else {
       errorToast("Không tìm thấy thông tin dịch vụ để đặt lịch.");
-      // Cân nhắc điều hướng người dùng nếu không có dịch vụ
       // navigate('/');
     }
   }, [location, navigate]);
@@ -83,8 +82,41 @@ const BookServicePage = () => {
     if (service) {
       fetchBranches();
       fetchSavedVouchers();
+      checkUserProfile(); // Gọi hàm kiểm tra thông tin người dùng
     }
   }, [service]);
+
+  // Hàm kiểm tra thông tin người dùng
+  const checkUserProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setIsProfileComplete(false);
+        setProfileLoading(false);
+        return;
+      }
+      const { id } = jwtDecode(token);
+      const response = await getUser(id);
+      if (response.success && response.data) {
+        const userData = response.data;
+        const requiredFields = ['firstName', 'lastName', 'phoneNumber', 'address', 'dateOfBirth'];
+        const isComplete = requiredFields.every(field => userData[field]?.trim());
+        setIsProfileComplete(isComplete);
+        if (!isComplete) {
+          errorToast("Vui lòng cập nhật đầy đủ thông tin cá nhân trước khi đặt lịch!");
+        }
+      } else {
+        setIsProfileComplete(false);
+        errorToast("Không thể tải thông tin người dùng!");
+      }
+    } catch (error) {
+      console.error("Error checking user profile:", error);
+      setIsProfileComplete(false);
+      errorToast("Lỗi khi kiểm tra thông tin người dùng!");
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const fetchBranches = async () => {
     try {
@@ -124,7 +156,7 @@ const BookServicePage = () => {
         return;
       }
 
-      const normalizedEmployees = response.data.map((emp) => ({ // Chuẩn hóa dữ liệu nếu cần
+      const normalizedEmployees = response.data.map((emp) => ({
         ...emp,
         branchInfo: emp.BranchID,
         userInfo: emp.User,
@@ -143,7 +175,7 @@ const BookServicePage = () => {
         return (
           empBranchId === branchId &&
           emp.status?.trim().toLowerCase() !== "nghỉ việc" &&
-          emp.position?.trim().toLowerCase() !== "nhân viên dịch vụ" // Xem lại logic này nếu cần
+          emp.position?.trim().toLowerCase() !== "nhân viên dịch vụ"
         );
       });
 
@@ -152,7 +184,7 @@ const BookServicePage = () => {
         if (employeeSelectionMode === "auto") {
           const randomEmp = filteredEmployees[Math.floor(Math.random() * filteredEmployees.length)];
           setAutoSelectedEmployeeId(randomEmp._id);
-          handleEmployeeChange(randomEmp._id, form.getFieldValue("date")); // Gọi với ID đã random
+          handleEmployeeChange(randomEmp._id, form.getFieldValue("date"));
         } else {
           form.setFieldsValue({ employee: undefined });
         }
@@ -179,7 +211,7 @@ const BookServicePage = () => {
     try {
       const response = await getEmployeeBookings(
         employeeIdToFetch,
-        date.format("YYYY-MM-DD") // date là dayjs object
+        date.format("YYYY-MM-DD")
       );
       if (Array.isArray(response.data)) {
         setEmployeeBookings(response.data);
@@ -206,13 +238,12 @@ const BookServicePage = () => {
         .filter((voucher) => ["all", "services"].includes(voucher.applicableTo))
         .map((voucher) => ({
           ...voucher,
-          title: `Ưu đãi ${voucher.applicableTo === "services" ? "dịch vụ" : "tất cả"
-            }`,
+          title: `Ưu đãi ${voucher.applicableTo === "services" ? "dịch vụ" : "tất cả"}`,
           discount: Number(voucher.discount) || 0,
-          expiry: `HSD: ${dayjs(voucher.endDate).format("DD/MM/YYYY")}`, // Sử dụng dayjs
+          expiry: `HSD: ${dayjs(voucher.endDate).format("DD/MM/YYYY")}`,
           tags: [
             voucher.applicableTo === "services" ? "Dịch vụ" : "Tất cả",
-            dayjs().isAfter(dayjs(voucher.endDate)) ? "Hết hạn" : "Còn hiệu lực", // Sử dụng dayjs
+            dayjs().isAfter(dayjs(voucher.endDate)) ? "Hết hạn" : "Còn hiệu lực",
           ],
           minOrder:
             voucher.minimumAmount > 0
@@ -258,7 +289,7 @@ const BookServicePage = () => {
   };
 
   const handleEmployeeChange = (employeeIdArg, dateArg) => {
-    const currentDate = dateArg || form.getFieldValue("date"); // dateArg là dayjs object
+    const currentDate = dateArg || form.getFieldValue("date");
     let finalEmployeeIdToFetchBookings = null;
 
     if (employeeSelectionMode === 'manual') {
@@ -288,7 +319,7 @@ const BookServicePage = () => {
     }
   };
 
-  const handleDateChange = (date) => { // date là dayjs object từ DatePicker
+  const handleDateChange = (date) => {
     const currentEmployeeId = employeeSelectionMode === 'auto'
       ? autoSelectedEmployeeId
       : form.getFieldValue("employee");
@@ -299,7 +330,7 @@ const BookServicePage = () => {
   };
 
   const disabledTime = () => {
-    const allowedHours = Array.from({ length: 11 }, (_, i) => i + 8); // 8AM to 6PM (18:00)
+    const allowedHours = Array.from({ length: 11 }, (_, i) => i + 8);
     const allHours = Array.from({ length: 24 }, (_, i) => i);
     const disabledHours = allHours.filter((h) => !allowedHours.includes(h));
     return {
@@ -311,8 +342,8 @@ const BookServicePage = () => {
   const isTimeSlotAvailable = (employeeId, date, time, duration) => {
     if (!employeeId || !date || !time || !duration || !service) return true;
 
-    const selectedDateStr = date.format("YYYY-MM-DD"); // date là dayjs object
-    const selectedTimeStr = time.format("HH:mm"); // time là dayjs object
+    const selectedDateStr = date.format("YYYY-MM-DD");
+    const selectedTimeStr = time.format("HH:mm");
     const selectedStart = convertTimeToMinutes(selectedTimeStr);
     const selectedEnd = selectedStart + duration;
 
@@ -399,8 +430,8 @@ const BookServicePage = () => {
       return false;
     }
 
-    const timeObj = dayjs(values.time); // values.time là dayjs object từ Form
-    const dateObj = dayjs(values.date); // values.date là dayjs object từ Form
+    const timeObj = dayjs(values.time);
+    const dateObj = dayjs(values.date);
     const now = dayjs();
     const selectedDateTime = dateObj.hour(timeObj.hour()).minute(timeObj.minute());
 
@@ -409,7 +440,7 @@ const BookServicePage = () => {
       return false;
     }
 
-    const { branch } = values; // time và date đã được lấy ở trên (timeObj, dateObj)
+    const { branch } = values;
 
     if (!branch || !dateObj || !timeObj) {
       errorToast("Vui lòng điền đầy đủ thông tin chi nhánh, ngày và giờ đặt lịch");
@@ -440,19 +471,13 @@ const BookServicePage = () => {
 
     setCheckingAvailability(true);
     try {
-      // Gọi lại fetchEmployeeBookings để đảm bảo dữ liệu mới nhất trước khi kiểm tra
-      // Vì state employeeBookings có thể chưa kịp cập nhật nếu người dùng thay đổi nhanh
       await fetchEmployeeBookings(employeeIdForCheck, dateObj);
-
-      // Đợi một chút để state employeeBookings có thể được cập nhật sau khi fetch
-      // Đây là một giải pháp tạm thời, cách tốt hơn là sử dụng callback hoặc promise từ fetchEmployeeBookings
       await new Promise(resolve => setTimeout(resolve, 100));
-
 
       const isAvailable = isTimeSlotAvailable(
         employeeIdForCheck,
-        dateObj, // dayjs object
-        timeObj, // dayjs object
+        dateObj,
+        timeObj,
         service.duration
       );
 
@@ -474,6 +499,13 @@ const BookServicePage = () => {
 
   const onFinish = async (values) => {
     setServerError(null);
+
+    // Kiểm tra lại thông tin người dùng trước khi đặt lịch
+    if (!isProfileComplete) {
+      errorToast("Vui lòng cập nhật đầy đủ thông tin cá nhân trước khi đặt lịch!");
+      navigate("/profile", { state: { activeTab: "profile" } });
+      return;
+    }
 
     const finalEmployeeId = employeeSelectionMode === 'auto'
       ? autoSelectedEmployeeId
@@ -503,8 +535,8 @@ const BookServicePage = () => {
       service: service._id,
       branch: values.branch,
       employee: finalEmployeeId,
-      date: dayjs(values.date).format("YYYY-MM-DD"), // values.date là dayjs object
-      time: dayjs(values.time).format("HH:mm"),   // values.time là dayjs object
+      date: dayjs(values.date).format("YYYY-MM-DD"),
+      time: dayjs(values.time).format("HH:mm"),
       duration: service.duration,
       notes: values.notes || "",
       voucher: selectedVoucher ? selectedVoucher._id : null,
@@ -554,6 +586,14 @@ const BookServicePage = () => {
     );
   }
 
+  if (profileLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spin tip="Đang kiểm tra thông tin người dùng..." size="large" />
+      </div>
+    );
+  }
+
   const selectedEmployeeInfoForAutoDisplay = employeeSelectionMode === 'auto' && autoSelectedEmployeeId && employees.length > 0
     ? employees.find(emp => emp._id === autoSelectedEmployeeId)
     : null;
@@ -565,7 +605,6 @@ const BookServicePage = () => {
   return (
     <>
       <Header className="!bg-white !text-black !shadow-md" />
-      {/* Tăng max-width để có không gian cho tỷ lệ mới */}
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <h1 className="text-2xl font-bold mb-6 text-center">
           Đặt Lịch Dịch Vụ: {service?.name || "Không có tên"}
@@ -578,12 +617,11 @@ const BookServicePage = () => {
           </div>
         )}
 
-        {/* SỬ DỤNG GRID-COLS-5 CHO TỶ LỆ 2/5 VÀ 3/5 */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-2">
             <Card title="Thông tin dịch vụ" className="h-full shadow-lg">
               <Descriptions column={1} bordered size="small">
-                <Descriptions.Item label="Tên dịch vụ"  >
+                <Descriptions.Item label="Tên dịch vụ">
                   {service?.name || "N/A"}
                 </Descriptions.Item>
                 <Descriptions.Item label="Giá">
@@ -644,7 +682,6 @@ const BookServicePage = () => {
             </Card>
           </div>
 
-          {/* Cột Thông tin đặt lịch - chiếm 3/5 */}
           <div className="lg:col-span-3">
             <Card title="Thông tin đặt lịch" className="h-full shadow-lg">
               <Form
@@ -652,7 +689,6 @@ const BookServicePage = () => {
                 layout="vertical"
                 onFinish={onFinish}
                 initialValues={{
-                  // Sử dụng dayjs cho initialValues của DatePicker và TimePicker
                   date: dayjs(),
                   time: dayjs().hour(9).minute(0),
                 }}
@@ -759,12 +795,12 @@ const BookServicePage = () => {
                       rules={[{ required: true, message: "Vui lòng chọn ngày" }]}
                     >
                       <DatePicker
-                        format="DD/MM/YYYY" // Format hiển thị
+                        format="DD/MM/YYYY"
                         style={{ width: "100%" }}
                         disabledDate={(current) =>
-                          current && current < dayjs().startOf("day") // current là dayjs object
+                          current && current < dayjs().startOf("day")
                         }
-                        onChange={handleDateChange} // nhận dayjs object
+                        onChange={handleDateChange}
                         allowClear={false}
                         onOpenChange={handleOpenChange}
                       />
@@ -777,7 +813,7 @@ const BookServicePage = () => {
                       rules={[{ required: true, message: "Vui lòng chọn giờ" }]}
                     >
                       <TimePicker
-                        format="HH:mm" // Format hiển thị
+                        format="HH:mm"
                         minuteStep={60}
                         style={{ width: "100%" }}
                         disabledTime={disabledTime}
@@ -803,6 +839,7 @@ const BookServicePage = () => {
                     loading={loading || checkingAvailability}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md w-full md:w-auto"
                     disabled={
+                      !isProfileComplete || // Vô hiệu hóa nếu thông tin chưa đầy đủ
                       !form.getFieldValue("branch") ||
                       (employeeSelectionMode === 'manual' && !form.getFieldValue("employee") && employees.length > 0 && !employeeLoading) ||
                       (employeeSelectionMode === 'auto' && !autoSelectedEmployeeId && employees.length > 0 && form.getFieldValue("branch") && !employeeLoading) ||
@@ -820,7 +857,7 @@ const BookServicePage = () => {
 
         <Modal
           title="Chọn voucher ưu đãi"
-          open={isVoucherModalVisible} // AntD v5+ sử dụng 'open'
+          open={isVoucherModalVisible}
           onCancel={handleVoucherCancel}
           footer={null}
           width={600}
@@ -861,7 +898,7 @@ const BookServicePage = () => {
                   <p className="text-xs text-gray-500 mt-1">{voucher.expiry}</p>
                   <Button
                     type="primary"
-                    ghost={selectedVoucher?._id === voucher.id} // Sửa thành selectedVoucher?._id
+                    ghost={selectedVoucher?._id === voucher.id}
                     className="mt-3 w-full"
                     onClick={() => applyVoucher(voucher)}
                     disabled={voucher.tags.includes("Hết hạn")}

@@ -88,7 +88,7 @@ const Payment = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       errorToast("Vui lòng đăng nhập để tiếp tục.");
-      navigate("/login");
+      navigate("/sign-in");
       return;
     }
     try {

@@ -133,7 +133,7 @@ const Header = ({ className = "" }) => {
       navigate("/cart");
     }
   }
-
+  
   return (
     <header
       className={`fixed z-30 top-0 left-0 h-[65px] w-full shadow-sm transition-all 

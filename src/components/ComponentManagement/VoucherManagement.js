@@ -131,7 +131,7 @@
 
 //   //   { title: 'Mã', dataIndex: 'code' },
 //   //   { title: 'Giảm giá (%)', dataIndex: 'discount' ,
-      
+
 //   //   },
 //   //   { title: 'Giảm tối đa', dataIndex: 'maximumDiscount' },
 //   //   { title: 'Đơn tối thiểu', dataIndex: 'minimumAmount' },
@@ -199,7 +199,6 @@
 //   },
 // },
 
-    
 //     { title: 'Giảm tối đa', dataIndex: 'maximumDiscount',},
 //     { title: 'Đơn tối thiểu', dataIndex: 'minimumAmount'},
 //     {
@@ -211,7 +210,7 @@
 //       title: 'Ngày kết thúc',
 //       dataIndex: 'endDate',
 //       render: (date) => new Date(date).toLocaleDateString(),
-      
+
 //     },
 //     {
 //       title: 'Giới hạn sử dụng',
@@ -280,7 +279,7 @@
 //       ),
 //     },
 //   ];
-  
+
 //   return (
 //     <div className="pt-5 p-4">
 //       <h2>Quản Lý Voucher</h2>
@@ -353,18 +352,31 @@
 
 // export default VoucherManagement;
 
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Button, Drawer, Table, Select, Input, Spin,
-  Form, DatePicker, Popconfirm, message,
-} from 'antd';
-import { DeleteOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+  Button,
+  Drawer,
+  Table,
+  Select,
+  Input,
+  Spin,
+  Form,
+  DatePicker,
+  Popconfirm,
+  message,
+} from "antd";
 import {
-  addVoucher, getVouchers, updateVoucher, deleteVoucher,
-} from '../../APIs/VoucherAPI';
+  DeleteOutlined,
+  EditOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import {
+  addVoucher,
+  getVouchers,
+  updateVoucher,
+  deleteVoucher,
+} from "../../APIs/VoucherAPI";
 
 const { Option } = Select;
 
@@ -374,8 +386,8 @@ const VoucherManagement = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // all | active | expired
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all"); // all | active | expired
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -389,12 +401,12 @@ const VoucherManagement = () => {
       const now = dayjs();
 
       const filtered = data
-        .map(v => ({ ...v, key: v._id }))
-        .filter(v => {
-          if (statusFilter === 'active') {
+        .map((v) => ({ ...v, key: v._id }))
+        .filter((v) => {
+          if (statusFilter === "active") {
             return dayjs(v.endDate).isAfter(now);
           }
-          if (statusFilter === 'expired') {
+          if (statusFilter === "expired") {
             return dayjs(v.endDate).isBefore(now);
           }
           return true;
@@ -402,7 +414,7 @@ const VoucherManagement = () => {
 
       setVouchers(filtered);
     } catch {
-      message.error('Không thể tải danh sách voucher.');
+      message.error("Không thể tải danh sách voucher.");
     } finally {
       setIsTableLoading(false);
     }
@@ -433,26 +445,33 @@ const VoucherManagement = () => {
     try {
       const values = await form.validateFields();
       if (values.startDate.isAfter(values.endDate)) {
-        message.error('Ngày bắt đầu đang lớn hơn ngày kết thúc!');
+        message.error("Ngày bắt đầu đang lớn hơn ngày kết thúc!");
         return;
       }
       if (values.usageLimit < 1) {
-        message.error('Giới hạn sử dụng phải lớn hơn 0!');
+        message.error("Giới hạn sử dụng phải lớn hơn 0!");
         return;
       }
-      if (values.discount < 1 || values.discount > 99) {
-        message.error('Giảm giá phải nằm trong khoảng 1-99%!');
+      if (values.discount < 1 || values.discount > 100) {
+        message.error("Giảm giá phải nằm trong khoảng 1-100%!");
         return;
       }
-      if (values.maximumDiscount < 100000) {
-        message.error('Giảm tối đa phải lớn hơn 100.000 VNĐ!');
+      // if (values.maximumDiscount < 100000) {
+      //   message.error('Giảm tối đa phải lớn hơn 100.000 VNĐ!');
+      //   return;
+      // }
+      // if (values.minimumAmount < 200000) {
+      //   message.error('Đơn tối thiểu phải bằng 200.000 VNĐ!');
+      //   return;
+      // }
+      if (values.maximumDiscount < 1) {
+        message.error("Giảm tối đa phải lớn hơn 0!");
         return;
       }
-      if (values.minimumAmount < 200000) {
-        message.error('Đơn tối thiểu phải bằng 200.000 VNĐ!');
+      if (values.minimumAmount < 0) {
+        message.error("Đơn tối thiểu không được âm!");
         return;
       }
-
       const payload = {
         ...values,
         startDate: values.startDate.toISOString(),
@@ -462,10 +481,10 @@ const VoucherManagement = () => {
       setLoading(true);
       if (selectVoucher?._id) {
         await updateVoucher(selectVoucher._id, payload);
-        message.success('Cập nhật voucher thành công!');
+        message.success("Cập nhật voucher thành công!");
       } else {
         await addVoucher(payload);
-        message.success('Thêm voucher thành công!');
+        message.success("Thêm voucher thành công!");
       }
       closeDrawer();
       fetchVouchers();
@@ -479,100 +498,98 @@ const VoucherManagement = () => {
   const handleDeleteVoucher = async (id) => {
     try {
       await deleteVoucher(id);
-      message.success('Xóa voucher thành công!');
+      message.success("Xóa voucher thành công!");
       fetchVouchers();
     } catch {
-      message.error('Xóa voucher thất bại!');
+      message.error("Xóa voucher thất bại!");
     }
   };
 
- const columns = [
-    { title: 'Mã', dataIndex: 'code' },
-    {title: 'Tên', dataIndex: 'name' },
+  const columns = [
+    { title: "Mã", dataIndex: "code" },
+    { title: "Tên", dataIndex: "name" },
     {
-  title: 'Giảm giá (%)',
-  dataIndex: 'discount',
-  filters: [
-    {
-      text: '1% - 49%',
-      value: '1-49',
+      title: "Giảm giá (%)",
+      dataIndex: "discount",
+      filters: [
+        {
+          text: "1% - 49%",
+          value: "1-49",
+        },
+        {
+          text: "50% - 100%",
+          value: "50-100",
+        },
+      ],
+      onFilter: (value, record) => {
+        const discount = record.discount;
+        if (value === "1-49") return discount >= 1 && discount <= 49;
+        if (value === "50-100") return discount >= 50 && discount <= 100;
+        return false;
+      },
     },
-    {
-      text: '50% - 100%',
-      value: '50-100',
-    },
-  ],
-  onFilter: (value, record) => {
-    const discount = record.discount;
-    if (value === '1-49') return discount >= 1 && discount <= 49;
-    if (value === '50-100') return discount >= 50 && discount <= 100;
-    return false;
-  },
-},
 
-    
-    { title: 'Giảm tối đa', dataIndex: 'maximumDiscount',},
-    { title: 'Đơn tối thiểu', dataIndex: 'minimumAmount'},
+    { title: "Giảm tối đa", dataIndex: "maximumDiscount" },
+    { title: "Đơn tối thiểu", dataIndex: "minimumAmount" },
     {
-      title: 'Ngày bắt đầu',
-      dataIndex: 'startDate',
+      title: "Ngày bắt đầu",
+      dataIndex: "startDate",
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Ngày kết thúc',
-      dataIndex: 'endDate',
+      title: "Ngày kết thúc",
+      dataIndex: "endDate",
       render: (date) => new Date(date).toLocaleDateString(),
-      
     },
     {
-      title: 'Giới hạn sử dụng',
-      dataIndex: 'usageLimit',
+      title: "Giới hạn sử dụng",
+      dataIndex: "usageLimit",
       render: (v) => v ?? 0,
       filters: [
-        { text: '1 - 10', value: '1-10' },
-        { text: '11 - 50', value: '11-50' },
-        { text: '51 - 100', value: '51-100' },
+        { text: "1 - 10", value: "1-10" },
+        { text: "11 - 50", value: "11-50" },
+        { text: "51 - 100", value: "51-100" },
       ],
       onFilter: (value, record) => {
         const usageLimit = record.usageLimit;
-        if (value === '1-10') return usageLimit >= 1 && usageLimit <= 10;
-        if (value === '11-50') return usageLimit >= 11 && usageLimit <= 50;
-        if (value === '51-100') return usageLimit >= 51 && usageLimit <= 100;
+        if (value === "1-10") return usageLimit >= 1 && usageLimit <= 10;
+        if (value === "11-50") return usageLimit >= 11 && usageLimit <= 50;
+        if (value === "51-100") return usageLimit >= 51 && usageLimit <= 100;
         return false;
       },
     },
 
     {
-      title: 'Số lượt dùng',
-      dataIndex: 'usageLeft',
+      title: "Số lượt dùng",
+      dataIndex: "usageLeft",
       render: (v) => v ?? 0,
       filters: [
-        { text: '0 - 10', value: '0-10' },
-        { text: '11 - 50', value: '11-50' },
-        { text: '51 - 100', value: '51-100' },
+        { text: "0 - 10", value: "0-10" },
+        { text: "11 - 50", value: "11-50" },
+        { text: "51 - 100", value: "51-100" },
       ],
       onFilter: (value, record) => {
         const usageLeft = record.usageLeft;
-        if (value === '0-10') return usageLeft >= 0 && usageLeft <= 10;
-        if (value === '11-50') return usageLeft >= 11 && usageLeft <= 50;
-        if (value === '51-100') return usageLeft >= 51 && usageLeft <= 100;
+        if (value === "0-10") return usageLeft >= 0 && usageLeft <= 10;
+        if (value === "11-50") return usageLeft >= 11 && usageLeft <= 50;
+        if (value === "51-100") return usageLeft >= 51 && usageLeft <= 100;
         return false;
       },
     },
     {
-      title: 'Áp dụng cho',
-      dataIndex: 'applicableTo',
+      title: "Áp dụng cho",
+      dataIndex: "applicableTo",
       filters: [
-        { text: 'Tất cả', value: 'all' },
-        { text: 'Dịch vụ', value: 'services' },
-        { text: 'Sản phẩm', value: 'products' },
+        { text: "Tất cả", value: "all" },
+        { text: "Dịch vụ", value: "services" },
+        { text: "Sản phẩm", value: "products" },
       ],
       onFilter: (value, record) => record.applicableTo === value,
       render: (v) =>
-        v === 'all' ? 'Tất cả' : v === 'products' ? 'Sản phẩm' : 'Dịch vụ',
+        v === "all" ? "Tất cả" : v === "products" ? "Sản phẩm" : "Dịch vụ",
     },
     {
-      title: 'Hành động',
+      title: "Hành động",
       render: (record) => (
         <div>
           <Popconfirm
@@ -581,10 +598,17 @@ const VoucherManagement = () => {
             okText="Xóa"
             cancelText="Hủy"
           >
-            <DeleteOutlined style={{ color: 'red', fontSize: 20, cursor: 'pointer' }} />
+            <DeleteOutlined
+              style={{ color: "red", fontSize: 20, cursor: "pointer" }}
+            />
           </Popconfirm>
           <EditOutlined
-            style={{ color: 'blue', fontSize: 20, marginLeft: 10, cursor: 'pointer' }}
+            style={{
+              color: "blue",
+              fontSize: 20,
+              marginLeft: 10,
+              cursor: "pointer",
+            }}
             onClick={() => openEditDrawer(record)}
           />
         </div>
@@ -603,10 +627,17 @@ const VoucherManagement = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ width: 200 }}
         />
-        <Button className="bg-blue-500" onClick={() => openEditDrawer()}>Thêm Voucher</Button>
-        <Button onClick={() => setStatusFilter('active')}>Còn sử dụng</Button>
-        <Button onClick={() => setStatusFilter('expired')}>Đã hết hạn</Button>
-        <Button icon={<ReloadOutlined />} onClick={() => setStatusFilter('all')}>Tải lại</Button>
+        <Button className="bg-blue-500" onClick={() => openEditDrawer()}>
+          Thêm Voucher
+        </Button>
+        <Button onClick={() => setStatusFilter("active")}>Còn sử dụng</Button>
+        <Button onClick={() => setStatusFilter("expired")}>Đã hết hạn</Button>
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={() => setStatusFilter("all")}
+        >
+          Tải lại
+        </Button>
       </div>
 
       <Spin tip="Đang tải dữ liệu..." spinning={isTableLoading}>
@@ -619,38 +650,74 @@ const VoucherManagement = () => {
       </Spin>
 
       <Drawer
-        title={selectVoucher ? 'Chỉnh sửa voucher' : 'Thêm voucher'}
+        title={selectVoucher ? "Chỉnh sửa voucher" : "Thêm voucher"}
         placement="right"
         onClose={closeDrawer}
         open={isDrawerOpen}
         width={400}
       >
         <Form layout="vertical" form={form}>
-          <Form.Item name="code" label="Mã voucher" rules={[{ required: true }]}>
+          <Form.Item
+            name="code"
+            label="Mã voucher"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="name" label="Tên voucher" rules={[{ required: true }]}>
+          <Form.Item
+            name="name"
+            label="Tên voucher"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="discount" label="Giảm giá (%)" rules={[{ required: true }]}>
+          <Form.Item
+            name="discount"
+            label="Giảm giá (%)"
+            rules={[{ required: true }]}
+          >
             <Input type="number" min={1} max={99} />
           </Form.Item>
-          <Form.Item name="maximumDiscount" label="Giảm tối đa" rules={[{ required: true }]}>
+          <Form.Item
+            name="maximumDiscount"
+            label="Giảm tối đa"
+            rules={[{ required: true }]}
+          >
             <Input type="number" min={1} />
           </Form.Item>
-          <Form.Item name="minimumAmount" label="Đơn tối thiểu" rules={[{ required: true }]}>
+          <Form.Item
+            name="minimumAmount"
+            label="Đơn tối thiểu"
+            rules={[{ required: true }]}
+          >
             <Input type="number" min={0} />
           </Form.Item>
-          <Form.Item name="startDate" label="Ngày bắt đầu" rules={[{ required: true }]}>
-            <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
+          <Form.Item
+            name="startDate"
+            label="Ngày bắt đầu"
+            rules={[{ required: true }]}
+          >
+            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="endDate" label="Ngày kết thúc" rules={[{ required: true }]}>
-            <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
+          <Form.Item
+            name="endDate"
+            label="Ngày kết thúc"
+            rules={[{ required: true }]}
+          >
+            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="usageLimit" label="Giới hạn sử dụng" rules={[{ required: true }]}>
+          <Form.Item
+            name="usageLimit"
+            label="Giới hạn sử dụng"
+            rules={[{ required: true }]}
+          >
             <Input type="number" min={1} />
           </Form.Item>
-          <Form.Item name="applicableTo" label="Áp dụng cho" rules={[{ required: true }]}>
+          <Form.Item
+            name="applicableTo"
+            label="Áp dụng cho"
+            rules={[{ required: true }]}
+          >
             <Select>
               <Option value="all">Tất cả</Option>
               <Option value="services">Dịch vụ</Option>
