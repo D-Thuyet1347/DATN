@@ -1,9 +1,23 @@
-import { useEffect, useState } from 'react';
-import { listUser, updateUser, updateUserRole, registerUser } from '../../APIs/userApi';
-import { Button, Drawer, Input, Table, Select, Form, Popconfirm, message } from 'antd';
-import { EditOutlined, ReloadOutlined } from '@ant-design/icons';
-import { FaLock, FaUnlock } from 'react-icons/fa6';
-
+import { useEffect, useState } from "react";
+import {
+  listUser,
+  updateUser,
+  updateUserRole,
+  registerUser,
+} from "../../APIs/userApi";
+import {
+  Button,
+  Drawer,
+  Input,
+  Table,
+  Select,
+  Form,
+  Popconfirm,
+  message,
+} from "antd";
+import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
+import { FaLock, FaUnlock } from "react-icons/fa6";
+import { GoBlocked } from "react-icons/go";
 const { Option } = Select;
 
 const AccountManagement = () => {
@@ -13,7 +27,7 @@ const AccountManagement = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [form] = Form.useForm();
   const [addForm] = Form.useForm();
 
@@ -25,12 +39,14 @@ const AccountManagement = () => {
     if (searchQuery) {
       const lowercasedQuery = searchQuery.toLowerCase();
       const filtered = data.filter((item) => {
-        const fullName = `${item.firstName || ''} ${item.lastName || ''}`.toLowerCase();
+        const fullName = `${item.firstName || ""} ${
+          item.lastName || ""
+        }`.toLowerCase();
         return (
           fullName.includes(lowercasedQuery) ||
           item.email?.toLowerCase().includes(lowercasedQuery)
         );
-      });  
+      });
       setFilteredData(filtered);
     } else {
       setFilteredData(data);
@@ -62,122 +78,159 @@ const AccountManagement = () => {
   };
 
   const handleUpdateAccount = async () => {
-    const updatedRole = form.getFieldValue('role'); 
+    const updatedRole = form.getFieldValue("role");
     const updatedUser = { ...selectedUser, role: updatedRole };
     await updateUserRole(updatedUser._id, { role: updatedRole });
-    message.success('Cập nhật thành công!');
+    message.success("Cập nhật thành công!");
     setIsEditOpen(false);
-    fetchAccount(); 
+    fetchAccount();
   };
 
   const handleToggleBlockAccount = async (user) => {
     try {
       const newStatus = !user.isEmailVerified;
       await updateUser(user._id, { isEmailVerified: newStatus });
-      message.success(`Đã ${newStatus ? 'mở khóa' : 'chặn'} email cho tài khoản!`);
+      message.success(
+        `Đã ${newStatus ? "mở khóa" : "chặn"} email cho tài khoản!`
+      );
       fetchAccount();
     } catch {
-      message.error('Có lỗi khi cập nhật trạng thái xác thực email.');
+      message.error("Có lỗi khi cập nhật trạng thái xác thực email.");
     }
   };
 
   const handleAddAccount = async (values) => {
     try {
-      await registerUser({email: values.email, password: values.password, role: values.role});
-      message.success('Tạo tài khoản thành công! Một email xác nhận đã được gửi.');
+      await registerUser({
+        email: values.email,
+        password: values.password,
+        role: values.role,
+      });
+      message.success(
+        "Tạo tài khoản thành công! Một email xác nhận đã được gửi."
+      );
       setIsAddOpen(false);
       addForm.resetFields();
       fetchAccount();
     } catch (error) {
-      message.error(error?.response?.data?.message || 'Tạo tài khoản thất bại!');
+      message.error(
+        error?.response?.data?.message || "Tạo tài khoản thất bại!"
+      );
     }
   };
-  
 
   const columns = [
     {
-      title: 'Tên tài khoản',
-      key: 'fullName',
-      render: (_, record) => `${record.firstName || ''} ${record.lastName || ''}`.trim(),
-    },  
-    { title: 'Email', dataIndex: 'email', key: 'email' },
-    { title: 'Vai trò', dataIndex: 'role', key: 'role' ,
+      title: "Tên tài khoản",
+      key: "fullName",
+      render: (_, record) =>
+        `${record.firstName || ""} ${record.lastName || ""}`.trim(),
+    },
+    { title: "Email", dataIndex: "email", key: "email" },
+    {
+      title: "Vai trò",
+      dataIndex: "role",
+      key: "role",
       filters: [
-        { text: 'Admin', value: 'admin' },
-        { text: 'Manager', value: 'manager' },
-        { text: 'Employee', value: 'employee' },
-        { text: 'User', value: 'user' },
+        { text: "Admin", value: "admin" },
+        { text: "Manager", value: "manager" },
+        { text: "Employee", value: "employee" },
+        { text: "User", value: "user" },
       ],
       onFilter: (value, record) => record.role.includes(value),
     },
     {
-      title: 'Email Đã xác thực',
-      dataIndex: 'isEmailVerified',
-      key: 'isEmailVerified',
-      render: v => v ? 'Đang hoạt động' : 'Đã bị chặn',
+      title: "Email Đã xác thực",
+      dataIndex: "isEmailVerified",
+      key: "isEmailVerified",
+      render: (v) => (v ? "Đang hoạt động" : "Đã bị chặn"),
+      filters: [
+        { text: "Đang hoạt động", value: true },
+        { text: "Đã bị chặn", value: false },
+      ],
+      onFilter: (value, record) => record.isEmailVerified === value,
     },
     {
-      title: 'Ngày tạo',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (text) => {
         const date = new Date(text);
-        return date.toLocaleDateString('vi-VN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
+        return date.toLocaleDateString("vi-VN", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
         });
-      },  
+      },
     },
     {
-      title: 'Hành động',
-      key: 'action',
+      title: "Hành động",
+      key: "action",
       width: 150,
-      render: (_, record) => (
-        <span>
-          <Popconfirm
-            title="Bạn có chắc chắn không?"
-            onConfirm={() => handleToggleBlockAccount(record)}
-            okText="Xác nhận"
-            cancelText="Hủy"
-          >
-            <Button
-              style={{ color: record.isEmailVerified ? 'green' : 'red', marginLeft:'20px', fontSize: 20 }}
-            >
-              {record.isEmailVerified ? <FaUnlock  /> : <FaLock />}
-            </Button>
-          </Popconfirm>
-          <EditOutlined
-            style={{ color: 'blue', fontSize: 20, marginLeft: 16, cursor: 'pointer' }}
-            onClick={() => openEditDrawer(record)}
-          />
-        </span>
-      ),
+      render: (_, record) => {
+        const isDontTouch = record.role === "admin";
+        return (
+          <div style={{ display: "flex", justifyContent: "center", gap: 8 ,marginLeft: "-25px"}}>
+            {!isDontTouch && (
+              <Popconfirm
+                title="Bạn có chắc chắn không?"
+                onConfirm={() => handleToggleBlockAccount(record)}
+                okText="Xác nhận"
+                cancelText="Hủy"
+              >
+                <Button
+                  type="text"
+                  style={{
+                    color: record.isEmailVerified ? "green" : "red",
+                    fontSize: 18,
+                  }}
+                  icon={record.isEmailVerified ? <FaUnlock /> : <FaLock />}
+                />
+              </Popconfirm>
+            )}
+            {!isDontTouch && (
+              <Button
+                type="text"
+                style={{ color: "blue", fontSize: 18 }}
+                icon={<EditOutlined />}
+                onClick={() => openEditDrawer(record)}
+              />
+            )}
+            {isDontTouch && (
+              <GoBlocked  className="text-red-500 font-bold text-4xl"/>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
   return (
     <div className="mt-3">
       <h1>Quản lý tài khoản</h1>
-      <Button type="primary" onClick={() => setIsAddOpen(true)} className="mt-2 mb-3 mr-3">
+      <Button
+        type="primary"
+        onClick={() => setIsAddOpen(true)}
+        className="mt-2 mb-3 mr-3"
+      >
         Tạo tài khoản nhân viên mới
       </Button>
-      
+
       <Input
-        style={{ width: '300px', marginBottom: '16px', outline: 'none' }}
+        style={{ width: "300px", marginBottom: "16px", outline: "none" }}
         placeholder="Tìm kiếm theo tên tài khoản hoặc email"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
       <Button
-              icon={<ReloadOutlined />}
-              className="ml-[90%]"
-              onClick={fetchAccount}
-              loading={isLoading}
-              style={{ backgroundColor: '#3b82f6', color: 'white' }}
-            >
-              Tải lại
-            </Button>
+        icon={<ReloadOutlined />}
+        className="ml-[90%]"
+        onClick={fetchAccount}
+        loading={isLoading}
+        style={{ backgroundColor: "#3b82f6", color: "white" }}
+      >
+        Tải lại
+      </Button>
       <Table
         className="mt-3"
         dataSource={filteredData}
@@ -205,7 +258,7 @@ const AccountManagement = () => {
           <Form.Item
             name="role"
             label="Vai trò"
-            rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
+            rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
           >
             <Select>
               <Option value="user">User</Option>
@@ -231,32 +284,44 @@ const AccountManagement = () => {
         onClose={() => setIsAddOpen(false)}
         open={isAddOpen}
       >
-        <Form layout="vertical" form={addForm} onFinish={handleAddAccount} initialValues={{ role: 'employee' }}>
+        <Form
+          layout="vertical"
+          form={addForm}
+          onFinish={handleAddAccount}
+          initialValues={{ role: "employee" }}
+        >
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, type: 'email', message: 'Email không hợp lệ' }]}
+            rules={[
+              { required: true, type: "email", message: "Email không hợp lệ" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="password"
             label="Mật khẩu"
-            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
           >
             <Input.Password />
           </Form.Item>
           <Form.Item
             name="role"
             label="Vai trò"
-            rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
+            rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
           >
             <Select>
               <Option value="manager">Manager</Option>
               <Option value="employee">Employee</Option>
             </Select>
           </Form.Item>
-          <Button type="primary" htmlType="submit" block className="mt-4 bg-blue-500">
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            className="mt-4 bg-blue-500"
+          >
             Thêm tài khoản nhân viên
           </Button>
         </Form>
