@@ -33,7 +33,7 @@ const OneProduct = ({
     
   return (
     <div  className="relative h-[500px] w-[320px] group  ">
-      <div className="bg-white h-[320px] w-[320px] p-4 border  group overflow-hidden relative transition-all duration-300 ">
+      <div className="bg-white  rounded-2xl h-[320px] w-[320px] p-4 border group overflow-hidden relative transition-all duration-300 ">
         <motion.img
         onClick={handleDetailPd}
           whileHover={{ scale: 1.2 }}
@@ -74,12 +74,12 @@ const OneProduct = ({
         </div>
       </div>
       <div className="absolute text-black  bottom-0 left-0 right-0 top-[350px] bg-white  text-center transition-all duration-300 group-hover:bottom-0">
-        <h3 className="text-xl font-semibold text-black mt-2 truncate max-w-xs">
+        <h3 className="text-lg font-semibold">
           {title}
-        </h3>
-        <p className="text-black mt-2 truncate max-w-xs">{description}</p>
-        <div className="flex justify-between items-center mt-4">
-          <span className="text-black font-bold">Giá: {price.toLocaleString()} VNĐ</span>
+        </h3> 
+        <p className="text-sm text-gray-600 line-clamp-2 mt-1">{description}</p>
+        <div className="flex justify-between items-center mt-2">
+          <span className="text-black font-semibold">Giá: {price.toLocaleString()} VNĐ</span>
         </div>
       </div>
     </div>

@@ -160,7 +160,7 @@ const Header = ({ className = "" }) => {
               className={`ml-2 text-[26] ${
                 isScrolled ? "text-black" : "text-blue"
               }`}
-              style={{ fontFamily: "Dancing Script, serif" }}
+          style={{ fontFamily: "Dancing Script, serif" }}
             >
               Spa Beauty
             </div>

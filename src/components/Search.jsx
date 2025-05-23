@@ -62,7 +62,6 @@ const SearchComponent = ({ isVisible, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20">
       <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 relative">
-        {/* Nút đóng */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
@@ -70,7 +69,6 @@ const SearchComponent = ({ isVisible, onClose }) => {
           <IoMdClose size={24} />
         </button>
 
-        {/* Thanh tìm kiếm */}
         <div className="mb-6">
           <input
             type="text"
@@ -82,15 +80,11 @@ const SearchComponent = ({ isVisible, onClose }) => {
           />
         </div>
 
-        {/* Trạng thái tải */}
         {loading && <p className="text-center text-gray-600">Đang tải...</p>}
 
-        {/* Lỗi */}
         {error && <p className="text-center text-red-500">{error}</p>}
 
-        {/* Kết quả tìm kiếm */}
         <div className="max-h-96 overflow-y-auto">
-          {/* Dịch vụ */}
           {services.length > 0 && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Dịch vụ</h3>
@@ -117,7 +111,6 @@ const SearchComponent = ({ isVisible, onClose }) => {
             </div>
           )}
 
-          {/* Sản phẩm */}
           {products.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Sản phẩm</h3>
@@ -144,7 +137,6 @@ const SearchComponent = ({ isVisible, onClose }) => {
             </div>
           )}
 
-          {/* Không có kết quả */}
           {query && !loading && services.length === 0 && products.length === 0 && (
             <p className="text-center text-gray-600">Không tìm thấy kết quả cho "{query}"</p>
           )}

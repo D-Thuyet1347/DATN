@@ -103,7 +103,7 @@ const Products = () => {
     >
       <section className="p-10">
         <h2
-          className="text-2xl text-[40px] font-bold mb-6 text-center"
+          className="text-5xl text-[40px] font-bold mb-6 text-center"
           style={{ fontFamily: "Dancing Script, serif" }}
         >
           {t("header.featured Products")}
@@ -135,7 +135,7 @@ const Products = () => {
                   : "bg-gray-200 textEP-gray-700"
               }`}
             >
-              {t("header.all")} {/* Tất cả */}
+              {t("header.all")} 
             </motion.div>
             {categories
               .slice(
@@ -153,7 +153,7 @@ const Products = () => {
                       : "bg-gray-200 text-gray-700"
                   }`}
                 >
-                  {item.name} {/* Danh mục sản phẩm không dịch */}
+                  {item.name} 
                 </motion.div>
               ))}
           </div>

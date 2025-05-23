@@ -1,11 +1,24 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {Table,Button,Drawer,Spin,Select,Descriptions,Badge,message,Space,Empty} from "antd";
+import {
+  Table,
+  Button,
+  Drawer,
+  Spin,
+  Select,
+  Descriptions,
+  Badge,
+  message,
+  Space,
+  Empty,
+} from "antd";
 import { EditOutlined, ReloadOutlined } from "@ant-design/icons";
 import { getAllBookings } from "../../APIs/booking";
 import { updateBookingStatus } from "../../APIs/booking";
 import moment from "moment";
+import ExportBookingExcel from "./ExportExcelBooking";
 const BookingManagement = () => {
   const [state, setState] = useState({
+    allBookings: [],
     bookings: [],
     selectedBooking: null,
     isDrawerOpen: false,
@@ -27,16 +40,17 @@ const BookingManagement = () => {
       const response = await getAllBookings();
       if (Array.isArray(response)) {
         const processedBookings = response
-        .filter((item) => item.branch?._id !== "680b4f376e58bda8dfa176e2")
-        .map((item) => ({
-          ...item,
-          key: item._id,
-          dateFormatted: moment(item.date).format("DD/MM/YYYY"),
-          createdAtFormatted: moment(item.updatedAt).format("DD/MM/YYYY"),
-        }));
-      
+          .filter((item) => item.branch?._id !== "680b4f376e58bda8dfa176e2")
+          .map((item) => ({
+            ...item,
+            key: item._id,
+            dateFormatted: moment(item.date).format("DD/MM/YYYY"),
+            createdAtFormatted: moment(item.updatedAt).format("DD/MM/YYYY"),
+          }));
+
         setState((prev) => ({
           ...prev,
+          allBookings: processedBookings,
           bookings: processedBookings,
           loading: { ...prev.loading, table: false },
         }));
@@ -44,7 +58,6 @@ const BookingManagement = () => {
         throw new Error("Dữ liệu không hợp lệ");
       }
     } catch (error) {
-    
       setState((prev) => ({
         ...prev,
         error: error.response?.data?.message || error.message,
@@ -149,8 +162,13 @@ const BookingManagement = () => {
       dataIndex: ["employee", "UserID"],
       key: "employee",
       render: (emp) => `${emp?.firstName} ${emp?.lastName}` || "Không xác định",
+      filters: state.bookings.map((booking) => ({
+        text: `${booking.employee?.UserID?.firstName} ${booking.employee?.UserID?.lastName}`,
+        value: booking.employee?.UserID?._id,
+      })),
+      onFilter: (value, record) =>
+        record.employee?.UserID?._id === value,
     },
-
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -194,14 +212,36 @@ const BookingManagement = () => {
 
   return (
     <div className="mt-3">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <div >
         <h1>Quản lý lịch hẹn</h1>
+        <Select
+        className="mt-3"
+            placeholder="Lọc theo chi nhánh"
+            style={{ width: 240 }}
+            allowClear
+            onChange={(value) => {
+              setState((prev) => ({
+                ...prev,
+                bookings: value
+                  ? prev.allBookings.filter((b) => b.branch?._id === value)
+                  : prev.allBookings,
+              }));
+            }}
+            options={[
+              ...Array.from(
+                new Map(
+                  state.allBookings.map((b) => [
+                    b.branch?._id,
+                    {
+                      value: b.branch?._id,
+                      label: b.branch?.BranchName || "Không xác định",
+                    },
+                  ])
+                ).values()
+              ),
+            ]}
+          />
+
         <Button
           icon={<ReloadOutlined />}
           onClick={fetchBookings}
@@ -209,6 +249,7 @@ const BookingManagement = () => {
         >
           Tải lại
         </Button>
+        <ExportBookingExcel bookings={state.bookings} />
       </div>
 
       <Spin tip="Đang tải lịch hẹn..." spinning={state.loading.table}>
@@ -258,6 +299,9 @@ const BookingManagement = () => {
               <Descriptions.Item label="Mã lịch hẹn">
                 {state.selectedBooking._id}
               </Descriptions.Item>
+              <Descriptions.Item label="Chi nhánh">
+                {state.selectedBooking.branch?.BranchName || "Không xác định"}
+              </Descriptions.Item>
               <Descriptions.Item label="Khách hàng">
                 {state.selectedBooking.user.firstName}{" "}
                 {state.selectedBooking.user.lastName}
@@ -266,9 +310,7 @@ const BookingManagement = () => {
                 {moment(state.selectedBooking.date).format("DD/MM/YYYY")}
               </Descriptions.Item>
               <Descriptions.Item label="Ngày đăng ký">
-                {moment(state.selectedBooking.updatedAt).format(
-                  "DD/MM/YYYY"
-                )}
+                {moment(state.selectedBooking.updatedAt).format("DD/MM/YYYY")}
               </Descriptions.Item>
               <Descriptions.Item label="Tên nhân viên">
                 {state.selectedBooking.employee?.UserID?.firstName}{" "}

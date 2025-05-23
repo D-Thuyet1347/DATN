@@ -97,7 +97,7 @@ const ProductsPage = () => {
             </Link>{" "}
             &gt;{" "}
           </nav>
-          <h2 className="text-3xl font-bold text-maincolor text-center mb-6">
+          <h2 style={{ fontFamily: "Dancing Script, serif" }} className="text-5xl font-bold text-black text-center mb-6">
             Danh sách sản phẩm
           </h2>
           {cartMessage && (
@@ -110,7 +110,6 @@ const ProductsPage = () => {
             </div>
           ) : (
             <div className="flex gap-10">
-              {/* Category Filter - Left Sidebar */}
               <div className="w-46">
                 <h3 className="text-lg font-semibold mb-4">Danh mục</h3>
                 <ul className="space-y-3">
@@ -140,7 +139,6 @@ const ProductsPage = () => {
                 </ul>
               </div>
 
-              {/* Product Grid - Right */}
               <div className="flex-1">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {filteredProductsPage.length > 0 ? (

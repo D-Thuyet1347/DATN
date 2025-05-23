@@ -21,9 +21,7 @@ import MyVouchers from './pages/MyVouchers';
 import ServiceDetailPage from './pages/ServiceDetailPage';
 import Payment from './pages/Payment';
 import OrderConfirmation from './pages/OrderConfirmation';
-import SearchResultPage from './pages/SearchResult';
 import { Page404 } from './pages/Page404';
-import SearchPage from './pages/SearchResult';
 import StripeCheckout from './pages/StripeCheckout';
 import BookServicePage from './pages/BookServicePage';
 import ServicePage from './pages/ServicePage';
@@ -31,9 +29,10 @@ import ProductsPage from './pages/ProductPage';
 import BlogPage from './pages/BlogPage';
 import Manager from './pages/Manager';
 import { CartProvider } from './context/CartContext';
-import { ToastContainerWrapper, Wrapper } from './utils/toast';
+import { ToastContainerWrapper } from './utils/toast';
 import VnpayCheckout from './pages/VnpayCheckout';
 import ConfirmEmail from './pages/ConfirmEmail';
+import BlogDetail from './components/BlogDetail';
 
 function App() {
   return (
@@ -60,12 +59,14 @@ function App() {
           {/* Router chỉ người dùng mới sử dụng được */}
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/verify/success" element={ <StripeCheckout />} /> 
-          <Route path="/payment-status/success" element={ <VnpayCheckout />} />     
+          <Route path="/vnpay_return/success" element={<VnpayCheckout />} />
+          <Route path="/vnpay_return/failed" element={<VnpayCheckout />} />   
           <Route path="/spvc" element={<SuperVouchers />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/book-service/:id" element={<PrivateRoute element={<BookServicePage/>} requiredRole="user" />} />  
           <Route path="/myvc" element={<PrivateRoute element={<MyVouchers />} requiredRole="user" />} />
           <Route path="/cart" element={<PrivateRoute element={<Cart />} requiredRole="user" />} />
+          <Route path="/blog-detail/:id" element={<BlogDetail />} />
            <Route path="/confirm-email/:code" element={<ConfirmEmail />} />
           {/* Router riêng dành cho admin và manager */}
           <Route path="/admin-sign" element={<SignInPage />} />

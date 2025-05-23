@@ -149,12 +149,6 @@ export const EmployeeManagement = () => {
       title: "Vị trí",
       dataIndex: "Position",
       key: "Position",
-      filters: [
-        { text: "Nhân viên chăm sóc", value: "Nhân viên chăm sóc" },
-        { text: "Nhân viên dịch vụ", value: "Nhân viên dịch vụ" },
-        { text: "Nhân viên lễ tân", value: "Nhân viên lễ tân" },
-      ],
-      onFilter: (value, record) => record.Position === value,
     },
     {
       title: "Số điện thoại",
@@ -305,9 +299,9 @@ export const EmployeeManagement = () => {
             rules={[{ required: true, message: "Vui lòng nhập vị trí" }]}
           >
             <Select placeholder="Chọn vị trí">
-              <Option value="Nhân viên chăm sóc">Nhân viên chăm sóc</Option>
+              {/* <Option value="Nhân viên chăm sóc">Nhân viên chăm sóc</Option> */}
               <Option value="Nhân viên dịch vụ">Nhân viên dịch vụ</Option>
-              <Option value="Nhân viên lễ tân">Nhân viên lễ tân</Option>
+              {/* <Option value="Nhân viên lễ tân">Nhân viên lễ tân</Option> */}
             </Select>
           </Form.Item>
 

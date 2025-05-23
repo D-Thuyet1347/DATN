@@ -1,8 +1,9 @@
+// BlogViewer.jsx
 import React, { useEffect, useState } from "react";
 import { getAllBlogs } from "../APIs/blogApi";
-import { Button, message, Pagination } from "antd";
+import { Pagination } from "antd";
 import { motion } from "framer-motion";
-import { errorToast,  } from "../utils/toast";
+import { errorToast } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -27,13 +28,12 @@ const BlogViewer = () => {
           key: item._id,
         }));
         setBlogs(allBlogs);
-        const filteredBlogs = allBlogs.filter((blog) => blog.isPublished);
-        setPublishedBlogs(filteredBlogs);
+        setPublishedBlogs(allBlogs.filter((blog) => blog.isPublished));
       } else {
-        errorToast(t("blog.noData")); 
+        errorToast(t("blog.noData"));
       }
     } catch (error) {
-      errorToast(t("blog.fetchError")); 
+      errorToast(t("blog.fetchError"));
     }
   };
 
@@ -41,13 +41,14 @@ const BlogViewer = () => {
     setCurrentPage(page);
   };
 
+  const handleBlogClick = (blogId) => {
+    navigate(`/blog-detail/${blogId}`);
+  };
+
   const paginatedBlogs = publishedBlogs.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-  const handleBlog = () => {
-    navigate("/blogpage");
-  };
 
   return (
     <motion.div
@@ -57,22 +58,20 @@ const BlogViewer = () => {
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 1.2 }}
     >
-      
-      <h1
-        className="text-2xl text-[40px] font-bold mb-6 text-center"
-        style={{ fontFamily: "Dancing Script, serif" }}
-      >
-        {t("blog.featuredBlog")} 
+      <h1 className="text-5xl font-bold mb-6 text-center" style={{ fontFamily: "Dancing Script, serif" }}>
+        {t("blog.featuredBlog")}
       </h1>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center ml-[25px] px-10">
         {paginatedBlogs.map((blog, index) => (
           <motion.div
             key={blog._id}
-            className="border border-gray-300 w-[388px] rounded-lg bg-white p-4 shadow-md"
+            className="border border-gray-300 w-[388px] rounded-lg bg-white p-4 shadow-md cursor-pointer"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
+            onClick={() => handleBlogClick(blog._id)}
           >
             <div className="flex items-center mb-4">
               <img
@@ -92,17 +91,16 @@ const BlogViewer = () => {
               </p>
               {blog.image && (
                 <img
-                  onClick={handleBlog}
                   src={blog.image}
                   alt="Post"
                   className="w-full h-[192px] object-cover rounded-lg mt-4"
-                  style={{ cursor: "pointer" }}
                 />
               )}
             </div>
           </motion.div>
         ))}
       </div>
+
       <div className="flex justify-center mt-10">
         <Pagination
           current={currentPage}

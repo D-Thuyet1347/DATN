@@ -141,7 +141,6 @@ const ProductDetail = () => {
               {product.ProductName}
             </h1>
 
-            {/* Hiển thị đánh giá */}
             <div className="flex items-center mb-4">
               <div className="flex text-yellow-400">
                 {[...Array(5)].map((_, i) => (

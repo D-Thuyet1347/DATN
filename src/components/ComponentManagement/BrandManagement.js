@@ -285,7 +285,7 @@ const BrandManagement = () => {
           >
             <Select placeholder="Chọn vị trí">
               <Option value="Quản lý chi nhánh">Quản lý chi nhánh</Option>
-              <Option value="Quản lý dịch vụ">Quản lý dịch vụ</Option>
+              {/* <Option value="Quản lý dịch vụ">Quản lý dịch vụ</Option> */}
             </Select>
           </Form.Item>
           <Button

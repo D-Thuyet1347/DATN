@@ -48,7 +48,6 @@ const BlogManagement = () => {
         message.error("Không lấy được dữ liệu blog!");
       }
     } catch (error) {
-      
       message.error("Lỗi tải danh sách bài viết!");
     }
     setIsTableLoading(false);
@@ -82,7 +81,7 @@ const BlogManagement = () => {
 
   const handleSubmit = async (values) => {
     const blogData = { ...values, image, userId };
-    if(!image) {
+    if (!image) {
       message.error("Vui lòng tải lên ảnh cho bài viết!");
       return;
     }
@@ -97,7 +96,6 @@ const BlogManagement = () => {
       handleCloseDrawer();
       fetchBlogs();
     } catch (error) {
-      
       message.error("Lỗi khi thêm/cập nhật bài viết!");
     }
   };
@@ -108,7 +106,6 @@ const BlogManagement = () => {
       message.success("Xóa bài viết thành công!");
       fetchBlogs();
     } catch (error) {
-      
       message.error("Lỗi khi xóa bài viết!");
     }
   };
@@ -125,7 +122,6 @@ const BlogManagement = () => {
       try {
         file.preview = await getBase64(file.originFileObj);
       } catch (error) {
-      
         message.error("Không thể đọc file ảnh!");
       }
     }
@@ -135,7 +131,17 @@ const BlogManagement = () => {
 
   const columns = [
     { title: "Tiêu đề", dataIndex: "title", key: "title" },
-    { title: "Nội dung", dataIndex: "content", key: "content" },
+    {
+      title: "Nội dung",
+      dataIndex: "content",
+      key: "content",
+      render: (text) => {
+        const maxLength = 100;
+        return text.length > maxLength
+          ? text.slice(0, maxLength) + "..."
+          : text;
+      },
+    },
     { title: "Người đăng", dataIndex: "userId", key: "userId" },
     {
       title: "Ảnh",
@@ -161,7 +167,11 @@ const BlogManagement = () => {
             okText="Xóa"
             cancelText="Hủy"
             okButtonProps={{
-              style: { backgroundColor: "blue", color: "white", borderRadius: "5px" },
+              style: {
+                backgroundColor: "blue",
+                color: "white",
+                borderRadius: "5px",
+              },
             }}
           >
             <DeleteOutlined

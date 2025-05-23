@@ -75,7 +75,7 @@ const Service = () => {
     >
       <section className="p-2">
         <motion.h2
-          className="text-2xl text-[40px] font-bold mb-6 text-center"
+          className="text-5xl text-[40px] font-bold mb-6 text-center"
           style={{ fontFamily: "Dancing Script, serif" }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}

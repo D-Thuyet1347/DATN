@@ -174,8 +174,9 @@ const BookServicePage = () => {
 
         return (
           empBranchId === branchId &&
-          emp.status?.trim().toLowerCase() !== "nghỉ việc" &&
-          emp.position?.trim().toLowerCase() !== "nhân viên dịch vụ"
+          emp.status?.trim().toLowerCase() !== "nghỉ việc"
+          //  &&
+          // emp.position?.trim().toLowerCase() !== "nhân viên dịch vụ"
         );
       });
 

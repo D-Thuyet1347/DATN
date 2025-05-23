@@ -3,12 +3,10 @@ import React from 'react';
 const Booking = () => {
   return (
     <section className="flex items-center justify-between p-10 bg-white">
-      {/* Left Side: Booking Form */}
       <div className="max-w-md bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-blue-900">Book Your Appointment</h2>
         <p className="text-gray-600 mt-2">Schedule your spa experience in a few simple steps</p>
 
-        {/* Progress Bar */}
         <div className="flex items-center mt-6">
           <div className="flex flex-col items-center">
             <div className="bg-blue-900 text-white rounded-full w-8 h-8 flex items-center justify-center">1</div>
@@ -26,7 +24,6 @@ const Booking = () => {
           </div>
         </div>
 
-        {/* Service Selection */}
         <div className="mt-6">
           <select className="w-full p-3 border rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-900">
             <option>Choose a service</option>
@@ -36,13 +33,11 @@ const Booking = () => {
           </select>
         </div>
 
-        {/* Continue Button */}
         <button className="bg-blue-900 text-white px-6 py-3 rounded-md hover:bg-blue-800 mt-6 flex items-center">
           Continue <span className="ml-2 material-icons">arrow_forward</span>
         </button>
       </div>
 
-      {/* Right Side: Description */}
       <div className="max-w-lg">
         <h2 className="text-3xl font-bold text-blue-900">Book Your Appointment in Minutes</h2>
         <p className="text-gray-600 mt-4">

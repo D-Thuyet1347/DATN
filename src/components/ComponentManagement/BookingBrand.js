@@ -6,6 +6,7 @@ import { updateBookingStatus } from "../../APIs/booking";
 import moment from "moment";
 import { listmanager } from "../../APIs/manager";
 import { listBranch } from "../../APIs/brand";
+import ExportBookingExcel from "./ExportExcelBooking";
 const BookingBrand = () => {
     const [state, setState] = useState({
       bookings: [],
@@ -18,10 +19,8 @@ const BookingBrand = () => {
       },
       error: null,
     });
-  
     const [managerBranchId, setManagerBranchId] = useState(null);
     const [managerBranchInfo, setManagerBranchInfo] = useState(null);
-  
     useEffect(() => {
       const fetchManagerBranch = async () => {
         try {
@@ -32,7 +31,6 @@ const BookingBrand = () => {
           ]);
           const managerList = managerRes?.data || [];
           const branchList = branchRes?.data || [];
-    
           const currentManager = managerList.find((m) => {
             return (
               m.UserID === userId ||
@@ -154,7 +152,6 @@ const BookingBrand = () => {
         }));
       }
     };
-  
     const bookingStatusOptions = [
       { value: "Đang xử lý", label: "Đang xử lý" },
       { value: "Đã xác nhận", label: "Đã xác nhận" },
@@ -195,6 +192,16 @@ const BookingBrand = () => {
         dataIndex: ["employee", "UserID"],
         key: "employee",
         render: (emp) => `${emp?.firstName || ""} ${emp?.lastName || ""}`.trim(),
+        filters: state.bookings.map((booking) => ({
+          text: `${booking.employee?.UserID?.firstName || ""} ${
+            booking.employee?.UserID?.lastName || ""
+          }`.trim(),
+          value: booking.employee?._id,
+        })),
+        onFilter: (value, record) =>
+          `${record.employee?.UserID?.firstName || ""} ${
+            record.employee?.UserID?.lastName || ""
+          }`.trim() === value,
       },
       {
         title: "Trạng thái",
@@ -239,12 +246,13 @@ const BookingBrand = () => {
   
     return (
       <div className="mt-3">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div >
           <h1>Quản lý lịch hẹn {managerBranchInfo ? ` - ${managerBranchInfo.BranchName}` : ""}
           </h1>
-          <Button icon={<ReloadOutlined />} onClick={fetchBookings} loading={state.loading.table}>
+          <Button className="mt-3" icon={<ReloadOutlined />} onClick={fetchBookings} loading={state.loading.table}>
             Tải lại
           </Button>
+          <ExportBookingExcel bookings={state.bookings} />
         </div>
   
         <Spin tip="Đang tải lịch hẹn..." spinning={state.loading.table}>

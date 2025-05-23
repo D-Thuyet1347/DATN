@@ -190,7 +190,7 @@ export const EmployeeBrand = () => {
       key: "UserID",
       render: (text, record) => {
         const user = dataUser.find((u) => u._id === record.UserID);
-        return user ? `${user.firstName}` : "Chưa có nhân viên";
+        return user ? `${user.firstName} ${user.lastName}`  : "Chưa có nhân viên";
       },
       filters: dataUser.map((user) => ({
         text: `${user.firstName} ${user.lastName}`,
@@ -360,9 +360,9 @@ export const EmployeeBrand = () => {
             rules={[{ required: true, message: "Vui lòng nhập vị trí" }]}
           >
             <Select placeholder="Chọn vị trí">
-              <Option value="Nhân viên chăm sóc">Nhân viên chăm sóc</Option>
+              {/* <Option value="Nhân viên chăm sóc">Nhân viên chăm sóc</Option> */}
               <Option value="Nhân viên dịch vụ">Nhân viên dịch vụ</Option>
-              <Option value="Nhân viên lễ tân">Nhân viên lễ tân</Option>
+              {/* <Option value="Nhân viên lễ tân">Nhân viên lễ tân</Option> */}
             </Select>
           </Form.Item>
 

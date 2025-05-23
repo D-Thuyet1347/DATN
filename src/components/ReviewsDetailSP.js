@@ -146,7 +146,6 @@ const ReviewsDetailSP = () => {
           {showReview && <ReviewSP onAddReview={fetchUserAndReviews} />}
         </div>
 
-        {/* Danh sách đánh giá */}
         <div className="space-y-4 flex-1">
           {loading ? (
             <p className="text-gray-500 italic">Đang tải đánh giá...</p>

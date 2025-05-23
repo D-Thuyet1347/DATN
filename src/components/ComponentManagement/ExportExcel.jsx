@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button } from 'antd';
 import { FileExcelOutlined } from '@ant-design/icons';
 import * as XLSX from 'xlsx';

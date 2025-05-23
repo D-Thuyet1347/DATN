@@ -346,22 +346,17 @@ const Payment = () => {
 
   const handleBackToCart = () => navigate("/cart");
 
-  // --- PHẦN RENDER UI ---
   return (
     <div className=" bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 min-h-screen mt-16">
       {" "}
-      {/* Thêm mt-16 nếu header fixed */}
       <div className="max-w-6xl mx-auto">
-        {/* Header và Progress bar (Giữ nguyên) */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Thanh Toán</h1>
           <p className="text-gray-600">Hoàn tất đơn hàng của bạn</p>
         </div>
         <div className="flex justify-center mb-12">
-          {/* Progress bar Steps */}
           <div className="w-full max-w-md">
             <div className="flex items-center">
-              {/* Step 1 */}
               <div className="flex flex-col items-center">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 text-white">
                   <CheckCircle size={20} />
@@ -371,7 +366,6 @@ const Payment = () => {
                 </span>
               </div>
               <div className="flex-1 h-1 mx-2 bg-blue-600"></div>
-              {/* Step 2 */}
               <div className="flex flex-col items-center">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 text-white">
                   2
@@ -381,7 +375,6 @@ const Payment = () => {
                 </span>
               </div>
               <div className="flex-1 h-1 mx-2 bg-gray-200"></div>
-              {/* Step 3 */}
               <div className="flex flex-col items-center">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200 text-gray-600">
                   3
@@ -392,13 +385,9 @@ const Payment = () => {
           </div>
         </div>
 
-        {/* Form và Order Summary */}
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Cột trái: Form */}
           <div className="lg:w-2/3">
-            {/* Bỏ thẻ <form> hoặc giữ lại nhưng dùng button type="button" */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              {/* Thông tin giao hàng (Giữ nguyên) */}
               <div className="p-6 border-b">
                 <div className="flex items-center mb-4">
                   <Truck className="text-blue-600 mr-2" size={20} />
@@ -407,7 +396,6 @@ const Payment = () => {
                   </h2>
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {/* Các input fields giống code gốc */}
                   <div>
                     <label
                       htmlFor="firstName"
@@ -505,7 +493,6 @@ const Payment = () => {
                   </h2>
                 </div>
                 <div className="space-y-3">
-                  {/* Stripe (Card) */}
                   <PaymentMethod
                     id="card"
                     name="Thanh toán bằng Thẻ ngân hàng (Stripe)"
@@ -540,7 +527,6 @@ const Payment = () => {
           <div className="lg:w-1/3">
             <div className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-20">
               {" "}
-              {/* Điều chỉnh top nếu header fixed */}
               <div className="p-6 border-b">
                 <h2 className="text-xl font-semibold text-gray-800">
                   Đơn hàng của bạn
