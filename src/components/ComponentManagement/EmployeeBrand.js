@@ -38,6 +38,7 @@ export const EmployeeBrand = () => {
   const [viewScheduleFor, setViewScheduleFor] = useState(null);
   const [managerBranchId, setManagerBranchId] = useState(null);
   const [managerBranchInfo, setManagerBranchInfo] = useState(null); // 👈
+  const [allEmployees, setAllEmployees] = useState([]);
 
   useEffect(() => {
     const fetchManagerBranch = async () => {
@@ -92,20 +93,30 @@ export const EmployeeBrand = () => {
       if (brandRes?.data)
         setDataBrand(brandRes.data.map((item) => ({ ...item, key: item._id })));
 
-      if (employeeRes?.data) {
-        const employeesInBranch = employeeRes.data.filter(
+      if (employeeRes?.data && userRes?.data) {
+        const employees = employeeRes.data.filter(
           (emp) => emp.BranchID === managerBranchId
         );
-        setDataEmployee(
-          employeesInBranch.map((item) => ({ ...item, key: item._id }))
-        );
-      }
+        const employeeWithUser = employees.map((emp) => {
+          const matchedUser = userRes.data.find(
+            (u) => u._id === emp.UserID && u.role === "employee"
+          );
+          return {
+            ...emp,
+            user: matchedUser || null,
+            key: emp._id,
+          };
+        });
 
-      if (userRes?.data) {
-        const employees = userRes.data.filter(
-          (user) => user.role === "employee"
+        setDataEmployee(employeeWithUser);
+        const dataUserFiltered = userRes.data.filter(
+          (user) =>
+            user.role === "employee" &&
+            employees.some((emp) => emp.UserID === user._id)
         );
-        setDataUser(employees.map((item) => ({ ...item, key: item._id })));
+        setDataUser(
+          dataUserFiltered.map((item) => ({ ...item, key: item._id }))
+        );
       }
     } catch (error) {
       message.error("Lỗi khi tải dữ liệu!");
@@ -189,17 +200,15 @@ export const EmployeeBrand = () => {
       dataIndex: "UserID",
       key: "UserID",
       render: (text, record) => {
-        const user = dataUser.find((u) => u._id === record.UserID);
-        return user ? `${user.firstName} ${user.lastName}`  : "Chưa có nhân viên";
+        return record.user
+          ? `${record.user.firstName} ${record.user.lastName}`
+          : "Chưa có nhân viên";
       },
       filters: dataUser.map((user) => ({
         text: `${user.firstName} ${user.lastName}`,
         value: user._id,
-      })),  
-      onFilter: (value, record) => {
-        const user = dataUser.find((u) => u._id === record.UserID);
-        return user ? user._id === value : false;
-      },
+      })),
+      onFilter: (value, record) => record.UserID === value,
     },
     {
       title: "Vị trí",
@@ -311,23 +320,23 @@ export const EmployeeBrand = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            name="BranchID"
             label="Chi nhánh"
+            name="BranchID"
             initialValue={managerBranchId}
             rules={[{ required: true, message: "Vui lòng chọn chi nhánh" }]}
           >
-            <Select placeholder="Chọn chi nhánh" disabled>
-              {managerBranchInfo && (
-                <Option
-                  key={managerBranchInfo._id}
-                  value={managerBranchInfo._id}
-                >
-                  {managerBranchInfo.BranchName}
-                </Option>
-              )}
+            <Select disabled>
+              {managerBranchInfo &&
+                managerBranchInfo._id !== "683162e86f625225432dc93b" && (
+                  <Option
+                    key={managerBranchInfo._id}
+                    value={managerBranchInfo._id}
+                  >
+                    {managerBranchInfo.BranchName}
+                  </Option>
+                )}
             </Select>
           </Form.Item>
-
           <Form.Item
             name="UserID"
             label="Nhân viên"
@@ -336,15 +345,18 @@ export const EmployeeBrand = () => {
             <Select placeholder="Chọn nhân viên">
               {dataUser
                 .filter((user) => {
-                  const isEditing = !!editingEmployee;
-                  const isAssignedElsewhere = dataEmployee.some((emp) => {
-                    const isSameUser =
-                      emp.UserID === user._id || emp.UserID?._id === user._id;
-                    const isDifferentRecord =
-                      !isEditing || emp._id !== editingEmployee._id;
-                    return isSameUser && isDifferentRecord;
-                  });
-                  return !isAssignedElsewhere;
+                  const isAssigned = allEmployees.some(
+                    (emp) =>
+                      emp.UserID === user._id || emp.UserID?._id === user._id
+                  );
+
+                  if (editingEmployee) {
+                    const editingUserId =
+                      editingEmployee.UserID?._id || editingEmployee.UserID;
+                    return user._id === editingUserId || !isAssigned;
+                  }
+
+                  return !isAssigned;
                 })
                 .map((user) => (
                   <Option key={user._id} value={user._id}>

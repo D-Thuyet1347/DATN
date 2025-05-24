@@ -96,12 +96,6 @@ const Manager = () => {
         children: [
           { key: 'employee', label: 'Quản lý nhân viên' },
           { key: 'booking', label: 'Quản lý đặt lịch' },
-          { key: 'blog', label: 'Quản lý BLog' },
-          { key: 'service', label: 'Quản lý dịch vụ' },
-          { key: 'product', label: 'Quản lý sản phẩm' },
-          { key: 'order', label: 'Quản lý đơn hàng' },
-          { key: 'voucher', label: 'Quản lý voucher' },
-          { key: 'category', label: 'Quản lý danh mục' },
         ],
       });
     } else if (position === 'Quản lý dịch vụ') {

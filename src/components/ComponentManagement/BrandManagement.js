@@ -281,11 +281,10 @@ const BrandManagement = () => {
           <Form.Item
             name="Position"
             label="Vị trí"
-            rules={[{ required: true, message: "Vui lòng chọn vị trí" }]}
-          >
+            rules={[{ required: true, message: "Vui lòng chọn vị trí" }]}>
             <Select placeholder="Chọn vị trí">
               <Option value="Quản lý chi nhánh">Quản lý chi nhánh</Option>
-              {/* <Option value="Quản lý dịch vụ">Quản lý dịch vụ</Option> */}
+              <Option value="Quản lý dịch vụ">Quản lý dịch vụ</Option>
             </Select>
           </Form.Item>
           <Button

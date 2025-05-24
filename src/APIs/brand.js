@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// const API_BASE_URL = process.env.REACT_APP_API_KEY || "https://backend-fu3h.onrender.com/api";
 const API_BASE_URL = "http://localhost:4000/api"; 
 
 const branch = axios.create({

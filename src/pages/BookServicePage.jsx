@@ -710,7 +710,7 @@ const BookServicePage = () => {
                   >
                     {branches
                       .filter(
-                        (branch) => branch._id !== "680b4f376e58bda8dfa176e2"
+                        (branch) => branch._id !== "683162e86f625225432dc93b"
                       )
                       .map((branch) => (
                         <Option key={branch._id} value={branch._id}>

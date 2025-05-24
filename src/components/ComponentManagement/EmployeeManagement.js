@@ -130,7 +130,7 @@ export const EmployeeManagement = () => {
         return branch?.BranchName || "Chưa có chi nhánh";
       },
       filters: dataBrand
-        .filter((branch) => branch._id !== "680b4f376e58bda8dfa176e2")
+        .filter((branch) => branch._id !== "683162e86f625225432dc93b")
         .map((branch) => ({ text: branch.BranchName, value: branch._id })),
       onFilter: (value, record) => record.BranchID === value,
     },
@@ -261,7 +261,7 @@ export const EmployeeManagement = () => {
           >
             <Select placeholder="Chọn chi nhánh">
               {dataBrand
-                .filter((branch) => branch._id !== "680b4f376e58bda8dfa176e2")
+                .filter((branch) => branch._id !== "683162e86f625225432dc93b")
                 .map((branch) => (
                   <Option key={branch._id} value={branch._id}>
                     {branch.BranchName}
@@ -278,16 +278,22 @@ export const EmployeeManagement = () => {
             <Select placeholder="Chọn nhân viên">
               {dataUser
                 .filter((user) => {
-                  if (editingEmployee) return true;
-                  const alreadyAssigned = dataEmployee.some(
-                    (emp) => emp.UserID === user._id
+                  const isAssigned = dataEmployee.some(
+                    (emp) =>
+                      emp.UserID === user._id || emp.UserID?._id === user._id
                   );
-                  return !alreadyAssigned;
+
+                  if (editingEmployee) {
+                    const editingUserId =
+                      editingEmployee.UserID?._id || editingEmployee.UserID;
+                    return user._id === editingUserId || !isAssigned;
+                  }
+
+                  return !isAssigned;
                 })
                 .map((user) => (
                   <Option key={user._id} value={user._id}>
-                    {user.firstName}
-                    {" " + user.lastName}
+                    {user.firstName} {user.lastName}
                   </Option>
                 ))}
             </Select>
